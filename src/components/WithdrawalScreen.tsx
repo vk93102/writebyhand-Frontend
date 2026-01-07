@@ -1,0 +1,582 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+  Image,
+  Platform,
+  Linking,
+} from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
+import { getUserCoins, requestCoinWithdrawal } from '../services/api';
+
+interface WithdrawalScreenProps {
+  userId: string;
+  onClose: () => void;
+  onWithdrawalSuccess: () => void;
+}
+
+export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
+  userId,
+  onClose,
+  onWithdrawalSuccess,
+}) => {
+  const [userCoins, setUserCoins] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // Simple form states
+  const [coinsAmount, setCoinsAmount] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  // Payout details
+  const [payoutMethod, setPayoutMethod] = useState<'upi' | 'bank'>('upi');
+  const [accountHolderName, setAccountHolderName] = useState('');
+  const [upiId, setUpiId] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [ifscCode, setIfscCode] = useState('');
+
+  useEffect(() => {
+    if (userId) {
+      loadUserCoins();
+    }
+  }, [userId]);
+
+  // Removed Razorpay key loading (payouts are processed server-side)
+
+  const loadUserCoins = async () => {
+    try {
+      const data = await getUserCoins(userId);
+      console.log('Loaded user coins:', data);
+      setUserCoins(data.total_coins || 0);
+    } catch (error: any) {
+      console.error('Failed to load coins:', error);
+    }
+  };
+
+  const handleRequestWithdrawal = async () => {
+    try {
+      // Clear previous errors
+      setErrorMessage('');
+      
+      // Trim input
+      const coinsInput = coinsAmount.trim();
+      const emailInput = userEmail.trim();
+      
+      // Optional email validation (used for contact purposes)
+      if (emailInput) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(emailInput)) {
+          const msg = 'Please enter a valid email address';
+          setErrorMessage(msg);
+          Alert.alert('Invalid Email', msg);
+          return;
+        }
+      }
+      
+      // Validate coins amount
+      if (!coinsInput) {
+        setErrorMessage('Please enter the number of coins to withdraw');
+        Alert.alert('Required Field', 'Please enter the number of coins to withdraw');
+        return;
+      }
+
+      const coins = parseInt(coinsInput);
+      if (isNaN(coins) || coins <= 0) {
+        const msg = 'Please enter a valid number of coins';
+        setErrorMessage(msg);
+        Alert.alert('Invalid Amount', msg);
+        return;
+      }
+
+      if (coins < 100) {
+        const msg = 'Minimum withdrawal is 100 coins (₹10)';
+        setErrorMessage(msg);
+        Alert.alert('Minimum Withdrawal', msg);
+        return;
+      }
+
+      if (coins > userCoins) {
+        const msg = `Insufficient balance. You have ${userCoins} coins`;
+        setErrorMessage(msg);
+        Alert.alert('Insufficient Balance', `You only have ${userCoins} coins available. Please enter a lower amount.`);
+        return;
+      }
+      // Validate payout details
+      if (!accountHolderName.trim()) {
+        const msg = 'Account holder name is required';
+        setErrorMessage(msg);
+        Alert.alert('Required Field', msg);
+        return;
+      }
+
+      if (payoutMethod === 'upi') {
+        if (!upiId.trim()) {
+          const msg = 'UPI ID is required for UPI payout';
+          setErrorMessage(msg);
+          Alert.alert('Required Field', msg);
+          return;
+        }
+      } else if (payoutMethod === 'bank') {
+        if (!accountNumber.trim() || !ifscCode.trim()) {
+          const msg = 'Account number and IFSC code are required for bank transfer';
+          setErrorMessage(msg);
+          Alert.alert('Required Field', msg);
+          return;
+        }
+      }
+
+      // Submit withdrawal request to backend (server will process payout)
+      setLoading(true);
+      const response = await requestCoinWithdrawal(
+        userId,
+        coins,
+        payoutMethod,
+        accountHolderName.trim(),
+        payoutMethod === 'upi' ? upiId.trim() : undefined,
+        payoutMethod === 'bank' ? accountNumber.trim() : undefined,
+        payoutMethod === 'bank' ? ifscCode.trim() : undefined
+      );
+
+      if (!response?.success) {
+        throw new Error(response?.error || 'Failed to submit withdrawal request');
+      }
+
+      Alert.alert(
+        '✅ Withdrawal Auto-Approved!',
+        `Your withdrawal has been automatically approved and is now processing!\n\n💰 Amount: ₹${(coins / 10).toFixed(2)}\n🪙 Coins Deducted: ${coins}\n📊 New Balance: ${response.remaining_balance} coins\n\n⚡ Status: Processing\n⏱️ Expected: 1-3 business days\n\n✨ No manual approval needed - your payout is on its way!`,
+        [
+          {
+            text: 'Great!',
+            onPress: () => {
+              setCoinsAmount('');
+              setUserEmail('');
+              setAccountHolderName('');
+              setUpiId('');
+              setAccountNumber('');
+              setIfscCode('');
+              loadUserCoins();
+              onWithdrawalSuccess();
+            },
+          },
+        ]
+      );
+      setLoading(false);
+      
+    } catch (error: any) {
+      let errMsg = 'Failed to process withdrawal';
+      if (error.message) {
+        errMsg = error.message;
+      }
+      setErrorMessage(errMsg);
+      Alert.alert('Error', errMsg);
+      setLoading(false);
+    }
+  };
+  // Removed Razorpay checkout flow. Payouts are created and processed by backend.
+
+  const calculateRupees = () => {
+    const coins = parseInt(coinsAmount);
+    if (isNaN(coins)) return '0.00';
+    return (coins / 10).toFixed(2);
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <MaterialIcons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Image source={require('../../assets/coins.png')} style={styles.headerImage} />
+          <Text style={styles.headerTitle}>Withdraw Coins</Text>
+        </View>
+      </View>
+
+      {/* Coin Balance Card */}
+      <View style={styles.balanceCard}>
+        <View style={styles.balanceRow}>
+          <MaterialIcons name="account-balance-wallet" size={32} color={colors.primary} />
+          <View style={styles.balanceInfo}>
+            <Text style={styles.balanceLabel}>Available Balance</Text>
+            <Text style={styles.balanceAmount}>{userCoins} Coins</Text>
+            <Text style={styles.balanceRupees}>≈ ₹{(userCoins / 10).toFixed(2)}</Text>
+          </View>
+        </View>
+        <View style={styles.conversionInfo}>
+          <MaterialIcons name="info-outline" size={16} color={colors.textMuted} />
+          <Text style={styles.conversionText}>10 Coins = ₹1</Text>
+        </View>
+      </View>
+
+      {/* Withdrawal Form */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Withdrawal Details</Text>
+
+        {/* Error Message Display */}
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <MaterialIcons name="error" size={20} color={colors.error} />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+
+        {/* Account Holder Name */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Account Holder Name</Text>
+          <TextInput
+            style={[styles.input, errorMessage && !accountHolderName.trim() ? styles.inputError : null]}
+            placeholder="Full name"
+            placeholderTextColor={colors.textMuted}
+            value={accountHolderName}
+            onChangeText={(val) => {
+              setAccountHolderName(val);
+              setErrorMessage('');
+            }}
+          />
+        </View>
+
+        {/* Coins Amount */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Coins to Withdraw (Min: 100)</Text>
+          <TextInput
+            style={[styles.input, errorMessage && !coinsAmount.trim() ? styles.inputError : null]}
+            placeholder="Enter coins amount"
+            placeholderTextColor={colors.textMuted}
+            keyboardType="numeric"
+            value={coinsAmount}
+            onChangeText={(val) => {
+              setCoinsAmount(val);
+              setErrorMessage('');
+            }}
+          />
+          {coinsAmount && (
+            <Text style={styles.conversionHint}>= ₹{calculateRupees()}</Text>
+          )}
+        </View>
+
+        {/* Payout Method */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Payout Method</Text>
+          <View style={{ flexDirection: 'row', gap: spacing.md }}>
+            <TouchableOpacity
+              style={[styles.methodButton, payoutMethod === 'upi' ? styles.methodButtonActive : null]}
+              onPress={() => setPayoutMethod('upi')}
+            >
+              <MaterialIcons name="payments" size={18} color={payoutMethod === 'upi' ? colors.white : colors.text} />
+              <Text style={[styles.methodButtonText, payoutMethod === 'upi' ? { color: colors.white } : null]}>UPI</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.methodButton, payoutMethod === 'bank' ? styles.methodButtonActive : null]}
+              onPress={() => setPayoutMethod('bank')}
+            >
+              <MaterialIcons name="account-balance" size={18} color={payoutMethod === 'bank' ? colors.white : colors.text} />
+              <Text style={[styles.methodButtonText, payoutMethod === 'bank' ? { color: colors.white } : null]}>Bank Transfer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* UPI Details */}
+        {payoutMethod === 'upi' && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>UPI ID</Text>
+            <TextInput
+              style={[styles.input, errorMessage && !upiId.trim() ? styles.inputError : null]}
+              placeholder="yourupi@bank"
+              placeholderTextColor={colors.textMuted}
+              autoCapitalize="none"
+              value={upiId}
+              onChangeText={(val) => {
+                setUpiId(val);
+                setErrorMessage('');
+              }}
+            />
+          </View>
+        )}
+
+        {/* Bank Details */}
+        {payoutMethod === 'bank' && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Bank Account Number</Text>
+            <TextInput
+              style={[styles.input, errorMessage && !accountNumber.trim() ? styles.inputError : null]}
+              placeholder="Account number"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="numeric"
+              autoCapitalize="none"
+              value={accountNumber}
+              onChangeText={(val) => {
+                setAccountNumber(val);
+                setErrorMessage('');
+              }}
+            />
+            <Text style={[styles.inputLabel, { marginTop: spacing.sm }]}>IFSC Code</Text>
+            <TextInput
+              style={[styles.input, errorMessage && !ifscCode.trim() ? styles.inputError : null]}
+              placeholder="IFSC code"
+              placeholderTextColor={colors.textMuted}
+              autoCapitalize="characters"
+              value={ifscCode}
+              onChangeText={(val) => {
+                setIfscCode(val);
+                setErrorMessage('');
+              }}
+            />
+          </View>
+        )}
+
+        {/* Payout Info */}
+        <View style={styles.paymentInfo}>
+          <MaterialIcons name="info" size={20} color={colors.primary} />
+          <Text style={styles.paymentInfoText}>
+            Submit your withdrawal request. Our backend will process a payout to your UPI or bank account. Processing may take 1-3 business days.
+          </Text>
+        </View>
+
+        {/* Request Withdrawal Button */}
+        <TouchableOpacity
+          style={[styles.payButton, loading && styles.payButtonDisabled]}
+          onPress={handleRequestWithdrawal}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <>
+              <MaterialIcons name="send" size={20} color={colors.white} />
+              <Text style={styles.payButtonText}>⚡ Withdraw Now (Auto-Approved)</Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+        <Text style={styles.processingNote}>
+          * Payouts are processed securely via Razorpay (server-side)
+        </Text>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.lg,
+    backgroundColor: colors.white,
+    ...shadows.sm,
+  },
+  closeButton: {
+    padding: spacing.sm,
+    marginRight: spacing.md,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  headerImage: {
+    width: 40,
+    height: 40,
+    marginRight: spacing.md,
+  },
+  headerTitle: {
+    ...typography.h2,
+    color: colors.text,
+  },
+  balanceCard: {
+    backgroundColor: colors.white,
+    margin: spacing.lg,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.md,
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  balanceInfo: {
+    marginLeft: spacing.md,
+    flex: 1,
+  },
+  balanceLabel: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  balanceAmount: {
+    ...typography.h1,
+    color: colors.text,
+    marginTop: spacing.xs,
+  },
+  balanceRupees: {
+    ...typography.body,
+    color: colors.primary,
+    marginTop: spacing.xs,
+  },
+  conversionInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+  },
+  conversionText: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginLeft: spacing.xs,
+  },
+  section: {
+    backgroundColor: colors.white,
+    margin: spacing.lg,
+    marginTop: 0,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.sm,
+  },
+  sectionTitle: {
+    ...typography.h3,
+    color: colors.text,
+    marginBottom: spacing.md,
+  },
+  inputGroup: {
+    marginBottom: spacing.lg,
+  },
+  inputLabel: {
+    ...typography.body,
+    color: colors.text,
+    marginBottom: spacing.sm,
+    fontWeight: '600',
+  },
+  input: {
+    ...typography.body,
+    backgroundColor: colors.background,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    color: colors.text,
+  },
+  methodButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  methodButtonActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  methodButtonText: {
+    ...typography.body,
+    color: colors.text,
+    fontWeight: '600',
+  },
+  conversionHint: {
+    ...typography.caption,
+    color: colors.primary,
+    marginTop: spacing.xs,
+    fontWeight: '600',
+  },
+  paymentInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: colors.backgroundLight,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  paymentInfoText: {
+    ...typography.caption,
+    color: colors.text,
+    flex: 1,
+    lineHeight: 18,
+  },
+  payButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.success,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginTop: spacing.md,
+    ...shadows.sm,
+  },
+  payButtonDisabled: {
+    opacity: 0.6,
+  },
+  payButtonText: {
+    ...typography.body,
+    color: colors.white,
+    fontWeight: '600',
+    marginLeft: spacing.sm,
+  },
+  processingNote: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.md,
+    fontStyle: 'italic',
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.errorLight,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.error,
+  },
+  errorText: {
+    ...typography.body,
+    color: colors.error,
+    marginLeft: spacing.sm,
+    flex: 1,
+    fontWeight: '600',
+  },
+  inputError: {
+    borderColor: colors.error,
+    borderWidth: 2,
+  },
+  autoApprovalBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#D1FAE5',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#10B981',
+    gap: 8,
+  },
+  autoApprovalText: {
+    flex: 1,
+  },
+  autoApprovalTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#065F46',
+    marginBottom: 2,
+  },
+  autoApprovalSubtitle: {
+    fontSize: 12,
+    color: '#047857',
+    lineHeight: 16,
+  },
+});

@@ -1,0 +1,1902 @@
+[
+  {
+    "id": 1,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "05 May 2024",
+    "session": "Morning",
+    "topic": "Cell Biology",
+    "difficulty": "Easy",
+    "question": "Which of the following is not a function of the Golgi apparatus?",
+    "options": {
+      "A": "Glycosylation of proteins",
+      "B": "Formation of lysosomes",
+      "C": "Synthesis of lipids",
+      "D": "Packaging of materials"
+    },
+    "correct_answer": "C",
+    "solution": "The Golgi apparatus is involved in modification, packaging, and secretion of proteins. Synthesis of lipids occurs in the smooth endoplasmic reticulum, not in the Golgi apparatus.",
+    "marks": 4
+  },
+  {
+    "id": 2,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "05 May 2024",
+    "session": "Morning",
+    "topic": "Genetics",
+    "difficulty": "Medium",
+    "question": "In a dihybrid cross between two heterozygous individuals (AaBb × AaBb), what is the phenotypic ratio in F2 generation?",
+    "options": {
+      "A": "3:1",
+      "B": "1:2:1",
+      "C": "9:3:3:1",
+      "D": "1:1:1:1"
+    },
+    "correct_answer": "C",
+    "solution": "In a dihybrid cross between two heterozygous individuals, the phenotypic ratio following Mendel's law of independent assortment is 9:3:3:1, where 9 shows both dominant traits, 3:3 show one dominant and one recessive trait each, and 1 shows both recessive traits.",
+    "marks": 4
+  },
+  {
+    "id": 3,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "05 May 2024",
+    "session": "Afternoon",
+    "topic": "Plant Physiology",
+    "difficulty": "Easy",
+    "question": "Which pigment is responsible for the red and blue colors in flowers?",
+    "options": {
+      "A": "Chlorophyll",
+      "B": "Carotenoids",
+      "C": "Anthocyanins",
+      "D": "Xanthophylls"
+    },
+    "correct_answer": "C",
+    "solution": "Anthocyanins are water-soluble pigments responsible for red, purple, and blue colors in flowers, fruits, and leaves. They belong to the flavonoid group of compounds.",
+    "marks": 4
+  },
+  {
+    "id": 4,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "06 May 2024",
+    "session": "Morning",
+    "topic": "Human Physiology",
+    "difficulty": "Medium",
+    "question": "The sino-atrial node (SA node) is located in which chamber of the heart?",
+    "options": {
+      "A": "Left atrium",
+      "B": "Right atrium",
+      "C": "Left ventricle",
+      "D": "Right ventricle"
+    },
+    "correct_answer": "B",
+    "solution": "The sino-atrial (SA) node, also called the pacemaker of the heart, is located in the upper wall of the right atrium near the opening of the superior vena cava. It initiates the cardiac impulse.",
+    "marks": 4
+  },
+  {
+    "id": 5,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "06 May 2024",
+    "session": "Afternoon",
+    "topic": "Ecology",
+    "difficulty": "Easy",
+    "question": "The pyramid of energy in an ecosystem is always:",
+    "options": {
+      "A": "Upright",
+      "B": "Inverted",
+      "C": "Spindle-shaped",
+      "D": "Irregular"
+    },
+    "correct_answer": "A",
+    "solution": "The pyramid of energy is always upright because energy decreases at successive trophic levels due to loss as heat during respiration and metabolism. Only about 10% of energy is transferred to the next trophic level.",
+    "marks": 4
+  },
+  {
+    "id": 6,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "07 May 2024",
+    "session": "Morning",
+    "topic": "Molecular Biology",
+    "difficulty": "Hard",
+    "question": "In the lac operon, which molecule acts as an inducer?",
+    "options": {
+      "A": "Glucose",
+      "B": "Lactose",
+      "C": "Allolactose",
+      "D": "Galactose"
+    },
+    "correct_answer": "C",
+    "solution": "Allolactose, a metabolite of lactose, acts as the actual inducer of the lac operon. It binds to the repressor protein, causing it to release from the operator region, thereby allowing transcription of the lac genes.",
+    "marks": 4
+  },
+  {
+    "id": 7,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "07 May 2024",
+    "session": "Afternoon",
+    "topic": "Reproduction",
+    "difficulty": "Medium",
+    "question": "Which hormone is responsible for the release of the ovum from the Graafian follicle?",
+    "options": {
+      "A": "FSH",
+      "B": "LH",
+      "C": "Progesterone",
+      "D": "Estrogen"
+    },
+    "correct_answer": "B",
+    "solution": "Luteinizing hormone (LH) surge triggers ovulation, causing the rupture of the Graafian follicle and release of the secondary oocyte. This typically occurs around day 14 of the menstrual cycle.",
+    "marks": 4
+  },
+  {
+    "id": 8,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "08 May 2024",
+    "session": "Morning",
+    "topic": "Evolution",
+    "difficulty": "Easy",
+    "question": "Who proposed the theory of natural selection?",
+    "options": {
+      "A": "Lamarck",
+      "B": "Hugo de Vries",
+      "C": "Charles Darwin",
+      "D": "Oparin"
+    },
+    "correct_answer": "C",
+    "solution": "Charles Darwin proposed the theory of natural selection in his book 'On the Origin of Species' (1859). The theory states that organisms with favorable variations are more likely to survive and reproduce.",
+    "marks": 4
+  },
+  {
+    "id": 9,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "08 May 2024",
+    "session": "Afternoon",
+    "topic": "Biomolecules",
+    "difficulty": "Medium",
+    "question": "Which of the following is a non-reducing sugar?",
+    "options": {
+      "A": "Glucose",
+      "B": "Fructose",
+      "C": "Maltose",
+      "D": "Sucrose"
+    },
+    "correct_answer": "D",
+    "solution": "Sucrose is a non-reducing sugar because the reducing groups of both glucose and fructose are involved in glycosidic bond formation. Therefore, it cannot reduce Benedict's or Fehling's reagent.",
+    "marks": 4
+  },
+  {
+    "id": 10,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "09 May 2024",
+    "session": "Morning",
+    "topic": "Plant Anatomy",
+    "difficulty": "Easy",
+    "question": "Casparian strips are found in which part of the root?",
+    "options": {
+      "A": "Epidermis",
+      "B": "Cortex",
+      "C": "Endodermis",
+      "D": "Pericycle"
+    },
+    "correct_answer": "C",
+    "solution": "Casparian strips are bands of suberin present in the radial and transverse walls of endodermal cells. They prevent the apoplastic movement of water and force it to pass through the cell membrane.",
+    "marks": 4
+  },
+  {
+    "id": 11,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "09 May 2024",
+    "session": "Afternoon",
+    "topic": "Biotechnology",
+    "difficulty": "Hard",
+    "question": "Which enzyme is used to join DNA fragments in recombinant DNA technology?",
+    "options": {
+      "A": "DNA polymerase",
+      "B": "Restriction endonuclease",
+      "C": "DNA ligase",
+      "D": "Helicase"
+    },
+    "correct_answer": "C",
+    "solution": "DNA ligase is the enzyme that catalyzes the formation of phosphodiester bonds between adjacent nucleotides, effectively joining DNA fragments together. It is essential in creating recombinant DNA molecules.",
+    "marks": 4
+  },
+  {
+    "id": 12,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "10 May 2024",
+    "session": "Morning",
+    "topic": "Human Health and Disease",
+    "difficulty": "Medium",
+    "question": "Typhoid fever is caused by which bacterium?",
+    "options": {
+      "A": "Vibrio cholerae",
+      "B": "Salmonella typhi",
+      "C": "Streptococcus pneumoniae",
+      "D": "Mycobacterium tuberculosis"
+    },
+    "correct_answer": "B",
+    "solution": "Typhoid fever is caused by the bacterium Salmonella typhi. It is transmitted through contaminated food and water. Symptoms include sustained high fever, weakness, stomach pain, and headache.",
+    "marks": 4
+  },
+  {
+    "id": 13,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "10 May 2024",
+    "session": "Afternoon",
+    "topic": "Animal Kingdom",
+    "difficulty": "Easy",
+    "question": "Which phylum is characterized by the presence of a notochord?",
+    "options": {
+      "A": "Mollusca",
+      "B": "Arthropoda",
+      "C": "Chordata",
+      "D": "Echinodermata"
+    },
+    "correct_answer": "C",
+    "solution": "Phylum Chordata is characterized by the presence of a notochord at some stage of their life cycle. Other characteristic features include a dorsal hollow nerve cord, pharyngeal gill slits, and a post-anal tail.",
+    "marks": 4
+  },
+  {
+    "id": 14,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "11 May 2024",
+    "session": "Morning",
+    "topic": "Photosynthesis",
+    "difficulty": "Medium",
+    "question": "In C4 plants, the primary CO2 acceptor is:",
+    "options": {
+      "A": "RuBP",
+      "B": "PEP",
+      "C": "PGA",
+      "D": "OAA"
+    },
+    "correct_answer": "B",
+    "solution": "In C4 plants, phosphoenolpyruvate (PEP) is the primary CO2 acceptor. The enzyme PEP carboxylase catalyzes the fixation of CO2 to PEP, forming oxaloacetic acid (OAA), a 4-carbon compound.",
+    "marks": 4
+  },
+  {
+    "id": 15,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "11 May 2024",
+    "session": "Afternoon",
+    "topic": "Respiration",
+    "difficulty": "Hard",
+    "question": "How many ATP molecules are produced from the complete oxidation of one glucose molecule in aerobic respiration?",
+    "options": {
+      "A": "2",
+      "B": "36-38",
+      "C": "30",
+      "D": "24"
+    },
+    "correct_answer": "B",
+    "solution": "Complete aerobic oxidation of one glucose molecule yields approximately 36-38 ATP molecules. This includes glycolysis (2 ATP + 2 NADH), Krebs cycle (2 ATP + 6 NADH + 2 FADH2), and oxidative phosphorylation in the electron transport chain.",
+    "marks": 4
+  },
+  {
+    "id": 16,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "12 May 2024",
+    "session": "Morning",
+    "topic": "Biodiversity",
+    "difficulty": "Easy",
+    "question": "Which of the following is a biodiversity hotspot in India?",
+    "options": {
+      "A": "Thar Desert",
+      "B": "Western Ghats",
+      "C": "Indo-Gangetic Plains",
+      "D": "Deccan Plateau"
+    },
+    "correct_answer": "B",
+    "solution": "The Western Ghats is one of the four biodiversity hotspots in India. Others include the Eastern Himalayas, Indo-Burma region, and Sundaland. These areas have high endemic species diversity.",
+    "marks": 4
+  },
+  {
+    "id": 17,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "12 May 2024",
+    "session": "Afternoon",
+    "topic": "Neural Control",
+    "difficulty": "Medium",
+    "question": "Which neurotransmitter is associated with Parkinson's disease?",
+    "options": {
+      "A": "Acetylcholine",
+      "B": "Dopamine",
+      "C": "Serotonin",
+      "D": "GABA"
+    },
+    "correct_answer": "B",
+    "solution": "Parkinson's disease is associated with degeneration of dopamine-producing neurons in the substantia nigra region of the brain. This leads to reduced dopamine levels, causing movement disorders.",
+    "marks": 4
+  },
+  {
+    "id": 18,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "13 May 2024",
+    "session": "Morning",
+    "topic": "Plant Kingdom",
+    "difficulty": "Easy",
+    "question": "Gymnosperms are characterized by:",
+    "options": {
+      "A": "Covered seeds",
+      "B": "Naked seeds",
+      "C": "Presence of flowers",
+      "D": "Double fertilization"
+    },
+    "correct_answer": "B",
+    "solution": "Gymnosperms have naked seeds, meaning their seeds are not enclosed within a fruit. The term 'gymnosperm' means 'naked seeds'. Examples include Pinus, Cycas, and Ginkgo.",
+    "marks": 4
+  },
+  {
+    "id": 19,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "13 May 2024",
+    "session": "Afternoon",
+    "topic": "Immune System",
+    "difficulty": "Hard",
+    "question": "Which cells are primarily responsible for cell-mediated immunity?",
+    "options": {
+      "A": "B lymphocytes",
+      "B": "T lymphocytes",
+      "C": "Plasma cells",
+      "D": "Basophils"
+    },
+    "correct_answer": "B",
+    "solution": "T lymphocytes (T cells) are primarily responsible for cell-mediated immunity. They directly attack infected cells, cancer cells, and foreign tissues. They also help regulate the immune response.",
+    "marks": 4
+  },
+  {
+    "id": 20,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "14 May 2024",
+    "session": "Morning",
+    "topic": "Endocrine System",
+    "difficulty": "Medium",
+    "question": "Which hormone regulates blood calcium levels?",
+    "options": {
+      "A": "Insulin",
+      "B": "Thyroxine",
+      "C": "Parathormone",
+      "D": "Cortisol"
+    },
+    "correct_answer": "C",
+    "solution": "Parathormone (PTH), secreted by the parathyroid glands, regulates blood calcium levels. It increases blood calcium by promoting calcium release from bones, calcium absorption in the intestine, and calcium reabsorption in kidneys.",
+    "marks": 4
+  },
+  {
+    "id": 21,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "14 May 2024",
+    "session": "Afternoon",
+    "topic": "DNA Replication",
+    "difficulty": "Hard",
+    "question": "Which enzyme removes RNA primers during DNA replication in prokaryotes?",
+    "options": {
+      "A": "DNA polymerase I",
+      "B": "DNA polymerase III",
+      "C": "Primase",
+      "D": "Helicase"
+    },
+    "correct_answer": "A",
+    "solution": "DNA polymerase I has 5' to 3' exonuclease activity that removes RNA primers and fills the gaps with DNA nucleotides. DNA polymerase III is the main replicating enzyme, while primase synthesizes RNA primers.",
+    "marks": 4
+  },
+  {
+    "id": 22,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "15 May 2024",
+    "session": "Morning",
+    "topic": "Digestion",
+    "difficulty": "Easy",
+    "question": "Which enzyme initiates protein digestion in the stomach?",
+    "options": {
+      "A": "Trypsin",
+      "B": "Pepsin",
+      "C": "Chymotrypsin",
+      "D": "Amylase"
+    },
+    "correct_answer": "B",
+    "solution": "Pepsin is the proteolytic enzyme secreted by gastric glands in the stomach. It is secreted as inactive pepsinogen and activated by HCl. It breaks down proteins into peptones and proteoses.",
+    "marks": 4
+  },
+  {
+    "id": 23,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "15 May 2024",
+    "session": "Afternoon",
+    "topic": "Excretion",
+    "difficulty": "Medium",
+    "question": "The functional unit of the kidney is:",
+    "options": {
+      "A": "Neuron",
+      "B": "Nephron",
+      "C": "Alveolus",
+      "D": "Villus"
+    },
+    "correct_answer": "B",
+    "solution": "The nephron is the functional unit of the kidney. Each kidney contains about one million nephrons. It consists of a glomerulus, Bowman's capsule, and renal tubules that filter blood and form urine.",
+    "marks": 4
+  },
+  {
+    "id": 24,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "16 May 2024",
+    "session": "Morning",
+    "topic": "Chromosomal Disorders",
+    "difficulty": "Medium",
+    "question": "Down syndrome is caused by trisomy of which chromosome?",
+    "options": {
+      "A": "Chromosome 13",
+      "B": "Chromosome 18",
+      "C": "Chromosome 21",
+      "D": "Chromosome X"
+    },
+    "correct_answer": "C",
+    "solution": "Down syndrome is caused by trisomy of chromosome 21, meaning there are three copies of chromosome 21 instead of two. It results in characteristic physical features and intellectual disability.",
+    "marks": 4
+  },
+  {
+    "id": 25,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "16 May 2024",
+    "session": "Afternoon",
+    "topic": "Microbes",
+    "difficulty": "Easy",
+    "question": "Which microorganism is used in the production of antibiotics like penicillin?",
+    "options": {
+      "A": "Lactobacillus",
+      "B": "Penicillium",
+      "C": "Rhizobium",
+      "D": "Azotobacter"
+    },
+    "correct_answer": "B",
+    "solution": "Penicillium notatum and Penicillium chrysogenum are fungi used in the production of the antibiotic penicillin. Alexander Fleming discovered penicillin from Penicillium notatum in 1928.",
+    "marks": 4
+  },
+  {
+    "id": 26,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "17 May 2024",
+    "session": "Morning",
+    "topic": "Transport in Plants",
+    "difficulty": "Medium",
+    "question": "According to the cohesion-tension theory, water moves up the xylem due to:",
+    "options": {
+      "A": "Root pressure",
+      "B": "Capillarity",
+      "C": "Transpiration pull",
+      "D": "Osmosis"
+    },
+    "correct_answer": "C",
+    "solution": "The cohesion-tension theory states that transpiration creates a negative pressure (tension) in leaves, which pulls water upward through the xylem. Cohesion between water molecules maintains the continuous water column.",
+    "marks": 4
+  },
+  {
+    "id": 27,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "17 May 2024",
+    "session": "Afternoon",
+    "topic": "Mineral Nutrition",
+    "difficulty": "Hard",
+    "question": "Which element is a constituent of chlorophyll?",
+    "options": {
+      "A": "Iron",
+      "B": "Magnesium",
+      "C": "Manganese",
+      "D": "Molybdenum"
+    },
+    "correct_answer": "B",
+    "solution": "Magnesium is a central element in the chlorophyll molecule. It is bound to four nitrogen atoms in the porphyrin ring of chlorophyll. Deficiency of magnesium causes chlorosis.",
+    "marks": 4
+  },
+  {
+    "id": 28,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "18 May 2024",
+    "session": "Morning",
+    "topic": "Reproduction in Flowering Plants",
+    "difficulty": "Easy",
+    "question": "What is the ploidy of endosperm in angiosperms?",
+    "options": {
+      "A": "Haploid",
+      "B": "Diploid",
+      "C": "Triploid",
+      "D": "Tetraploid"
+    },
+    "correct_answer": "C",
+    "solution": "In angiosperms, endosperm is triploid (3n) as it is formed by the fusion of one male gamete (n) with two polar nuclei (n+n) during double fertilization. It provides nutrition to the developing embryo.",
+    "marks": 4
+  },
+  {
+    "id": 29,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "18 May 2024",
+    "session": "Afternoon",
+    "topic": "Human Reproduction",
+    "difficulty": "Medium",
+    "question": "Implantation of the embryo occurs in which part of the female reproductive system?",
+    "options": {
+      "A": "Ovary",
+      "B": "Fallopian tube",
+      "C": "Uterus",
+      "D": "Cervix"
+    },
+    "correct_answer": "C",
+    "solution": "Implantation of the blastocyst occurs in the endometrium of the uterus, typically about 6-7 days after fertilization. The endometrium is prepared by progesterone to receive the embryo.",
+    "marks": 4
+  },
+  {
+    "id": 30,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "19 May 2024",
+    "session": "Morning",
+    "topic": "Population Ecology",
+    "difficulty": "Medium",
+    "question": "The logistic growth curve is represented by which shape?",
+    "options": {
+      "A": "J-shaped",
+      "B": "S-shaped",
+      "C": "Linear",
+      "D": "Exponential"
+    },
+    "correct_answer": "B",
+    "solution": "The logistic growth curve is S-shaped (sigmoid). Initially, population grows slowly (lag phase), then rapidly (exponential phase), and finally stabilizes at carrying capacity (stationary phase) due to limiting resources.",
+    "marks": 4
+  },
+  {
+    "id": 31,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "19 May 2024",
+    "session": "Afternoon",
+    "topic": "Environmental Issues",
+    "difficulty": "Easy",
+    "question": "Which gas is primarily responsible for the greenhouse effect?",
+    "options": {
+      "A": "Oxygen",
+      "B": "Nitrogen",
+      "C": "Carbon dioxide",
+      "D": "Hydrogen"
+    },
+    "correct_answer": "C",
+    "solution": "Carbon dioxide (CO2) is the primary greenhouse gas responsible for global warming. Other greenhouse gases include methane (CH4), nitrous oxide (N2O), and chlorofluorocarbons (CFCs).",
+    "marks": 4
+  },
+  {
+    "id": 32,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "20 May 2024",
+    "session": "Morning",
+    "topic": "Tissue",
+    "difficulty": "Easy",
+    "question": "Which type of epithelium lines the inner surface of blood vessels?",
+    "options": {
+      "A": "Squamous epithelium",
+      "B": "Cuboidal epithelium",
+      "C": "Columnar epithelium",
+      "D": "Stratified epithelium"
+    },
+    "correct_answer": "A",
+    "solution": "Simple squamous epithelium, also called endothelium, lines the inner surface of blood vessels and heart. It allows for easy exchange of materials and reduces friction for blood flow.",
+    "marks": 4
+  },
+  {
+    "id": 33,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "20 May 2024",
+    "session": "Afternoon",
+    "topic": "Evolutionary Biology",
+    "difficulty": "Hard",
+    "question": "Which is the correct sequence of human evolution?",
+    "options": {
+      "A": "Australopithecus → Homo habilis → Homo erectus → Homo sapiens",
+      "B": "Homo erectus → Australopithecus → Homo habilis → Homo sapiens",
+      "C": "Homo habilis → Australopithecus → Homo sapiens → Homo erectus",
+      "D": "Australopithecus → Homo erectus → Homo habilis → Homo sapiens"
+    },
+    "correct_answer": "A",
+    "solution": "The correct sequence of human evolution is Australopithecus (earliest) → Homo habilis (tool maker) → Homo erectus (upright man) → Homo sapiens (modern man). This represents increasing brain size and tool use complexity.",
+    "marks": 4
+  },
+  {
+    "id": 34,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "21 May 2024",
+    "session": "Morning",
+    "topic": "Locomotion",
+    "difficulty": "Medium",
+    "question": "Which protein is present in the thin filament of a muscle fiber?",
+    "options": {
+      "A": "Myosin",
+      "B": "Actin",
+      "C": "Troponin",
+      "D": "Both B and C"
+    },
+    "correct_answer": "D",
+    "solution": "Thin filaments in muscle fibers contain actin (main structural protein), tropomyosin, and troponin (regulatory proteins). Thick filaments are composed of myosin protein.",
+    "marks": 4
+  },
+  {
+    "id": 35,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "21 May 2024",
+    "session": "Afternoon",
+    "topic": "Blood Circulation",
+    "difficulty": "Easy",
+    "question": "Which blood cells are responsible for blood clotting?",
+    "options": {
+      "A": "RBCs",
+      "B": "WBCs",
+      "C": "Platelets",
+      "D": "Lymphocytes"
+    },
+    "correct_answer": "C",
+    "solution": "Platelets (thrombocytes) are responsible for blood clotting. They release clotting factors and form a plug at the site of injury. Normal platelet count is 150,000-400,000 per microliter of blood.",
+    "marks": 4
+  },
+  {
+    "id": 36,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "22 May 2024",
+    "session": "Morning",
+    "topic": "Breathing",
+    "difficulty": "Medium",
+    "question": "The respiratory center in the brain is located in the:",
+    "options": {
+      "A": "Cerebrum",
+      "B": "Cerebellum",
+      "C": "Medulla oblongata",
+      "D": "Hypothalamus"
+    },
+    "correct_answer": "C",
+    "solution": "The respiratory center is located in the medulla oblongata and pons of the brainstem. It regulates the rate and depth of breathing by controlling the respiratory muscles.",
+    "marks": 4
+    },
+  {
+    "id": 37,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "22 May 2024",
+    "session": "Afternoon",
+    "topic": "Body Fluids",
+    "difficulty": "Hard",
+    "question": "What is the pH of normal human blood?",
+    "options": {
+      "A": "6.8-7.0",
+      "B": "7.0-7.2",
+      "C": "7.35-7.45",
+      "D": "7.6-7.8"
+    },
+    "correct_answer": "C",
+    "solution": "Normal human blood pH is maintained between 7.35-7.45, making it slightly alkaline. This pH is maintained by buffer systems including bicarbonate, phosphate, and protein buffers. Deviation from this range can be life-threatening.",
+    "marks": 4
+  },
+  {
+    "id": 38,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "23 May 2024",
+    "session": "Morning",
+    "topic": "Principles of Inheritance",
+    "difficulty": "Medium",
+    "question": "A color blind man marries a normal woman whose father was color blind. What is the probability of their son being color blind?",
+    "options": {
+      "A": "0%",
+      "B": "25%",
+      "C": "50%",
+      "D": "100%"
+    },
+    "correct_answer": "C",
+    "solution": "Color blindness is X-linked recessive. The man is XcY, the woman is XCXc (carrier, as her father was affected). Possible offspring: XCXc (normal daughter), XcXc (color blind daughter), XCY (normal son), XcY (color blind son). Probability of color blind son = 50%.",
+    "marks": 4
+  },
+  {
+    "id": 39,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "23 May 2024",
+    "session": "Afternoon",
+    "topic": "Molecular Basis of Inheritance",
+    "difficulty": "Hard",
+    "question": "The length of DNA molecule of E. coli is approximately:",
+    "options": {
+      "A": "1.36 mm",
+      "B": "1.36 cm",
+      "C": "1.36 μm",
+      "D": "1.36 m"
+    },
+    "correct_answer": "A",
+    "solution": "The DNA of E. coli is a circular molecule containing approximately 4.6 million base pairs. The length of this DNA molecule when fully extended is about 1.36 mm (1360 μm), which is much longer than the bacterial cell itself.",
+    "marks": 4
+  },
+  {
+    "id": 40,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "24 May 2024",
+    "session": "Morning",
+    "topic": "Gene Expression",
+    "difficulty": "Medium",
+    "question": "Which of the following is involved in translation?",
+    "options": {
+      "A": "DNA",
+      "B": "mRNA",
+      "C": "tRNA",
+      "D": "Both B and C"
+    },
+    "correct_answer": "D",
+    "solution": "Translation is the process of protein synthesis. Both mRNA (provides the genetic code) and tRNA (brings amino acids to ribosomes) are essential for translation. rRNA is also involved as a component of ribosomes.",
+    "marks": 4
+  },
+  {
+    "id": 41,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "24 May 2024",
+    "session": "Afternoon",
+    "topic": "Origin of Life",
+    "difficulty": "Easy",
+    "question": "According to the theory of chemical evolution, the first form of life originated in:",
+    "options": {
+      "A": "Air",
+      "B": "Water",
+      "C": "Land",
+      "D": "Mountains"
+    },
+    "correct_answer": "B",
+    "solution": "According to the theory of chemical evolution, life originated in primitive oceans (water). The primordial soup or pre-biotic soup in water contained organic molecules that eventually led to the formation of first living cells.",
+    "marks": 4
+  },
+  {
+    "id": 42,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "25 May 2024",
+    "session": "Morning",
+    "topic": "Plant Growth and Development",
+    "difficulty": "Medium",
+    "question": "Which plant hormone is known as stress hormone?",
+    "options": {
+      "A": "Auxin",
+      "B": "Gibberellin",
+      "C": "Abscisic acid",
+      "D": "Cytokinin"
+    },
+    "correct_answer": "C",
+    "solution": "Abscisic acid (ABA) is called the stress hormone because it increases during stress conditions like drought, salinity, and cold. It causes stomatal closure to prevent water loss and induces seed dormancy.",
+    "marks": 4
+  },
+  {
+    "id": 43,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "25 May 2024",
+    "session": "Afternoon",
+    "topic": "Animal Diversity",
+    "difficulty": "Easy",
+    "question": "Mammalian red blood cells are unique because they:",
+    "options": {
+      "A": "Have nucleus",
+      "B": "Lack nucleus",
+      "C": "Have multiple nuclei",
+      "D": "Have irregular shape"
+    },
+    "correct_answer": "B",
+    "solution": "Mature mammalian red blood cells (RBCs) are enucleated, meaning they lack a nucleus. This adaptation provides more space for hemoglobin, allowing efficient oxygen transport. However, immature RBCs do have a nucleus.",
+    "marks": 4
+  },
+  {
+    "id": 44,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "26 May 2024",
+    "session": "Morning",
+    "topic": "Strategies for Enhancement",
+    "difficulty": "Hard",
+    "question": "In tissue culture, totipotency refers to the capacity of a cell to:",
+    "options": {
+      "A": "Divide rapidly",
+      "B": "Generate the whole plant",
+      "C": "Resist diseases",
+      "D": "Absorb nutrients"
+    },
+    "correct_answer": "B",
+    "solution": "Totipotency is the ability of a single cell to divide and produce all differentiated cells in an organism, including extraembryonic tissues. In plants, many cells retain totipotency and can regenerate into a complete plant through tissue culture.",
+    "marks": 4
+  },
+  {
+    "id": 45,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "26 May 2024",
+    "session": "Afternoon",
+    "topic": "Microbes in Human Welfare",
+    "difficulty": "Medium",
+    "question": "Methanogenic bacteria are found in:",
+    "options": {
+      "A": "Aerobic environment",
+      "B": "Rumen of cattle",
+      "C": "Ocean surface",
+      "D": "Soil surface"
+    },
+    "correct_answer": "B",
+    "solution": "Methanogenic bacteria (methanogens) are anaerobic microorganisms found in the rumen of cattle and other anaerobic environments like marshy areas and biogas plants. They produce methane by breaking down organic matter.",
+    "marks": 4
+  },
+  {
+    "id": 46,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 May 2024",
+    "session": "Morning",
+    "topic": "Biotechnology Principles",
+    "difficulty": "Hard",
+    "question": "The first restriction endonuclease to be discovered was:",
+    "options": {
+      "A": "EcoRI",
+      "B": "HindIII",
+      "C": "BamHI",
+      "D": "SmaI"
+    },
+    "correct_answer": "A",
+    "solution": "EcoRI was one of the first restriction endonucleases to be discovered and characterized. It is isolated from E. coli and recognizes the palindromic sequence GAATTC, making staggered cuts to produce sticky ends.",
+    "marks": 4
+  },
+  {
+    "id": 47,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "27 May 2024",
+    "session": "Afternoon",
+    "topic": "Organisms and Population",
+    "difficulty": "Medium",
+    "question": "Allen's rule is related to:",
+    "options": {
+      "A": "Body size in relation to temperature",
+      "B": "Limb size in relation to temperature",
+      "C": "Metabolic rate in relation to altitude",
+      "D": "Skin color in relation to latitude"
+    },
+    "correct_answer": "B",
+    "solution": "Allen's rule states that animals from colder climates have shorter limbs and appendages than animals from warmer climates. This helps reduce heat loss from body extremities in cold environments.",
+    "marks": 4
+  },
+  {
+    "id": 48,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "28 May 2024",
+    "session": "Morning",
+    "topic": "Ecosystem",
+    "difficulty": "Easy",
+    "question": "In an ecosystem, the 10% law of energy transfer was proposed by:",
+    "options": {
+      "A": "Odum",
+      "B": "Lindeman",
+      "C": "Tansley",
+      "D": "Elton"
+    },
+    "correct_answer": "B",
+    "solution": "Raymond Lindeman proposed the 10% law of energy transfer in 1942. It states that only about 10% of energy is transferred from one trophic level to the next, while 90% is lost as heat during respiration and metabolic processes.",
+    "marks": 4
+  },
+  {
+    "id": 49,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "28 May 2024",
+    "session": "Afternoon",
+    "topic": "Biodiversity Conservation",
+    "difficulty": "Medium",
+    "question": "Ex-situ conservation includes:",
+    "options": {
+      "A": "National parks",
+      "B": "Sanctuaries",
+      "C": "Seed banks",
+      "D": "Biosphere reserves"
+    },
+    "correct_answer": "C",
+    "solution": "Ex-situ conservation involves conservation outside natural habitats. Examples include seed banks, botanical gardens, zoos, and cryopreservation. National parks, sanctuaries, and biosphere reserves are examples of in-situ conservation.",
+    "marks": 4
+  },
+  {
+    "id": 50,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "29 May 2024",
+    "session": "Morning",
+    "topic": "Environmental Issues",
+    "difficulty": "Hard",
+    "question": "Biochemical Oxygen Demand (BOD) indicates:",
+    "options": {
+      "A": "Amount of oxygen required by microorganisms",
+      "B": "Amount of dissolved oxygen in water",
+      "C": "Amount of CO2 in water",
+      "D": "pH of water"
+    },
+    "correct_answer": "A",
+    "solution": "BOD is the amount of dissolved oxygen needed by aerobic biological organisms to break down organic material in water at a specific temperature over a specific time period. High BOD indicates high organic pollution and low water quality.",
+    "marks": 4
+  },
+  {
+    "id": 51,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "29 May 2024",
+    "session": "Afternoon",
+    "topic": "Sexual Reproduction in Flowering Plants",
+    "difficulty": "Medium",
+    "question": "The embryo sac in angiosperms is typically:",
+    "options": {
+      "A": "5-nucleate and 5-celled",
+      "B": "7-nucleate and 7-celled",
+      "C": "8-nucleate and 7-celled",
+      "D": "8-nucleate and 8-celled"
+    },
+    "correct_answer": "C",
+    "solution": "The mature embryo sac in angiosperms is typically 8-nucleate and 7-celled (Polygonum type). It contains 3 antipodal cells, 2 synergids, 1 egg cell, and 1 central cell with two polar nuclei.",
+    "marks": 4
+  },
+  {
+    "id": 52,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "30 May 2024",
+    "session": "Morning",
+    "topic": "Cell Cycle and Division",
+    "difficulty": "Easy",
+    "question": "Crossing over occurs during which phase of meiosis?",
+    "options": {
+      "A": "Leptotene",
+      "B": "Zygotene",
+      "C": "Pachytene",
+      "D": "Diplotene"
+    },
+    "correct_answer": "C",
+    "solution": "Crossing over (exchange of genetic material between non-sister chromatids) occurs during the pachytene stage of prophase I in meiosis. This results in genetic recombination and variation.",
+    "marks": 4
+  },
+  {
+    "id": 53,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "30 May 2024",
+    "session": "Afternoon",
+    "topic": "Biological Classification",
+    "difficulty": "Medium",
+    "question": "Which kingdom includes organisms that are eukaryotic, heterotrophic, and have chitin in their cell walls?",
+    "options": {
+      "A": "Protista",
+      "B": "Fungi",
+      "C": "Plantae",
+      "D": "Animalia"
+    },
+    "correct_answer": "B",
+    "solution": "Kingdom Fungi includes eukaryotic, heterotrophic organisms with chitin in their cell walls. They obtain nutrition through absorption and reproduce by spores. Examples include mushrooms, yeasts, and molds.",
+    "marks": 4
+  },
+  {
+    "id": 54,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "31 May 2024",
+    "session": "Morning",
+    "topic": "Morphology of Flowering Plants",
+    "difficulty": "Easy",
+    "question": "The root modification in radish is:",
+    "options": {
+      "A": "Conical",
+      "B": "Napiform",
+      "C": "Fusiform",
+      "D": "Tuberous"
+    },
+    "correct_answer": "C",
+    "solution": "Radish shows fusiform root modification where the root is swollen in the middle and tapers at both ends. Carrot shows conical (broad at top, narrow at bottom) and turnip shows napiform (spherical at top, abruptly tapering below) modifications.",
+    "marks": 4
+  },
+  {
+    "id": 55,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "31 May 2024",
+    "session": "Afternoon",
+    "topic": "Structural Organization in Animals",
+    "difficulty": "Medium",
+    "question": "Haversian canals are found in:",
+    "options": {
+      "A": "Cardiac tissue",
+      "B": "Bone tissue",
+      "C": "Nervous tissue",
+      "D": "Adipose tissue"
+    },
+    "correct_answer": "B",
+    "solution": "Haversian canals (or central canals) are found in compact bone tissue. They contain blood vessels and nerves that supply the bone cells (osteocytes). The Haversian system is the functional unit of compact bone.",
+    "marks": 4
+  },
+  {
+    "id": 56,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "01 June 2024",
+    "session": "Morning",
+    "topic": "Biomolecules",
+    "difficulty": "Hard",
+    "question": "Which amino acid contains sulfur?",
+    "options": {
+      "A": "Glycine",
+      "B": "Alanine",
+      "C": "Cysteine",
+      "D": "Valine"
+    },
+    "correct_answer": "C",
+    "solution": "Cysteine and methionine are sulfur-containing amino acids. Cysteine has a thiol (-SH) group that can form disulfide bonds (S-S) with another cysteine, important for protein structure stabilization.",
+    "marks": 4
+  },
+  {
+    "id": 57,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "01 June 2024",
+    "session": "Afternoon",
+    "topic": "Photosynthesis",
+    "difficulty": "Medium",
+    "question": "The first stable product of C3 cycle is:",
+    "options": {
+      "A": "PGA (3-phosphoglyceric acid)",
+      "B": "OAA (Oxaloacetic acid)",
+      "C": "RuBP (Ribulose bisphosphate)",
+      "D": "G3P (Glyceraldehyde 3-phosphate)"
+    },
+    "correct_answer": "A",
+    "solution": "In the C3 cycle (Calvin cycle), the first stable product is 3-phosphoglyceric acid (PGA), a 3-carbon compound. It is formed when CO2 is fixed to RuBP by the enzyme RuBisCO.",
+    "marks": 4
+  },
+  {
+    "id": 58,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "02 June 2024",
+    "session": "Morning",
+    "topic": "Respiration",
+    "difficulty": "Easy",
+    "question": "Glycolysis occurs in which part of the cell?",
+    "options": {
+      "A": "Mitochondria",
+      "B": "Cytoplasm",
+      "C": "Nucleus",
+      "D": "Endoplasmic reticulum"
+    },
+    "correct_answer": "B",
+    "solution": "Glycolysis is the breakdown of glucose to pyruvic acid and occurs in the cytoplasm. It is an anaerobic process that produces 2 ATP and 2 NADH molecules per glucose molecule.",
+    "marks": 4
+  },
+  {
+    "id": 59,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "02 June 2024",
+    "session": "Afternoon",
+    "topic": "Plant Growth Regulators",
+    "difficulty": "Hard",
+    "question": "Which hormone promotes cell division and delays senescence?",
+    "options": {
+      "A": "Auxin",
+      "B": "Gibberellin",
+      "C": "Cytokinin",
+      "D": "Ethylene"
+    },
+    "correct_answer": "C",
+    "solution": "Cytokinins promote cell division (cytokinesis) and delay leaf senescence. They are synthesized in root apices and work antagonistically to auxins in apical dominance. Examples include kinetin and zeatin.",
+    "marks": 4
+  },
+  {
+    "id": 60,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "03 June 2024",
+    "session": "Morning",
+    "topic": "Mineral Nutrition",
+    "difficulty": "Medium",
+    "question": "Which element is required for the synthesis of auxin?",
+    "options": {
+      "A": "Iron",
+      "B": "Zinc",
+      "C": "Copper",
+      "D": "Manganese"
+    },
+    "correct_answer": "B",
+    "solution": "Zinc is required for the synthesis of auxin (indole acetic acid). Zinc deficiency leads to stunted growth and small leaves. It also activates several enzymes including carbonic anhydrase.",
+    "marks": 4
+  },
+  {
+    "id": 61,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "03 June 2024",
+    "session": "Afternoon",
+    "topic": "Digestion and Absorption",
+    "difficulty": "Easy",
+    "question": "Bile is secreted by which organ?",
+    "options": {
+      "A": "Pancreas",
+      "B": "Liver",
+      "C": "Stomach",
+      "D": "Small intestine"
+    },
+    "correct_answer": "B",
+    "solution": "Bile is secreted by the liver and stored in the gall bladder. It contains bile salts and bile pigments. Bile salts emulsify fats, breaking them into smaller droplets for easier digestion by lipases.",
+    "marks": 4
+  },
+  {
+    "id": 62,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "04 June 2024",
+    "session": "Morning",
+    "topic": "Breathing and Gas Exchange",
+    "difficulty": "Medium",
+    "question": "Which of the following has the highest oxygen affinity?",
+    "options": {
+      "A": "Fetal hemoglobin",
+      "B": "Adult hemoglobin",
+      "C": "Myoglobin",
+      "D": "Carboxyhemoglobin"
+    },
+    "correct_answer": "C",
+    "solution": "Myoglobin has the highest oxygen affinity, followed by fetal hemoglobin, then adult hemoglobin. Myoglobin stores oxygen in muscles and releases it only at very low oxygen tensions.",
+    "marks": 4
+  },
+  {
+    "id": 63,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "04 June 2024",
+    "session": "Afternoon",
+    "topic": "Body Fluids and Circulation",
+    "difficulty": "Hard",
+    "question": "The pacemaker of the heart has an intrinsic rate of:",
+    "options": {
+      "A": "40-60 beats per minute",
+      "B": "70-75 beats per minute",
+      "C": "90-100 beats per minute",
+      "D": "100-120 beats per minute"
+    },
+    "correct_answer": "B",
+    "solution": "The SA node (pacemaker) has an intrinsic rate of about 70-75 beats per minute. However, neural and hormonal factors can modify this rate. The AV node has a rate of 40-60 bpm, while Purkinje fibers have 20-40 bpm.",
+    "marks": 4
+  },
+  {
+    "id": 64,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "05 June 2024",
+    "session": "Morning",
+    "topic": "Excretory Products and Elimination",
+    "difficulty": "Easy",
+    "question": "The principal nitrogenous excretory product in humans is:",
+    "options": {
+      "A": "Ammonia",
+      "B": "Urea",
+      "C": "Uric acid",
+      "D": "Creatinine"
+    },
+    "correct_answer": "B",
+    "solution": "Humans are ureotelic, meaning urea is the main nitrogenous waste product. Urea is less toxic than ammonia and is produced in the liver through the ornithine cycle (urea cycle) and excreted by kidneys.",
+    "marks": 4
+  },
+  {
+    "id": 65,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "05 June 2024",
+    "session": "Afternoon",
+    "topic": "Locomotion and Movement",
+    "difficulty": "Medium",
+    "question": "The neurotransmitter released at the neuromuscular junction is:",
+    "options": {
+      "A": "Dopamine",
+      "B": "Serotonin",
+      "C": "Acetylcholine",
+      "D": "Norepinephrine"
+    },
+    "correct_answer": "C",
+    "solution": "Acetylcholine is released at the neuromuscular junction (motor end plate). It binds to receptors on the muscle fiber membrane, causing depolarization and muscle contraction. It is then broken down by acetylcholinesterase.",
+    "marks": 4
+  },
+  {
+    "id": 66,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "06 June 2024",
+    "session": "Morning",
+    "topic": "Neural Control and Coordination",
+    "difficulty": "Hard",
+    "question": "The resting membrane potential of a neuron is approximately:",
+    "options": {
+      "A": "-40 mV",
+      "B": "-55 mV",
+      "C": "-70 mV",
+      "D": "-90 mV"
+    },
+    "correct_answer": "C",
+    "solution": "The resting membrane potential of a typical neuron is approximately -70 mV (inside negative). This is maintained by the sodium-potassium pump (3 Na+ out, 2 K+ in) and differential permeability of the membrane.",
+    "marks": 4
+  },
+  {
+    "id": 67,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "06 June 2024",
+    "session": "Afternoon",
+    "topic": "Chemical Coordination",
+    "difficulty": "Medium",
+    "question": "Which hormone is secreted by the pineal gland?",
+    "options": {
+      "A": "Serotonin",
+      "B": "Melatonin",
+      "C": "Dopamine",
+      "D": "GABA"
+    },
+    "correct_answer": "B",
+    "solution": "Melatonin is secreted by the pineal gland. It regulates circadian rhythms (sleep-wake cycle) and is influenced by light. Melatonin secretion increases in darkness and decreases in light.",
+    "marks": 4
+  },
+  {
+    "id": 68,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "07 June 2024",
+    "session": "Morning",
+    "topic": "Reproduction in Organisms",
+    "difficulty": "Easy",
+    "question": "Budding is a type of:",
+    "options": {
+      "A": "Sexual reproduction",
+      "B": "Asexual reproduction",
+      "C": "Parthenogenesis",
+      "D": "Fragmentation"
+    },
+    "correct_answer": "B",
+    "solution": "Budding is a type of asexual reproduction where a new organism develops from an outgrowth (bud) from the parent body. Examples include Hydra, yeast, and some plants. The offspring is genetically identical to the parent.",
+    "marks": 4
+  },
+  {
+    "id": 69,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "07 June 2024",
+    "session": "Afternoon",
+    "topic": "Human Reproduction",
+    "difficulty": "Hard",
+    "question": "Capacitation of sperm occurs in:",
+    "options": {
+      "A": "Testis",
+      "B": "Epididymis",
+      "C": "Female reproductive tract",
+      "D": "Vas deferens"
+    },
+    "correct_answer": "C",
+    "solution": "Capacitation is the physiological maturation of sperm that occurs in the female reproductive tract. It involves removal of cholesterol from the sperm membrane and makes the sperm capable of fertilizing the ovum.",
+    "marks": 4
+  },
+  {
+    "id": 70,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "08 June 2024",
+    "session": "Morning",
+    "topic": "Reproductive Health",
+    "difficulty": "Medium",
+    "question": "Which of the following is a copper-releasing IUD?",
+    "options": {
+      "A": "LNG-20",
+      "B": "Cu-T",
+      "C": "Progestasert",
+      "D": "Saheli"
+    },
+    "correct_answer": "B",
+    "solution": "Cu-T (Copper-T) is a copper-releasing intrauterine device. Copper ions suppress sperm motility and fertilizing capacity. Other examples include Cu-7, Multiload 375. LNG-20 and Progestasert release hormones.",
+    "marks": 4
+  },
+  {
+    "id": 71,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "08 June 2024",
+    "session": "Afternoon",
+    "topic": "Principles of Inheritance and Variation",
+    "difficulty": "Easy",
+    "question": "A gene that masks the expression of another gene is called:",
+    "options": {
+      "A": "Recessive",
+      "B": "Dominant",
+      "C": "Codominant",
+      "D": "Lethal"
+    },
+    "correct_answer": "B",
+    "solution": "A dominant gene masks the expression of its recessive allele in a heterozygous condition. Dominance was discovered by Mendel. The dominant trait is expressed in both homozygous (AA) and heterozygous (Aa) conditions.",
+    "marks": 4
+  },
+  {
+    "id": 72,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "09 June 2024",
+    "session": "Morning",
+    "topic": "Molecular Basis of Inheritance",
+    "difficulty": "Hard",
+    "question": "Okazaki fragments are associated with:",
+    "options": {
+      "A": "Leading strand synthesis",
+      "B": "Lagging strand synthesis",
+      "C": "RNA synthesis",
+      "D": "Protein synthesis"
+    },
+    "correct_answer": "B",
+    "solution": "Okazaki fragments are short DNA segments (1000-2000 nucleotides in prokaryotes, 100-200 in eukaryotes) synthesized discontinuously on the lagging strand during DNA replication. They are later joined by DNA ligase.",
+    "marks": 4
+  },
+  {
+    "id": 73,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "09 June 2024",
+    "session": "Afternoon",
+    "topic": "Evolution",
+    "difficulty": "Medium",
+    "question": "Adaptive radiation is best exemplified by:",
+    "options": {
+      "A": "Darwin's finches",
+      "B": "Industrial melanism",
+      "C": "Sickle cell anemia",
+      "D": "Antibiotic resistance"
+    },
+    "correct_answer": "A",
+    "solution": "Adaptive radiation is the evolution of different species from a common ancestor to adapt to different environments. Darwin's finches in the Galapagos Islands are a classic example, showing different beak shapes adapted to different food sources.",
+    "marks": 4
+  },
+  {
+    "id": 74,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "10 June 2024",
+    "session": "Morning",
+    "topic": "Human Health and Disease",
+    "difficulty": "Easy",
+    "question": "AIDS is caused by:",
+    "options": {
+      "A": "Bacteria",
+      "B": "Virus",
+      "C": "Fungus",
+      "D": "Protozoa"
+    },
+    "correct_answer": "B",
+    "solution": "AIDS (Acquired Immunodeficiency Syndrome) is caused by HIV (Human Immunodeficiency Virus), a retrovirus. It attacks T-helper cells (CD4+ cells), weakening the immune system and making the body susceptible to opportunistic infections.",
+    "marks": 4
+  },
+  {
+    "id": 75,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "10 June 2024",
+    "session": "Afternoon",
+    "topic": "Microbes in Human Welfare",
+    "difficulty": "Medium",
+    "question": "Cyclosporin A is produced by:",
+    "options": {
+      "A": "Trichoderma polysporum",
+      "B": "Streptococcus",
+      "C": "Monascus purpureus",
+      "D": "Aspergillus niger"
+    },
+    "correct_answer": "A",
+    "solution": "Cyclosporin A is an immunosuppressive drug produced by the fungus Trichoderma polysporum. It is used in organ transplant patients to prevent rejection of transplanted organs by suppressing the immune response.",
+    "marks": 4
+  },
+  {
+    "id": 76,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "11 June 2024",
+    "session": "Morning",
+    "topic": "Biotechnology and Its Applications",
+    "difficulty": "Hard",
+    "question": "Bt toxin is toxic to:",
+    "options": {
+      "A": "All insects",
+      "B": "Only lepidopteran insects",
+      "C": "Mammals",
+      "D": "Birds"
+    },
+    "correct_answer": "B",
+    "solution": "Bt toxin (from Bacillus thuringiensis) exists as inactive protoxin crystals. In the alkaline gut of lepidopteran insects (butterflies, moths), it is activated and creates pores in the gut epithelium, killing the insect. It is harmless to humans and other mammals.",
+    "marks": 4
+  },
+  {
+    "id": 77,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "11 June 2024",
+    "session": "Afternoon",
+    "topic": "Organisms and Populations",
+    "difficulty": "Medium",
+    "question": "The age pyramid with a broad base indicates:",
+    "options": {
+      "A": "Declining population",
+      "B": "Stable population",
+      "C": "Expanding population",
+      "D": "Extinct population"
+    },
+    "correct_answer": "C",
+    "solution": "An age pyramid with a broad base indicates an expanding or growing population with high birth rate. A narrow base indicates declining population, while a uniform shape indicates stable population.",
+    "marks": 4
+  },
+  {
+    "id": 78,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "12 June 2024",
+    "session": "Morning",
+    "topic": "Ecosystem",
+    "difficulty": "Easy",
+    "question": "The relationship between algae and fungi in lichens is:",
+    "options": {
+      "A": "Parasitism",
+      "B": "Commensalism",
+      "C": "Mutualism",
+      "D": "Competition"
+    },
+    "correct_answer": "C",
+    "solution": "Lichens are symbiotic associations between algae (or cyanobacteria) and fungi showing mutualism. The fungus provides protection and absorbs water and minerals, while the alga performs photosynthesis and provides food.",
+    "marks": 4
+  },
+  {
+    "id": 79,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "12 June 2024",
+    "session": "Afternoon",
+    "topic": "Biodiversity and Conservation",
+    "difficulty": "Hard",
+    "question": "The concept of biodiversity hotspot was given by:",
+    "options": {
+      "A": "Norman Myers",
+      "B": "E.O. Wilson",
+      "C": "Robert May",
+      "D": "Paul Ehrlich"
+    },
+    "correct_answer": "A",
+    "solution": "Norman Myers introduced the concept of biodiversity hotspots in 1988. A hotspot must have at least 1,500 vascular plant species as endemics and have lost at least 70% of its original habitat.",
+    "marks": 4
+  },
+  {
+    "id": 80,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "13 June 2024",
+    "session": "Morning",
+    "topic": "Environmental Issues",
+    "difficulty": "Medium",
+    "question": "Eutrophication is caused by excessive:",
+    "options": {
+      "A": "Nitrogen and phosphorus",
+      "B": "Carbon dioxide",
+      "C": "Oxygen",
+      "D": "Heavy metals"
+    },
+    "correct_answer": "A",
+    "solution": "Eutrophication is the enrichment of water bodies with nutrients, especially nitrogen and phosphorus from fertilizers and sewage. This causes excessive algal growth (algal bloom), oxygen depletion, and death of aquatic organisms.",
+    "marks": 4
+  },
+  {
+    "id": 81,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "13 June 2024",
+    "session": "Afternoon",
+    "topic": "Strategies for Enhancement in Food Production",
+    "difficulty": "Easy",
+    "question": "Which of the following is a marine fish?",
+    "options": {
+      "A": "Catla",
+      "B": "Rohu",
+      "C": "Pomfret",
+      "D": "Mrigal"
+    },
+    "correct_answer": "C",
+    "solution": "Pomfret is a marine fish. Catla, Rohu, and Mrigal are freshwater fishes commonly used in composite fish culture. Marine fishes include sardines, mackerel, tuna, and pomfret.",
+    "marks": 4
+  },
+  {
+    "id": 82,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "14 June 2024",
+    "session": "Morning",
+    "topic": "Cell Biology",
+    "difficulty": "Hard",
+    "question": "The 9+2 arrangement of microtubules is found in:",
+    "options": {
+      "A": "Centriole",
+      "B": "Cilia and flagella",
+      "C": "Both A and B",
+      "D": "Basal body"
+    },
+    "correct_answer": "B",
+    "solution": "The 9+2 arrangement (9 peripheral doublet microtubules + 2 central singlet microtubules) is characteristic of cilia and flagella. Centrioles and basal bodies have a 9+0 arrangement (9 triplet microtubules without central tubules).",
+    "marks": 4
+  },
+  {
+    "id": 83,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "14 June 2024",
+    "session": "Afternoon",
+    "topic": "Transport in Plants",
+    "difficulty": "Medium",
+    "question": "Guttation occurs through:",
+    "options": {
+      "A": "Stomata",
+      "B": "Lenticels",
+      "C": "Hydathodes",
+      "D": "Cuticle"
+    },
+    "correct_answer": "C",
+    "solution": "Guttation is the loss of water in liquid form from leaf margins through special structures called hydathodes. It occurs when root pressure is high and transpiration is low, typically at night or early morning.",
+    "marks": 4
+  },
+  {
+    "id": 84,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "15 June 2024",
+    "session": "Morning",
+    "topic": "Genetics",
+    "difficulty": "Easy",
+    "question": "If both parents are carriers for an autosomal recessive disorder, what is the probability of their child being affected?",
+    "options": {
+      "A": "0%",
+      "B": "25%",
+      "C": "50%",
+      "D": "75%"
+    },
+    "correct_answer": "B",
+    "solution": "When both parents are carriers (Aa × Aa), the offspring ratio is 1 AA : 2 Aa : 1 aa. Thus, 25% chance of affected child (aa), 50% carriers (Aa), and 25% normal (AA).",
+    "marks": 4
+  },
+  {
+    "id": 85,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "15 June 2024",
+    "session": "Afternoon",
+    "topic": "Plant Physiology",
+    "difficulty": "Hard",
+    "question": "Vernalization affects:",
+    "options": {
+      "A": "Seed germination",
+      "B": "Flowering",
+      "C": "Fruit ripening",
+      "D": "Root growth"
+    },
+    "correct_answer": "B",
+    "solution": "Vernalization is the promotion of flowering by exposure to low temperature. It is required by biennial plants and some winter varieties of wheat, which require cold treatment before they can flower.",
+    "marks": 4
+  },
+  {
+    "id": 86,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "16 June 2024",
+    "session": "Morning",
+    "topic": "Photosynthesis",
+    "difficulty": "Medium",
+    "question": "Photorespiration occurs in:",
+    "options": {
+      "A": "C3 plants only",
+      "B": "C4 plants only",
+      "C": "CAM plants only",
+      "D": "All plants"
+    },
+    "correct_answer": "A",
+    "solution": "Photorespiration is a wasteful process that occurs in C3 plants when RuBisCO binds with O2 instead of CO2. C4 and CAM plants have mechanisms to minimize photorespiration by concentrating CO2 around RuBisCO.",
+    "marks": 4
+  },
+  {
+    "id": 87,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "16 June 2024",
+    "session": "Afternoon",
+    "topic": "Human Physiology",
+    "difficulty": "Easy",
+    "question": "Insulin is secreted by which cells of the pancreas?",
+    "options": {
+      "A": "Alpha cells",
+      "B": "Beta cells",
+      "C": "Delta cells",
+      "D": "Gamma cells"
+    },
+    "correct_answer": "B",
+    "solution": "Insulin is secreted by beta cells of the islets of Langerhans in the pancreas. It lowers blood glucose levels by promoting glucose uptake by cells. Alpha cells secrete glucagon, which has the opposite effect.",
+    "marks": 4
+  },
+  {
+    "id": 88,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "17 June 2024",
+    "session": "Morning",
+    "topic": "Immune System",
+    "difficulty": "Hard",
+    "question": "Colostrum provides which type of immunity?",
+    "options": {
+      "A": "Active natural immunity",
+      "B": "Active artificial immunity",
+      "C": "Passive natural immunity",
+      "D": "Passive artificial immunity"
+    },
+    "correct_answer": "C",
+    "solution": "Colostrum (first milk) contains antibodies, especially IgA, that provide passive natural immunity to newborns. The antibodies are produced by the mother and transferred to the baby, providing immediate but temporary protection.",
+    "marks": 4
+  },
+  {
+    "id": 89,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "17 June 2024",
+    "session": "Afternoon",
+    "topic": "Ecology",
+    "difficulty": "Medium",
+    "question": "Primary succession occurs on:",
+    "options": {
+      "A": "Abandoned farmland",
+      "B": "Burnt forest",
+      "C": "Bare rock",
+      "D": "Deforested area"
+    },
+    "correct_answer": "C",
+    "solution": "Primary succession occurs on barren surfaces like bare rocks, sand dunes, or volcanic lava where no soil exists. Pioneer species like lichens colonize first. Secondary succession occurs on previously inhabited areas like burnt forests.",
+    "marks": 4
+  },
+  {
+    "id": 90,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "18 June 2024",
+    "session": "Morning",
+    "topic": "Biotechnology",
+    "difficulty": "Easy",
+    "question": "PCR is used for:",
+    "options": {
+      "A": "DNA sequencing",
+      "B": "DNA amplification",
+      "C": "Protein synthesis",
+      "D": "Gene editing"
+    },
+    "correct_answer": "B",
+    "solution": "PCR (Polymerase Chain Reaction) is used for amplification of DNA, producing millions of copies of a specific DNA segment. It requires DNA template, primers, Taq polymerase, and deoxynucleotides. It was developed by Kary Mullis.",
+    "marks": 4
+  },
+  {
+    "id": 91,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "18 June 2024",
+    "session": "Afternoon",
+    "topic": "Evolution",
+    "difficulty": "Hard",
+    "question": "Homologous organs indicate:",
+    "options": {
+      "A": "Divergent evolution",
+      "B": "Convergent evolution",
+      "C": "Parallel evolution",
+      "D": "Coevolution"
+    },
+    "correct_answer": "A",
+    "solution": "Homologous organs have similar basic structure and embryonic origin but different functions, indicating divergent evolution from a common ancestor. Examples include forelimbs of vertebrates. Analogous organs indicate convergent evolution.",
+    "marks": 4
+  },
+  {
+    "id": 92,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "19 June 2024",
+    "session": "Morning",
+    "topic": "Molecular Biology",
+    "difficulty": "Medium",
+    "question": "A codon consists of:",
+    "options": {
+      "A": "2 nucleotides",
+      "B": "3 nucleotides",
+      "C": "4 nucleotides",
+      "D": "5 nucleotides"
+    },
+    "correct_answer": "B",
+    "solution": "A codon consists of 3 nucleotides (triplet) that codes for a specific amino acid or acts as a stop signal. There are 64 possible codons (4³), with 61 coding for amino acids and 3 stop codons (UAA, UAG, UGA).",
+    "marks": 4
+  },
+  {
+    "id": 93,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "19 June 2024",
+    "session": "Afternoon",
+    "topic": "Plant Kingdom",
+    "difficulty": "Easy",
+    "question": "Which of the following is a pteridophyte?",
+    "options": {
+      "A": "Marchantia",
+      "B": "Funaria",
+      "C": "Selaginella",
+      "D": "Cycas"
+    },
+    "correct_answer": "C",
+    "solution": "Selaginella is a pteridophyte (vascular cryptogam). Marchantia and Funaria are bryophytes, while Cycas is a gymnosperm. Pteridophytes are the first terrestrial plants to have vascular tissue (xylem and phloem).",
+    "marks": 4
+  },
+  {
+    "id": 94,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "20 June 2024",
+    "session": "Morning",
+    "topic": "Animal Physiology",
+    "difficulty": "Hard",
+    "question": "JGA (Juxtaglomerular Apparatus) is located in:",
+    "options": {
+      "A": "Heart",
+      "B": "Kidney",
+      "C": "Liver",
+      "D": "Adrenal gland"
+    },
+    "correct_answer": "B",
+    "solution": "The juxtaglomerular apparatus (JGA) is located in the kidney at the junction of the afferent arteriole and the distal convoluted tubule. It regulates blood pressure by secreting renin, which activates the renin-angiotensin-aldosterone system.",
+    "marks": 4
+  },
+  {
+    "id": 95,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "20 June 2024",
+    "session": "Afternoon",
+    "topic": "Reproduction",
+    "difficulty": "Medium",
+    "question": "The acrosome of sperm contains:",
+    "options": {
+      "A": "Enzymes",
+      "B": "Mitochondria",
+      "C": "Nucleus",
+      "D": "Centriole"
+    },
+    "correct_answer": "A",
+    "solution": "The acrosome is a cap-like structure at the anterior end of sperm head containing hydrolytic enzymes like hyaluronidase and acrosin. These enzymes help the sperm penetrate the zona pellucida of the ovum during fertilization.",
+    "marks": 4
+  },
+  {
+    "id": 96,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "21 June 2024",
+    "session": "Morning",
+    "topic": "Biodiversity",
+    "difficulty": "Easy",
+    "question": "IUCN stands for:",
+    "options": {
+      "A": "International Union for Conservation of Nature",
+      "B": "Indian Union for Conservation of Nature",
+      "C": "International University for Conservation of Nature",
+      "D": "International Union for Control of Nature"
+    },
+    "correct_answer": "A",
+    "solution": "IUCN stands for International Union for Conservation of Nature. It publishes the Red Data Book, which contains information about endangered and threatened species. It categorizes species based on their conservation status.",
+    "marks": 4
+  },
+  {
+    "id": 97,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "21 June 2024",
+    "session": "Afternoon",
+    "topic": "Microbes",
+    "difficulty": "Hard",
+    "question": "The most abundant prokaryotes found in the ocean are:",
+    "options": {
+      "A": "Cyanobacteria",
+      "B": "Archaebacteria",
+      "C": "Actinomycetes",
+      "D": "Spirochetes"
+    },
+    "correct_answer": "A",
+    "solution": "Cyanobacteria are the most abundant prokaryotes in oceans. They are photosynthetic bacteria (blue-green algae) that contribute significantly to marine primary productivity. Examples include Anabaena, Nostoc, and Oscillatoria.",
+    "marks": 4
+  },
+  {
+    "id": 98,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "22 June 2024",
+    "session": "Morning",
+    "topic": "Environmental Issues",
+    "difficulty": "Medium",
+    "question": "The Montreal Protocol is related to:",
+    "options": {
+      "A": "Climate change",
+      "B": "Ozone layer depletion",
+      "C": "Biodiversity conservation",
+      "D": "Acid rain"
+    },
+    "correct_answer": "B",
+    "solution": "The Montreal Protocol (1987) is an international treaty designed to protect the ozone layer by phasing out production of ozone-depleting substances, particularly chlorofluorocarbons (CFCs) and halons.",
+    "marks": 4
+  },
+  {
+    "id": 99,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "22 June 2024",
+    "session": "Afternoon",
+    "topic": "Cell Division",
+    "difficulty": "Easy",
+    "question": "Synapsis occurs during:",
+    "options": {
+      "A": "Mitosis",
+      "B": "Meiosis I",
+      "C": "Meiosis II",
+      "D": "Both mitosis and meiosis"
+    },
+    "correct_answer": "B",
+    "solution": "Synapsis is the pairing of homologous chromosomes during zygotene of prophase I in meiosis I. The paired chromosomes form a bivalent or tetrad. This allows crossing over to occur during pachytene stage.",
+    "marks": 4
+  },
+  {
+    "id": 100,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "23 June 2024",
+    "session": "Morning",
+    "topic": "Human Health",
+    "difficulty": "Medium",
+    "question": "Which antibody is produced first during an immune response?",
+    "options": {
+      "A": "IgA",
+      "B": "IgG",
+      "C": "IgM",
+      "D": "IgE"
+    },
+    "correct_answer": "C",
+    "solution": "IgM is the first antibody produced during primary immune response. It is a pentamer and is most effective at agglutination. IgG is produced later during secondary immune response and provides long-term immunity.",
+    "marks": 4
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "name": "edtechmobile",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "test-api": "node test-api.js"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "@react-native-google-signin/google-signin": "^12.2.0",
+    "axios": "^1.13.2",
+    "expo": "~54.0.27",
+    "expo-auth-session": "~7.0.10",
+    "expo-constants": "~16.0.2",
+    "expo-document-picker": "~14.0.8",
+    "expo-file-system": "^19.0.19",
+    "expo-image-picker": "~17.0.9",
+    "expo-linear-gradient": "~15.0.8",
+    "expo-secure-store": "~15.0.8",
+    "expo-status-bar": "~3.0.9",
+    "expo-web-browser": "~15.0.10",
+    "jwt-decode": "^3.1.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-razorpay": "^2.3.1",
+    "react-native-vector-icons": "^10.3.0",
+    "react-native-web": "^0.21.0",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.0",
+    "@types/react-native-razorpay": "^2.2.6",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}

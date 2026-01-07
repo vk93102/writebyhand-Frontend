@@ -1,0 +1,623 @@
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Animated, Platform } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
+
+interface PricingPlan {
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: Array<{
+    name: string;
+    included: boolean;
+    limit?: string;
+  }>;
+  highlighted: boolean;
+  buttonText: string;
+  ctaText?: string;
+}
+
+export const Pricing: React.FC = () => {
+  const [selectedPlan, setSelectedPlan] = useState<string>('free');
+  const [autoPayEnabled, setAutoPayEnabled] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  const plans: PricingPlan[] = [
+    {
+      id: 'free',
+      name: 'Free',
+      price: '₹0',
+      period: '/month',
+      description: 'Perfect for getting started',
+      highlighted: false,
+      buttonText: 'Current Plan',
+      features: [
+        { name: 'Ask Question (Image/Text)', included: true, limit: '3 per month' },
+        { name: 'Generate Quiz', included: true, limit: '3 per month' },
+        { name: 'Create Flashcards', included: true, limit: '3 per month' },
+        { name: 'YouTube Summarizer', included: false },
+        { name: 'Predicted Questions', included: false },
+        { name: 'Trends Analysis', included: false },
+        { name: 'Study Material', included: false },
+        { name: 'Priority Support', included: false },
+      ],
+    },
+    {
+      id: 'premium',
+      name: 'Premium',
+      price: '₹1',
+      period: '/99 after month-end',
+      description: 'Unlock all features with auto-pay',
+      highlighted: true,
+      buttonText: 'Get Premium',
+      ctaText: 'Auto-renews Monthly',
+      features: [
+        { name: 'Ask Question (Image/Text)', included: true, limit: 'Unlimited' },
+        { name: 'Generate Quiz', included: true, limit: 'Unlimited' },
+        { name: 'Create Flashcards', included: true, limit: 'Unlimited' },
+        { name: 'YouTube Summarizer', included: true, limit: 'Unlimited' },
+        { name: 'Predicted Questions', included: true, limit: 'Unlimited' },
+        { name: 'Trends Analysis', included: true, limit: 'Unlimited' },
+        { name: 'Study Material', included: true, limit: 'Unlimited' },
+        { name: 'Priority Support', included: true },
+      ],
+    },
+  ];
+
+  const handleSubscribe = (planId: string) => {
+    if (planId === 'free') {
+      Alert.alert('Info', 'You are already on the free plan');
+      return;
+    }
+
+    if (planId === 'premium') {
+      setAutoPayEnabled(true);
+      Alert.alert(
+        'Premium Subscription',
+        `You will be charged ₹1.99 after the current month ends.\n\nAuto-pay will renew your subscription every month.`,
+        [
+          {
+            text: 'Cancel',
+            onPress: () => setAutoPayEnabled(false),
+            style: 'cancel',
+          },
+          {
+            text: 'Continue',
+            onPress: () => {
+              setSelectedPlan('premium');
+              Alert.alert('Success', 'Premium subscription activated! You will be charged ₹1.99 at month-end.');
+            },
+          },
+        ]
+      );
+    }
+  };
+
+  const handleManageAutopay = () => {
+    if (autoPayEnabled) {
+      Alert.alert(
+        'Manage Auto-Pay',
+        'Current Status: Enabled\n\nAuto-pay renews your subscription automatically every month.',
+        [
+          {
+            text: 'Keep Enabled',
+            style: 'cancel',
+          },
+          {
+            text: 'Disable Auto-Pay',
+            onPress: () => {
+              setAutoPayEnabled(false);
+              Alert.alert('Success', 'Auto-pay has been disabled. Your subscription will expire at month-end.');
+            },
+            style: 'destructive',
+          },
+        ]
+      );
+    } else {
+      Alert.alert(
+        'Auto-Pay Disabled',
+        'Enable auto-pay to automatically renew your subscription every month.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Enable Auto-Pay',
+            onPress: () => {
+              setAutoPayEnabled(true);
+              Alert.alert('Success', 'Auto-pay has been enabled.');
+            },
+          },
+        ]
+      );
+    }
+  };
+
+  const isWeb = Platform.OS === 'web';
+  // animated values per plan
+  const animValues = useRef(plans.reduce((acc, p) => { acc[p.id] = new Animated.Value(1); return acc; }, {} as Record<string, Animated.Value>)).current;
+
+  const handleHoverIn = (id: string) => {
+    Animated.spring(animValues[id], { toValue: 1.03, useNativeDriver: true }).start();
+  };
+  const handleHoverOut = (id: string) => {
+    Animated.spring(animValues[id], { toValue: 1, useNativeDriver: true }).start();
+  };
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} horizontal={false}>
+      {/* Header */}
+      <View style={styles.header}>
+        <MaterialIcons name="local-offer" size={40} color={colors.primary} />
+        <Text style={styles.headerTitle}>Simple Pricing</Text>
+        <Text style={styles.headerSubtitle}>Choose the perfect plan for your learning journey</Text>
+      </View>
+
+      {/* Pricing Cards */}
+      <ScrollView horizontal={isWeb} contentContainerStyle={styles.plansContainerHorizontal} showsHorizontalScrollIndicator={false}>
+        {plans.map((plan) => (
+          <Animated.View
+            key={plan.id}
+            style={[
+              styles.planCard,
+              plan.highlighted && styles.planCardHighlighted,
+              { transform: [{ scale: animValues[plan.id] }] },
+            ]}
+            onMouseEnter={() => isWeb && handleHoverIn(plan.id)}
+            onMouseLeave={() => isWeb && handleHoverOut(plan.id)}
+          >
+            {plan.highlighted && (
+              <View style={styles.popularBadge}>
+                <MaterialIcons name="trending-up" size={16} color={colors.white} />
+                <Text style={styles.popularBadgeText}>MOST POPULAR</Text>
+              </View>
+            )}
+
+            <View style={styles.planHeader}>
+              <Text style={styles.planName}>{plan.name}</Text>
+              <Text style={styles.planDescription}>{plan.description}</Text>
+            </View>
+
+            <View style={styles.priceSection}>
+              <Text style={styles.price}>{plan.price}</Text>
+              <Text style={styles.period}>{plan.period}</Text>
+            </View>
+
+            {plan.ctaText && (
+              <View style={styles.ctaBox}>
+                <MaterialIcons name="info" size={16} color={colors.primary} />
+                <Text style={styles.ctaText}>{plan.ctaText}</Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={[styles.subscribeButton, plan.highlighted && styles.subscribeButtonPremium]}
+              onPress={() => handleSubscribe(plan.id)}
+            >
+              <Text style={[styles.subscribeButtonText, plan.highlighted && styles.subscribeButtonTextPremium]}>
+                {plan.buttonText}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.featuresSection}>
+              <Text style={styles.featuresTitle}>Features:</Text>
+              {plan.features.map((feature, index) => (
+                <View key={index} style={styles.featureRow}>
+                  <MaterialIcons
+                    name={feature.included ? 'check-circle' : 'cancel'}
+                    size={20}
+                    color={feature.included ? colors.success : colors.textMuted}
+                  />
+                  <View style={styles.featureContent}>
+                    <Text style={[styles.featureName, !feature.included && styles.featureNameDisabled]}>
+                      {feature.name}
+                    </Text>
+                    {feature.limit && (
+                      <Text style={styles.featureLimit}>{feature.limit}</Text>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+          </Animated.View>
+        ))}
+      </ScrollView>
+
+      {/* Auto-Pay Management Section */}
+      {selectedPlan === 'premium' && (
+        <View style={styles.autoPaySection}>
+          <View style={styles.autoPayHeader}>
+            <MaterialIcons name="schedule" size={24} color={colors.primary} />
+            <Text style={styles.autoPayTitle}>Auto-Pay Settings</Text>
+          </View>
+
+          <View style={styles.autoPayStatusBox}>
+            <View style={styles.statusIndicator}>
+              <MaterialIcons
+                name={autoPayEnabled ? 'check-circle' : 'info'}
+                size={24}
+                color={autoPayEnabled ? colors.success : colors.warning}
+              />
+              <View style={styles.statusText}>
+                <Text style={styles.statusLabel}>
+                  {autoPayEnabled ? 'Auto-Pay Enabled' : 'Auto-Pay Disabled'}
+                </Text>
+                <Text style={styles.statusDescription}>
+                  {autoPayEnabled
+                    ? 'Your subscription renews automatically every month'
+                    : 'Enable auto-pay to auto-renew your subscription'}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity style={styles.manageButton} onPress={handleManageAutopay}>
+              <Text style={styles.manageButtonText}>
+                {autoPayEnabled ? 'Manage' : 'Enable'}
+              </Text>
+              <MaterialIcons name="arrow-forward" size={18} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.billingInfo}>
+            <Text style={styles.billingLabel}>💳 Billing Information</Text>
+            <View style={styles.billingRow}>
+              <Text style={styles.billingKey}>Next Billing Date:</Text>
+              <Text style={styles.billingValue}>End of current month</Text>
+            </View>
+            <View style={styles.billingRow}>
+              <Text style={styles.billingKey}>Amount:</Text>
+              <Text style={styles.billingValue}>₹1.99</Text>
+            </View>
+            <View style={styles.billingRow}>
+              <Text style={styles.billingKey}>Renewal:</Text>
+              <Text style={styles.billingValue}>Monthly</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* FAQ Section */}
+      <View style={styles.faqSection}>
+        <Text style={styles.faqTitle}>Frequently Asked Questions</Text>
+
+        {[
+          {
+            question: 'Can I change my plan later?',
+            answer: 'Yes, you can upgrade or downgrade your plan anytime. Changes take effect immediately.'
+          },
+          {
+            question: 'What payment methods do you accept?',
+            answer: 'We accept all major credit cards, debit cards, and UPI payments for Indian users.'
+          },
+          {
+            question: 'Can I cancel anytime?',
+            answer: 'Absolutely! You can cancel your subscription anytime. No hidden fees or penalties.'
+          },
+          {
+            question: 'What about refunds?',
+            answer: 'If you\'re not satisfied, we offer a 7-day money-back guarantee on all plans.'
+          }
+        ].map((faq, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.faqItem}
+            onPress={() => setExpandedFaq(expandedFaq === index ? null : index)}
+          >
+            <MaterialIcons name="help" size={20} color={colors.primary} />
+            <View style={styles.faqContent}>
+              <View style={styles.faqQuestionRow}>
+                <Text style={styles.faqQuestion}>{faq.question}</Text>
+                <MaterialIcons 
+                  name={expandedFaq === index ? 'expand-less' : 'expand-more'} 
+                  size={24} 
+                  color={colors.textMuted} 
+                />
+              </View>
+              {expandedFaq === index && (
+                <Text style={styles.faqAnswer}>{faq.answer}</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Questions? Contact us at support@edtech.com</Text>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    alignItems: 'center',
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+  },
+  headerTitle: {
+    ...typography.h2,
+    fontWeight: '700',
+    marginTop: spacing.md,
+  },
+  headerSubtitle: {
+    ...typography.body,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
+  plansContainer: {
+    paddingHorizontal: spacing.lg,
+    gap: spacing.lg,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  planCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    borderWidth: 2,
+    borderColor: colors.border,
+    ...shadows.md,
+  },
+  planCardHighlighted: {
+    borderColor: colors.primary,
+    borderWidth: 2,
+    backgroundColor: colors.blue50,
+  },
+  popularBadge: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    flexDirection: 'row',
+    gap: spacing.xs,
+    alignItems: 'center',
+  },
+  popularBadgeText: {
+    ...typography.small,
+    color: colors.white,
+    fontWeight: '700',
+  },
+  planHeader: {
+    marginBottom: spacing.lg,
+    marginTop: spacing.lg,
+  },
+  planName: {
+    ...typography.h3,
+    fontWeight: '700',
+    marginBottom: spacing.sm,
+  },
+  planDescription: {
+    ...typography.body,
+    color: colors.textMuted,
+  },
+  priceSection: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: spacing.lg,
+  },
+  price: {
+    ...typography.h2,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  period: {
+    ...typography.body,
+    color: colors.textMuted,
+    marginLeft: spacing.sm,
+  },
+  ctaBox: {
+    backgroundColor: colors.blue100,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    flexDirection: 'row',
+    gap: spacing.md,
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  ctaText: {
+    ...typography.body,
+    color: colors.primary,
+    fontWeight: '600',
+    flex: 1,
+  },
+  subscribeButton: {
+    backgroundColor: colors.border,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  subscribeButtonPremium: {
+    backgroundColor: colors.primary,
+  },
+  subscribeButtonText: {
+    ...typography.body,
+    fontWeight: '700',
+    color: colors.textMuted,
+  },
+  subscribeButtonTextPremium: {
+    color: colors.white,
+  },
+  featuresSection: {
+    gap: spacing.md,
+  },
+  featuresTitle: {
+    ...typography.h4,
+    fontWeight: '700',
+    marginBottom: spacing.sm,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  featureContent: {
+    flex: 1,
+  },
+  featureName: {
+    ...typography.body,
+    fontWeight: '500',
+  },
+  featureNameDisabled: {
+    color: colors.textMuted,
+    textDecorationLine: 'line-through',
+  plansContainerHorizontal: {
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+  },
+  planCard: {
+    width: 300,
+    borderRadius: 14,
+    backgroundColor: '#f8f8f8',
+    padding: 18,
+    marginRight: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
+  },
+    marginTop: spacing.xs / 2,
+    borderWidth: 1.5,
+    borderColor: '#2c6bed',
+    marginHorizontal: spacing.lg,
+    marginVertical: spacing.lg,
+    backgroundColor: colors.blue50,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    ...shadows.sm,
+  },
+  autoPayHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  autoPayTitle: {
+    ...typography.h3,
+    fontWeight: '700',
+  },
+  autoPayStatusBox: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  statusIndicator: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    flex: 1,
+  },
+  statusText: {
+    flex: 1,
+  },
+  statusLabel: {
+    ...typography.h4,
+    fontWeight: '700',
+  },
+  statusDescription: {
+    ...typography.small,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+  },
+  manageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  manageButtonText: {
+    ...typography.body,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  billingInfo: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  billingLabel: {
+    ...typography.h4,
+    fontWeight: '700',
+    marginBottom: spacing.sm,
+  },
+  billingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  billingKey: {
+    ...typography.body,
+    color: colors.textMuted,
+  },
+  billingValue: {
+    ...typography.body,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  faqSection: {
+    marginHorizontal: spacing.lg,
+    marginVertical: spacing.xl,
+  },
+  faqTitle: {
+    ...typography.h3,
+    fontWeight: '700',
+    marginBottom: spacing.lg,
+  },
+  faqItem: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.white,
+    padding: spacing.lg,
+    borderRadius: borderRadius.md,
+    ...shadows.sm,
+  },
+  faqContent: {
+    flex: 1,
+  },
+  faqQuestionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  faqQuestion: {
+    ...typography.h4,
+    fontWeight: '700',
+    marginBottom: spacing.sm,
+    flex: 1,
+  },
+  faqAnswer: {
+    ...typography.body,
+    color: colors.textMuted,
+    lineHeight: 22,
+  },
+  footer: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+    alignItems: 'center',
+  },
+  footerText: {
+    ...typography.small,
+    color: colors.textMuted,
+  },
+});

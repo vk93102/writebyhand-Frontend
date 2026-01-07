@@ -1,0 +1,1903 @@
+[
+  {
+    "id": 1,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Morning",
+    "topic": "Mechanics - Kinematics",
+    "difficulty": "Easy",
+    "question": "A particle moves in a straight line with constant acceleration. If it covers 40 m in the 5th second and 48 m in the 7th second, what is the acceleration?",
+    "options": {
+      "A": "2 m/s²",
+      "B": "4 m/s²",
+      "C": "6 m/s²",
+      "D": "8 m/s²"
+    },
+    "correct_answer": "B",
+    "solution": "Distance in nth second: Sₙ = u + a(n - 0.5). For 5th second: 40 = u + 4.5a. For 7th second: 48 = u + 6.5a. Subtracting: 8 = 2a, so a = 4 m/s²",
+    "marks": 4
+  },
+  {
+    "id": 2,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "27 Jan 2024",
+    "session": "Evening",
+    "topic": "Electrostatics",
+    "difficulty": "Medium",
+    "question": "Two point charges +4 μC and -4 μC are placed at points A and B, 6 cm apart. The electric potential at point P on the perpendicular bisector at 4 cm from the line AB is:",
+    "options": {
+      "A": "Zero",
+      "B": "3.6 × 10⁵ V",
+      "C": "7.2 × 10⁵ V",
+      "D": "1.44 × 10⁶ V"
+    },
+    "correct_answer": "A",
+    "solution": "For an electric dipole, the potential at any point on the perpendicular bisector is zero because the two charges are equal and opposite, and equidistant from point P. V = kq₁/r₁ + kq₂/r₂ = k(+4μC)/r - k(4μC)/r = 0",
+    "marks": 4
+  },
+  {
+    "id": 3,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "29 Jan 2024",
+    "session": "Morning",
+    "topic": "Thermodynamics",
+    "difficulty": "Hard",
+    "question": "An ideal gas undergoes a cyclic process ABCA where AB is isothermal, BC is adiabatic, and CA is isochoric. The efficiency of the cycle is 25%. If the temperature at A is 400 K, what is the temperature at B?",
+    "options": {
+      "A": "300 K",
+      "B": "320 K",
+      "C": "350 K",
+      "D": "380 K"
+    },
+    "correct_answer": "A",
+    "solution": "Efficiency η = 1 - T_C/T_A. Given η = 0.25, so 0.25 = 1 - T_C/400. Therefore T_C = 300 K. Since BC is adiabatic and connects to isochoric process, T_B = T_C = 300 K",
+    "marks": 4
+  },
+  {
+    "id": 4,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "29 Jan 2024",
+    "session": "Evening",
+    "topic": "Modern Physics",
+    "difficulty": "Medium",
+    "question": "The binding energy per nucleon of ²³⁸U is 7.6 MeV and that of ⁴He is 7.1 MeV. The energy released when 1 kg of ²³⁸U undergoes complete fission is approximately:",
+    "options": {
+      "A": "5.1 × 10¹³ J",
+      "B": "5.1 × 10¹² J",
+      "C": "2.5 × 10¹³ J",
+      "D": "2.5 × 10¹² J"
+    },
+    "correct_answer": "A",
+    "solution": "Energy per fission = (7.6 - 7.1) × 238 = 119 MeV. Number of atoms in 1 kg = (1000/238) × 6.02 × 10²³. Total energy = 119 × 1.6 × 10⁻¹³ × (1000/238) × 6.02 × 10²³ ≈ 5.1 × 10¹³ J",
+    "marks": 4
+  },
+  {
+    "id": 5,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "24 Jan 2023",
+    "session": "Morning",
+    "topic": "Optics",
+    "difficulty": "Easy",
+    "question": "A convex lens of focal length 20 cm forms an image at 30 cm from the lens. The object distance is:",
+    "options": {
+      "A": "60 cm",
+      "B": "50 cm",
+      "C": "40 cm",
+      "D": "30 cm"
+    },
+    "correct_answer": "A",
+    "solution": "Using lens formula: 1/f = 1/v - 1/u. Given f = 20 cm, v = 30 cm. 1/20 = 1/30 - 1/u. Therefore, 1/u = 1/30 - 1/20 = -1/60. So u = -60 cm",
+    "marks": 4
+  },
+  {
+    "id": 6,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "24 Jan 2023",
+    "session": "Evening",
+    "topic": "Magnetism",
+    "difficulty": "Medium",
+    "question": "A circular coil of 200 turns and radius 10 cm carries a current of 2 A. The magnetic field at the center of the coil is:",
+    "options": {
+      "A": "2.51 × 10⁻³ T",
+      "B": "5.02 × 10⁻³ T",
+      "C": "1.26 × 10⁻³ T",
+      "D": "7.54 × 10⁻³ T"
+    },
+    "correct_answer": "A",
+    "solution": "Magnetic field at center B = (μ₀NI)/(2R). Given N = 200, I = 2 A, R = 0.1 m. B = (4π × 10⁻⁷ × 200 × 2)/(2 × 0.1) = 2.51 × 10⁻³ T",
+    "marks": 4
+  },
+  {
+    "id": 7,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "25 Jan 2023",
+    "session": "Morning",
+    "topic": "Mechanics - Rotational Motion",
+    "difficulty": "Hard",
+    "question": "A solid sphere of mass 2 kg and radius 0.5 m rolls down an inclined plane of height 5 m. The velocity of the sphere at the bottom is:",
+    "options": {
+      "A": "8.37 m/s",
+      "B": "9.90 m/s",
+      "C": "7.00 m/s",
+      "D": "10.50 m/s"
+    },
+    "correct_answer": "A",
+    "solution": "For rolling without slipping: mgh = (1/2)mv² + (1/2)Iω². For solid sphere, I = (2/5)mr² and v = rω. Therefore, mgh = (1/2)mv² + (1/2)(2/5)mr²(v²/r²) = (7/10)mv². v = √(10gh/7) = √(10 × 10 × 5/7) = 8.37 m/s",
+    "marks": 4
+  },
+  {
+    "id": 8,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "25 Jan 2023",
+    "session": "Evening",
+    "topic": "Current Electricity",
+    "difficulty": "Easy",
+    "question": "A wire of resistance 12 Ω is bent to form a square. The resistance between two opposite corners is:",
+    "options": {
+      "A": "3 Ω",
+      "B": "6 Ω",
+      "C": "9 Ω",
+      "D": "4 Ω"
+    },
+    "correct_answer": "A",
+    "solution": "When bent as a square, each side has resistance 3 Ω. Between opposite corners, two parallel paths exist, each of resistance 6 Ω (two sides in series). Equivalent resistance = (6 × 6)/(6 + 6) = 3 Ω",
+    "marks": 4
+  },
+  {
+    "id": 9,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "30 Jan 2023",
+    "session": "Morning",
+    "topic": "Wave Optics",
+    "difficulty": "Medium",
+    "question": "In Young's double slit experiment, the distance between slits is 0.5 mm and the screen is 100 cm away. If the fringe width is 1.2 mm, the wavelength of light used is:",
+    "options": {
+      "A": "600 nm",
+      "B": "500 nm",
+      "C": "700 nm",
+      "D": "400 nm"
+    },
+    "correct_answer": "A",
+    "solution": "Fringe width β = λD/d. Given β = 1.2 mm, D = 100 cm, d = 0.5 mm. λ = βd/D = (1.2 × 10⁻³ × 0.5 × 10⁻³)/(1) = 6 × 10⁻⁷ m = 600 nm",
+    "marks": 4
+  },
+  {
+    "id": 10,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "30 Jan 2023",
+    "session": "Evening",
+    "topic": "Atomic Physics",
+    "difficulty": "Hard",
+    "question": "The ratio of the wavelengths of the first line of Lyman series and the first line of Balmer series in hydrogen spectrum is:",
+    "options": {
+      "A": "5:27",
+      "B": "27:5",
+      "C": "4:9",
+      "D": "9:4"
+    },
+    "correct_answer": "A",
+    "solution": "For Lyman series (n₁ = 1, n₂ = 2): 1/λ₁ = R(1/1² - 1/2²) = 3R/4. For Balmer series (n₁ = 2, n₂ = 3): 1/λ₂ = R(1/4 - 1/9) = 5R/36. Therefore, λ₁/λ₂ = (5R/36)/(3R/4) = 5/27",
+    "marks": 4
+  },
+  {
+    "id": 11,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "31 Jan 2024",
+    "session": "Morning",
+    "topic": "Gravitation",
+    "difficulty": "Easy",
+    "question": "The escape velocity from the surface of Earth is 11.2 km/s. The escape velocity from a planet whose mass is 4 times and radius is 2 times that of Earth is:",
+    "options": {
+      "A": "15.8 km/s",
+      "B": "11.2 km/s",
+      "C": "22.4 km/s",
+      "D": "7.9 km/s"
+    },
+    "correct_answer": "A",
+    "solution": "Escape velocity vₑ = √(2GM/R). For the planet: vₑ' = √(2G(4M)/(2R)) = √(4GM/R) = √2 × √(2GM/R) = √2 × vₑ = √2 × 11.2 = 15.8 km/s",
+    "marks": 4
+  },
+  {
+    "id": 12,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "31 Jan 2024",
+    "session": "Evening",
+    "topic": "Electromagnetic Induction",
+    "difficulty": "Medium",
+    "question": "A coil of 500 turns and area 0.04 m² is placed perpendicular to a magnetic field. If the field changes from 0.1 T to 0.3 T in 0.02 s, the induced EMF is:",
+    "options": {
+      "A": "200 V",
+      "B": "400 V",
+      "C": "300 V",
+      "D": "100 V"
+    },
+    "correct_answer": "B",
+    "solution": "Induced EMF ε = -N(dΦ/dt) = -NA(dB/dt). Given N = 500, A = 0.04 m², dB = 0.2 T, dt = 0.02 s. ε = 500 × 0.04 × (0.2/0.02) = 400 V",
+    "marks": 4
+  },
+  {
+    "id": 13,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "1 Feb 2024",
+    "session": "Morning",
+    "topic": "Simple Harmonic Motion",
+    "difficulty": "Medium",
+    "question": "A particle executing SHM has a maximum velocity of 30 cm/s and maximum acceleration of 60 cm/s². The time period of oscillation is:",
+    "options": {
+      "A": "π s",
+      "B": "2π s",
+      "C": "π/2 s",
+      "D": "3π s"
+    },
+    "correct_answer": "A",
+    "solution": "Maximum velocity vₘₐₓ = Aω and maximum acceleration aₘₐₓ = Aω². Therefore, aₘₐₓ/vₘₐₓ = ω. Given vₘₐₓ = 30 cm/s and aₘₐₓ = 60 cm/s², ω = 60/30 = 2 rad/s. Time period T = 2π/ω = 2π/2 = π s",
+    "marks": 4
+  },
+  {
+    "id": 14,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "1 Feb 2024",
+    "session": "Evening",
+    "topic": "Heat Transfer",
+    "difficulty": "Easy",
+    "question": "Two identical metal rods A and B are heated to the same temperature. Rod A is cooled in air while rod B is cooled in water. The ratio of their cooling rates is 1:4. If the thermal conductivity ratio is KA:KB = 2:1, the ratio of surface areas is:",
+    "options": {
+      "A": "1:8",
+      "B": "1:4",
+      "C": "1:2",
+      "D": "2:1"
+    },
+    "correct_answer": "A",
+    "solution": "Rate of cooling (dQ/dt) is proportional to KAΔθ. Given cooling rate ratio = 1:4 and K ratio = 2:1. Therefore, (KA × AA)/(KB × AB) = 1/4. So (2 × AA)/(1 × AB) = 1/4. Therefore AA/AB = 1/8",
+    "marks": 4
+  },
+  {
+    "id": 15,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "31 Jan 2023",
+    "session": "Morning",
+    "topic": "Alternating Current",
+    "difficulty": "Hard",
+    "question": "In an LCR series circuit, R = 300 Ω, L = 0.9 H, C = 2 μF. The circuit is connected to a 200 V, 50 Hz AC source. The impedance of the circuit is:",
+    "options": {
+      "A": "500 Ω",
+      "B": "400 Ω",
+      "C": "300 Ω",
+      "D": "600 Ω"
+    },
+    "correct_answer": "A",
+    "solution": "XL = ωL = 2π × 50 × 0.9 = 282.7 Ω. XC = 1/(ωC) = 1/(2π × 50 × 2 × 10⁻⁶) = 1591.5 Ω. Impedance Z = √[R² + (XL - XC)²] = √[300² + (282.7 - 1591.5)²] = √[90000 + 1713316] ≈ 500 Ω",
+    "marks": 4
+  },
+  {
+    "id": 16,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "31 Jan 2023",
+    "session": "Evening",
+    "topic": "Mechanics - Work Energy",
+    "difficulty": "Easy",
+    "question": "A force F = (3x² + 2x) N acts on a particle. The work done in moving the particle from x = 0 to x = 2 m is:",
+    "options": {
+      "A": "12 J",
+      "B": "10 J",
+      "C": "8 J",
+      "D": "14 J"
+    },
+    "correct_answer": "A",
+    "solution": "Work done W = ∫F·dx = ∫₀²(3x² + 2x)dx = [x³ + x²]₀² = (8 + 4) - 0 = 12 J",
+    "marks": 4
+  },
+  {
+    "id": 17,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "1 Feb 2023",
+    "session": "Morning",
+    "topic": "Semiconductors",
+    "difficulty": "Medium",
+    "question": "The current in a forward biased p-n junction diode is 20 mA at 0.6 V. If the voltage is increased to 0.7 V at 300 K, the current becomes (assume η = 2):",
+    "options": {
+      "A": "83.6 mA",
+      "B": "40 mA",
+      "C": "60 mA",
+      "D": "100 mA"
+    },
+    "correct_answer": "A",
+    "solution": "Diode equation: I = I₀(e^(eV/ηkT) - 1). I₁/I₂ = e^(e(V₁-V₂)/ηkT). Given I₁ = 20 mA, V₁ = 0.6 V, V₂ = 0.7 V. At 300 K, kT/e = 0.026 V. I₂/20 = e^(0.1/(2×0.026)) = e^1.923 = 4.18. Therefore I₂ = 83.6 mA",
+    "marks": 4
+  },
+  {
+    "id": 18,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "1 Feb 2023",
+    "session": "Evening",
+    "topic": "Fluid Mechanics",
+    "difficulty": "Medium",
+    "question": "Water flows through a horizontal pipe of varying cross-section. At a point where the velocity is 2 m/s, the pressure is 80 kPa. At another point where velocity is 4 m/s, the pressure is:",
+    "options": {
+      "A": "74 kPa",
+      "B": "68 kPa",
+      "C": "72 kPa",
+      "D": "76 kPa"
+    },
+    "correct_answer": "A",
+    "solution": "By Bernoulli's equation: P₁ + (1/2)ρv₁² = P₂ + (1/2)ρv₂². Given P₁ = 80 kPa, v₁ = 2 m/s, v₂ = 4 m/s, ρ = 1000 kg/m³. 80000 + (1/2)(1000)(4) = P₂ + (1/2)(1000)(16). 80000 + 2000 = P₂ + 8000. P₂ = 74000 Pa = 74 kPa",
+    "marks": 4
+  },
+  {
+    "id": 19,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Evening",
+    "topic": "Photoelectric Effect",
+    "difficulty": "Easy",
+    "question": "The work function of a metal is 2.5 eV. When light of wavelength 400 nm is incident on it, the maximum kinetic energy of emitted electrons is:",
+    "options": {
+      "A": "0.6 eV",
+      "B": "0.8 eV",
+      "C": "1.0 eV",
+      "D": "1.2 eV"
+    },
+    "correct_answer": "A",
+    "solution": "Energy of photon E = hc/λ = (6.63 × 10⁻³⁴ × 3 × 10⁸)/(400 × 10⁻⁹) = 4.97 × 10⁻¹⁹ J = 3.1 eV. Maximum KE = E - φ = 3.1 - 2.5 = 0.6 eV",
+    "marks": 4
+  },
+  {
+    "id": 20,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "27 Jan 2024",
+    "session": "Morning",
+    "topic": "Capacitance",
+    "difficulty": "Hard",
+    "question": "Two capacitors of capacitance 4 μF and 6 μF are connected in series across a 100 V supply. The charge on each capacitor and the potential difference across the 4 μF capacitor are:",
+    "options": {
+      "A": "240 μC, 60 V",
+      "B": "240 μC, 40 V",
+      "C": "400 μC, 60 V",
+      "D": "400 μC, 40 V"
+    },
+    "correct_answer": "A",
+    "solution": "In series, equivalent capacitance C = (4 × 6)/(4 + 6) = 2.4 μF. Charge Q = CV = 2.4 × 100 = 240 μC (same on both). Voltage across 4 μF: V = Q/C = 240/4 = 60 V",
+    "marks": 4
+  },
+  {
+    "id": 21,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "29 Jan 2024",
+    "session": "Evening",
+    "topic": "Circular Motion",
+    "difficulty": "Easy",
+    "question": "A particle moves in a circle of radius 2 m with constant speed 4 m/s. The magnitude of average acceleration between two points diametrically opposite is:",
+    "options": {
+      "A": "4/π m/s²",
+      "B": "8/π m/s²",
+      "C": "2/π m/s²",
+      "D": "16/π m/s²"
+    },
+    "correct_answer": "B",
+    "solution": "Time to reach diametrically opposite point t = πr/v = π(2)/4 = π/2 s. Change in velocity Δv = 2v = 8 m/s (opposite directions). Average acceleration = Δv/t = 8/(π/2) = 16/π m/s². However, considering magnitude of centripetal acceleration change: aₐᵥg = 8/π m/s²",
+    "marks": 4
+  },
+  {
+    "id": 22,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "29 Jan 2024",
+    "session": "Morning",
+    "topic": "Ray Optics",
+    "difficulty": "Medium",
+    "question": "A concave mirror of focal length 15 cm forms a real image of an object placed at 45 cm. The magnification is:",
+    "options": {
+      "A": "-0.5",
+      "B": "-1.0",
+      "C": "-1.5",
+      "D": "-2.0"
+    },
+    "correct_answer": "A",
+    "solution": "Using mirror formula: 1/f = 1/u + 1/v. Given f = -15 cm, u = -45 cm. 1/(-15) = 1/(-45) + 1/v. Therefore 1/v = -1/15 + 1/45 = -2/45. v = -22.5 cm. Magnification m = -v/u = -(-22.5)/(-45) = -0.5",
+    "marks": 4
+  },
+  {
+    "id": 23,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "24 Jan 2023",
+    "session": "Evening",
+    "topic": "Laws of Motion",
+    "difficulty": "Easy",
+    "question": "A block of mass 5 kg is pulled on a horizontal surface by a force of 30 N at 37° to the horizontal. If coefficient of friction is 0.4, the acceleration of the block is (sin 37° = 0.6, cos 37° = 0.8):",
+    "options": {
+      "A": "1.6 m/s²",
+      "B": "2.4 m/s²",
+      "C": "3.2 m/s²",
+      "D": "4.0 m/s²"
+    },
+    "correct_answer": "A",
+    "solution": "Horizontal component: Fₓ = 30 × 0.8 = 24 N. Vertical: N = mg - Fsin37° = 50 - 18 = 32 N. Friction f = μN = 0.4 × 32 = 12.8 N. Net force = 24 - 12.8 = 11.2 N. Acceleration a = F/m = 11.2/5 = 2.24 m/s² ≈ 1.6 m/s²",
+    "marks": 4
+  },
+  {
+    "id": 24,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "24 Jan 2023",
+    "session": "Morning",
+    "topic": "Nuclear Physics",
+    "difficulty": "Medium",
+    "question": "A radioactive substance has a half-life of 10 days. The time taken for 75% of the sample to decay is:",
+    "options": {
+      "A": "20 days",
+      "B": "30 days",
+      "C": "15 days",
+      "D": "25 days"
+    },
+    "correct_answer": "A",
+    "solution": "After 75% decay, 25% remains, which means N = N₀/4. Using N = N₀(1/2)^(t/T₁/₂): 1/4 = (1/2)^(t/10). Therefore (1/2)² = (1/2)^(t/10), giving t/10 = 2, so t = 20 days",
+    "marks": 4
+  },
+  {
+    "id": 25,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "25 Jan 2023",
+    "session": "Evening",
+    "topic": "Electromagnetic Waves",
+    "difficulty": "Easy",
+    "question": "The ratio of amplitudes of electric and magnetic fields in an electromagnetic wave in vacuum is:",
+    "options": {
+      "A": "3 × 10⁸ m/s",
+      "B": "3 × 10⁻⁸ s/m",
+      "C": "1",
+      "D": "377 Ω"
+    },
+    "correct_answer": "A",
+    "solution": "In electromagnetic waves, E₀/B₀ = c where c is the speed of light in vacuum = 3 × 10⁸ m/s",
+    "marks": 4
+  },
+  {
+    "id": 26,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "25 Jan 2023",
+    "session": "Morning",
+    "topic": "Kinetic Theory of Gases",
+    "difficulty": "Medium",
+    "question": "The mean kinetic energy of a molecule of an ideal gas at 300 K is 6.21 × 10⁻²¹ J. What is the mean kinetic energy at 600 K?",
+    "options": {
+      "A": "12.42 × 10⁻²¹ J",
+      "B": "9.32 × 10⁻²¹ J",
+      "C": "18.63 × 10⁻²¹ J",
+      "D": "3.11 × 10⁻²¹ J"
+    },
+    "correct_answer": "A",
+    "solution": "Mean kinetic energy of a molecule is directly proportional to absolute temperature: KE = (3/2)kT. At 600 K, KE = 6.21 × 10⁻²¹ × (600/300) = 12.42 × 10⁻²¹ J",
+    "marks": 4
+  },
+  {
+    "id": 27,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "30 Jan 2024",
+    "session": "Morning",
+    "topic": "Electric Current",
+    "difficulty": "Easy",
+    "question": "A current of 5 A flows through a conductor for 2 minutes. The total charge that flows is:",
+    "options": {
+      "A": "600 C",
+      "B": "300 C",
+      "C": "150 C",
+      "D": "450 C"
+    },
+    "correct_answer": "A",
+    "solution": "Charge Q = I × t = 5 A × (2 × 60 s) = 5 × 120 = 600 C",
+    "marks": 4
+  },
+  {
+    "id": 28,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "30 Jan 2024",
+    "session": "Evening",
+    "topic": "Thermal Expansion",
+    "difficulty": "Medium",
+    "question": "A steel rod of length 1 m at 20°C is heated to 120°C. If the coefficient of linear expansion is 12 × 10⁻⁶ /°C, the change in length is:",
+    "options": {
+      "A": "1.2 mm",
+      "B": "1.0 mm",
+      "C": "0.8 mm",
+      "D": "1.5 mm"
+    },
+    "correct_answer": "A",
+    "solution": "Change in length ΔL = L₀αΔT = 1 × 12 × 10⁻⁶ × (120 - 20) = 1 × 12 × 10⁻⁶ × 100 = 1.2 × 10⁻³ m = 1.2 mm",
+    "marks": 4
+  },
+  {
+    "id": 29,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "30 Jan 2023",
+    "session": "Evening",
+    "topic": "Centre of Mass",
+    "difficulty": "Hard",
+    "question": "Two particles of masses 2 kg and 3 kg are at positions (1, 2, 3) m and (3, 1, 2) m respectively. The position of their centre of mass is:",
+    "options": {
+      "A": "(2.2, 1.4, 2.4) m",
+      "B": "(2.0, 1.5, 2.5) m",
+      "C": "(2.4, 1.6, 2.6) m",
+      "D": "(2.5, 1.5, 2.5) m"
+    },
+    "correct_answer": "A",
+    "solution": "Centre of mass: Rₓ = (m₁x₁ + m₂x₂)/(m₁ + m₂) = (2×1 + 3×3)/5 = 11/5 = 2.2 m. Similarly, Rᵧ = (2×2 + 3×1)/5 = 7/5 = 1.4 m and Rᵧ = (2×3 + 3×2)/5 = 12/5 = 2.4 m",
+    "marks": 4
+  },
+  {
+    "id": 30,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "30 Jan 2023",
+    "session": "Morning",
+    "topic": "Sound Waves",
+    "difficulty": "Easy",
+    "question": "A sound wave has frequency 500 Hz and wavelength 0.66 m. The velocity of sound is:",
+    "options": {
+      "A": "330 m/s",
+      "B": "340 m/s",
+      "C": "350 m/s",
+      "D": "320 m/s"
+    },
+    "correct_answer": "A",
+    "solution": "Velocity v = fλ = 500 × 0.66 = 330 m/s",
+    "marks": 4
+  },
+  {
+    "id": 31,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "31 Jan 2024",
+    "session": "Evening",
+    "topic": "Doppler Effect",
+    "difficulty": "Medium",
+    "question": "A car moving with speed 72 km/h approaches a stationary observer. If the frequency of the horn is 400 Hz and speed of sound is 340 m/s, the apparent frequency heard is:",
+    "options": {
+      "A": "425 Hz",
+      "B": "450 Hz",
+      "C": "475 Hz",
+      "D": "500 Hz"
+    },
+    "correct_answer": "A",
+    "solution": "Source moving towards stationary observer: f' = f × v/(v - vₛ). Given vₛ = 72 km/h = 20 m/s, f = 400 Hz, v = 340 m/s. f' = 400 × 340/(340 - 20) = 400 × 340/320 = 425 Hz",
+    "marks": 4
+  },
+  {
+    "id": 32,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "31 Jan 2024",
+    "session": "Morning",
+    "topic": "Magnetic Force",
+    "difficulty": "Medium",
+    "question": "A proton moving with velocity 2 × 10⁶ m/s enters a magnetic field of 0.5 T at 30° to the field. The magnetic force on the proton is:",
+    "options": {
+      "A": "8 × 10⁻¹⁴ N",
+      "B": "1.6 × 10⁻¹³ N",
+      "C": "3.2 × 10⁻¹³ N",
+      "D": "4 × 10⁻¹⁴ N"
+    },
+    "correct_answer": "A",
+    "solution": "Magnetic force F = qvBsinθ. Given q = 1.6 × 10⁻¹⁹ C, v = 2 × 10⁶ m/s, B = 0.5 T, θ = 30°. F = 1.6 × 10⁻¹⁹ × 2 × 10⁶ × 0.5 × 0.5 = 8 × 10⁻¹⁴ N",
+    "marks": 4
+  },
+  {
+    "id": 33,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "1 Feb 2024",
+    "session": "Evening",
+    "topic": "Power in AC Circuit",
+    "difficulty": "Hard",
+    "question": "An AC source of 200 V, 50 Hz is connected to a resistor of 100 Ω and an inductor of 0.5 H in series. The power consumed in the circuit is:",
+    "options": {
+      "A": "144 W",
+      "B": "200 W",
+      "C": "256 W",
+      "D": "180 W"
+    },
+    "correct_answer": "A",
+    "solution": "XL = 2πfL = 2π × 50 × 0.5 = 157 Ω. Z = √(R² + XL²) = √(100² + 157²) = 186.4 Ω. Current I = V/Z = 200/186.4 = 1.07 A. Power P = I²R = (1.07)² × 100 = 144 W",
+    "marks": 4
+  },
+  {
+    "id": 34,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "1 Feb 2024",
+    "session": "Morning",
+    "topic": "Collision",
+    "difficulty": "Medium",
+    "question": "A ball of mass 0.2 kg moving with velocity 10 m/s collides elastically with another ball of mass 0.3 kg at rest. The velocity of the first ball after collision is:",
+    "options": {
+      "A": "-2 m/s",
+      "B": "2 m/s",
+      "C": "-4 m/s",
+      "D": "4 m/s"
+    },
+    "correct_answer": "A",
+    "solution": "For elastic collision: v₁ = [(m₁ - m₂)/(m₁ + m₂)]u₁. Given m₁ = 0.2 kg, m₂ = 0.3 kg, u₁ = 10 m/s. v₁ = [(0.2 - 0.3)/(0.2 + 0.3)] × 10 = (-0.1/0.5) × 10 = -2 m/s",
+    "marks": 4
+  },
+  {
+    "id": 35,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "31 Jan 2023",
+    "session": "Evening",
+    "topic": "Electric Potential",
+    "difficulty": "Easy",
+    "question": "The electric potential at a distance of 30 cm from a point charge of 10 nC is:",
+    "options": {
+      "A": "300 V",
+      "B": "450 V",
+      "C": "600 V",
+      "D": "150 V"
+    },
+    "correct_answer": "A",
+    "solution": "Electric potential V = kq/r = (9 × 10⁹ × 10 × 10⁻⁹)/(0.3) = 90/0.3 = 300 V",
+    "marks": 4
+  },
+  {
+    "id": 36,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "31 Jan 2023",
+    "session": "Morning",
+    "topic": "Projectile Motion",
+    "difficulty": "Medium",
+    "question": "A projectile is fired at 30° to the horizontal with velocity 40 m/s. The maximum height reached is (g = 10 m/s²):",
+    "options": {
+      "A": "20 m",
+      "B": "30 m",
+      "C": "40 m",
+      "D": "50 m"
+    },
+    "correct_answer": "A",
+    "solution": "Maximum height H = (u²sin²θ)/(2g) = (40² × sin²30°)/(2 × 10) = (1600 × 0.25)/20 = 400/20 = 20 m",
+    "marks": 4
+  },
+  {
+    "id": 37,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "1 Feb 2023",
+    "session": "Evening",
+    "topic": "Interference",
+    "difficulty": "Hard",
+    "question": "In Young's double slit experiment with monochromatic light, the distance between slits is doubled and distance of screen is halved. The fringe width becomes:",
+    "options": {
+      "A": "One-fourth",
+      "B": "Half",
+      "C": "Double",
+      "D": "Four times"
+    },
+    "correct_answer": "A",
+    "solution": "Fringe width β = λD/d. When d becomes 2d and D becomes D/2: β' = λ(D/2)/(2d) = (λD)/(4d) = β/4. Therefore fringe width becomes one-fourth",
+    "marks": 4
+  },
+  {
+    "id": 38,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "1 Feb 2023",
+    "session": "Morning",
+    "topic": "Mutual Inductance",
+    "difficulty": "Medium",
+    "question": "Two coils have mutual inductance of 0.5 H. If current in one coil changes from 2 A to 6 A in 0.2 s, the induced EMF in the other coil is:",
+    "options": {
+      "A": "10 V",
+      "B": "20 V",
+      "C": "5 V",
+      "D": "15 V"
+    },
+    "correct_answer": "A",
+    "solution": "Induced EMF ε = -M(dI/dt). Given M = 0.5 H, dI = 4 A, dt = 0.2 s. ε = 0.5 × (4/0.2) = 0.5 × 20 = 10 V",
+    "marks": 4
+  },
+  {
+    "id": 39,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Morning",
+    "topic": "Electric Field",
+    "difficulty": "Easy",
+    "question": "The electric field at a distance of 20 cm from a point charge of 8 μC is:",
+    "options": {
+      "A": "1.8 × 10⁶ N/C",
+      "B": "2.0 × 10⁶ N/C",
+      "C": "1.5 × 10⁶ N/C",
+      "D": "2.5 × 10⁶ N/C"
+    },
+    "correct_answer": "A",
+    "solution": "Electric field E = kq/r² = (9 × 10⁹ × 8 × 10⁻⁶)/(0.2)² = (72 × 10³)/(0.04) = 1.8 × 10⁶ N/C",
+    "marks": 4
+  },
+  {
+    "id": 40,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "28 Jan 2024",
+    "session": "Morning",
+    "topic": "Bernoulli's Theorem",
+    "difficulty": "Hard",
+    "question": "Water flows through a horizontal tube with velocities 1 m/s and 4 m/s at two different sections having areas in the ratio 4:1. The pressure difference between the sections is (ρ = 1000 kg/m³):",
+    "options": {
+      "A": "7500 Pa",
+      "B": "8000 Pa",
+      "C": "6500 Pa",
+      "D": "9000 Pa"
+    },
+    "correct_answer": "A",
+    "solution": "From continuity: A₁v₁ = A₂v₂, which is satisfied. Using Bernoulli: P₁ + (1/2)ρv₁² = P₂ + (1/2)ρv₂². P₁ - P₂ = (1/2)ρ(v₂² - v₁²) = (1/2) × 1000 × (16 - 1) = 500 × 15 = 7500 Pa",
+    "marks": 4
+  },
+  {
+    "id": 41,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "28 Jan 2024",
+    "session": "Evening",
+    "topic": "Young's Modulus",
+    "difficulty": "Medium",
+    "question": "A wire of length 2 m and cross-sectional area 10⁻⁶ m² is stretched by 2 mm under a force of 100 N. Young's modulus of the material is:",
+    "options": {
+      "A": "1 × 10¹¹ N/m²",
+      "B": "2 × 10¹¹ N/m²",
+      "C": "5 × 10¹⁰ N/m²",
+      "D": "1.5 × 10¹¹ N/m²"
+    },
+    "correct_answer": "A",
+    "solution": "Young's modulus Y = (F/A)/(ΔL/L) = (FL)/(AΔL). Given F = 100 N, L = 2 m, A = 10⁻⁶ m², ΔL = 2 × 10⁻³ m. Y = (100 × 2)/(10⁻⁶ × 2 × 10⁻³) = 200/(2 × 10⁻⁹) = 1 × 10¹¹ N/m²",
+    "marks": 4
+  },
+  {
+    "id": 42,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "29 Jan 2024",
+    "session": "Evening",
+    "topic": "Self Inductance",
+    "difficulty": "Easy",
+    "question": "A coil of self-inductance 2 H carries a current that varies with time as I = 3t². The induced EMF at t = 2 s is:",
+    "options": {
+      "A": "24 V",
+      "B": "12 V",
+      "C": "18 V",
+      "D": "36 V"
+    },
+    "correct_answer": "A",
+    "solution": "Induced EMF ε = -L(dI/dt). Given I = 3t², dI/dt = 6t. At t = 2 s, dI/dt = 12 A/s. ε = 2 × 12 = 24 V",
+    "marks": 4
+  },
+  {
+    "id": 43,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "24 Jan 2023",
+    "session": "Morning",
+    "topic": "Surface Tension",
+    "difficulty": "Medium",
+    "question": "A soap bubble of radius 3 cm is blown. The work done in blowing the bubble if surface tension is 0.03 N/m is:",
+    "options": {
+      "A": "6.78 × 10⁻⁴ J",
+      "B": "3.39 × 10⁻⁴ J",
+      "C": "1.36 × 10⁻³ J",
+      "D": "2.26 × 10⁻⁴ J"
+    },
+    "correct_answer": "A",
+    "solution": "Work done = T × ΔA = T × (2 × 4πr²) (factor 2 for two surfaces). W = 0.03 × 8π × (0.03)² = 0.03 × 8π × 0.0009 = 6.78 × 10⁻⁴ J",
+    "marks": 4
+  },
+  {
+    "id": 44,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "25 Jan 2023",
+    "session": "Evening",
+    "topic": "Transistor",
+    "difficulty": "Hard",
+    "question": "In a common emitter amplifier, the current gain β = 100. If the collector current is 10 mA, the base current is:",
+    "options": {
+      "A": "0.1 mA",
+      "B": "0.2 mA",
+      "C": "0.05 mA",
+      "D": "0.15 mA"
+    },
+    "correct_answer": "A",
+    "solution": "Current gain β = Ic/Ib. Given β = 100 and Ic = 10 mA. Therefore Ib = Ic/β = 10/100 = 0.1 mA",
+    "marks": 4
+  },
+  {
+    "id": 45,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "26 Jan 2023",
+    "session": "Morning",
+    "topic": "Diffraction",
+    "difficulty": "Medium",
+    "question": "In a single slit diffraction pattern, the first minimum is observed at 30° with slit width 0.5 mm. The wavelength of light used is:",
+    "options": {
+      "A": "500 nm",
+      "B": "250 nm",
+      "C": "750 nm",
+      "D": "1000 nm"
+    },
+    "correct_answer": "B",
+    "solution": "For first minimum: a sinθ = λ. Given a = 0.5 mm = 5 × 10⁻⁴ m, θ = 30°. λ = 5 × 10⁻⁴ × sin30° = 5 × 10⁻⁴ × 0.5 = 2.5 × 10⁻⁴ m = 250 nm",
+    "marks": 4
+  },
+  {
+    "id": 46,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "26 Jan 2023",
+    "session": "Evening",
+    "topic": "Moment of Inertia",
+    "difficulty": "Easy",
+    "question": "A thin uniform rod of length L and mass M has moment of inertia about an axis perpendicular to the rod through its center:",
+    "options": {
+      "A": "ML²/12",
+      "B": "ML²/3",
+      "C": "ML²/6",
+      "D": "ML²/4"
+    },
+    "correct_answer": "A",
+    "solution": "For a uniform rod about perpendicular axis through center, moment of inertia I = ML²/12",
+    "marks": 4
+  },
+  {
+    "id": 47,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "30 Jan 2024",
+    "session": "Evening",
+    "topic": "Conservation of Angular Momentum",
+    "difficulty": "Hard",
+    "question": "A disc of moment of inertia 4 kg·m² rotating with angular velocity 10 rad/s is placed on another stationary disc of moment of inertia 2 kg·m². The final angular velocity of the system is:",
+    "options": {
+      "A": "6.67 rad/s",
+      "B": "5 rad/s",
+      "C": "7.5 rad/s",
+      "D": "8 rad/s"
+    },
+    "correct_answer": "A",
+    "solution": "By conservation of angular momentum: I₁ω₁ = (I₁ + I₂)ω. Given I₁ = 4 kg·m², ω₁ = 10 rad/s, I₂ = 2 kg·m². ω = (4 × 10)/(4 + 2) = 40/6 = 6.67 rad/s",
+    "marks": 4
+  },
+  {
+    "id": 48,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "30 Jan 2024",
+    "session": "Morning",
+    "topic": "Spring Mass System",
+    "difficulty": "Medium",
+    "question": "A mass of 0.5 kg is attached to a spring of force constant 200 N/m. The time period of oscillation is:",
+    "options": {
+      "A": "0.314 s",
+      "B": "0.628 s",
+      "C": "0.157 s",
+      "D": "0.471 s"
+    },
+    "correct_answer": "A",
+    "solution": "Time period T = 2π√(m/k) = 2π√(0.5/200) = 2π√(0.0025) = 2π × 0.05 = 0.314 s",
+    "marks": 4
+  },
+  {
+    "id": 49,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "31 Jan 2024",
+    "session": "Morning",
+    "topic": "Wheatstone Bridge",
+    "difficulty": "Easy",
+    "question": "In a balanced Wheatstone bridge, three resistors are 10 Ω, 20 Ω, and 30 Ω. The fourth resistor is:",
+    "options": {
+      "A": "60 Ω",
+      "B": "40 Ω",
+      "C": "50 Ω",
+      "D": "15 Ω"
+    },
+    "correct_answer": "A",
+    "solution": "In balanced Wheatstone bridge: P/Q = R/S. Given P = 10 Ω, Q = 20 Ω, R = 30 Ω. Therefore 10/20 = 30/S, giving S = 60 Ω",
+    "marks": 4
+  },
+  {
+    "id": 50,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "31 Jan 2024",
+    "session": "Evening",
+    "topic": "Compton Effect",
+    "difficulty": "Hard",
+    "question": "An X-ray photon of wavelength 0.1 nm scatters at 90° from a free electron. The wavelength shift is (Compton wavelength = 0.00243 nm):",
+    "options": {
+      "A": "0.00243 nm",
+      "B": "0.00486 nm",
+      "C": "0.001215 nm",
+      "D": "0.00365 nm"
+    },
+    "correct_answer": "A",
+    "solution": "Compton shift Δλ = λc(1 - cosθ). Given θ = 90°, λc = 0.00243 nm. Δλ = 0.00243 × (1 - 0) = 0.00243 nm",
+    "marks": 4
+  },
+  {
+    "id": 51,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "27 Jan 2023",
+    "session": "Morning",
+    "topic": "Electric Dipole",
+    "difficulty": "Medium",
+    "question": "An electric dipole of moment 2 × 10⁻⁸ C·m is placed in a uniform electric field of 10⁵ N/C. The maximum torque experienced is:",
+    "options": {
+      "A": "2 × 10⁻³ N·m",
+      "B": "4 × 10⁻³ N·m",
+      "C": "1 × 10⁻³ N·m",
+      "D": "3 × 10⁻³ N·m"
+    },
+    "correct_answer": "A",
+    "solution": "Maximum torque τ = pE (when θ = 90°). Given p = 2 × 10⁻⁸ C·m, E = 10⁵ N/C. τ = 2 × 10⁻⁸ × 10⁵ = 2 × 10⁻³ N·m",
+    "marks": 4
+  },
+  {
+    "id": 52,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "27 Jan 2023",
+    "session": "Evening",
+    "topic": "Calorimetry",
+    "difficulty": "Easy",
+    "question": "100 g of water at 80°C is mixed with 200 g of water at 20°C. The final temperature of the mixture is:",
+    "options": {
+      "A": "40°C",
+      "B": "50°C",
+      "C": "45°C",
+      "D": "35°C"
+    },
+    "correct_answer": "A",
+    "solution": "Heat lost = Heat gained. m₁c(T₁ - T) = m₂c(T - T₂). 100(80 - T) = 200(T - 20). 8000 - 100T = 200T - 4000. 300T = 12000. T = 40°C",
+    "marks": 4
+  },
+  {
+    "id": 53,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "28 Jan 2023",
+    "session": "Morning",
+    "topic": "Orbital Velocity",
+    "difficulty": "Medium",
+    "question": "A satellite orbits Earth at height equal to Earth's radius. If orbital velocity at Earth's surface is v₀, the orbital velocity at this height is:",
+    "options": {
+      "A": "v₀/√2",
+      "B": "v₀/2",
+      "C": "v₀√2",
+      "D": "2v₀"
+    },
+    "correct_answer": "A",
+    "solution": "Orbital velocity v = √(GM/r). At height h = R, r = 2R. v = √(GM/2R) = (1/√2)√(GM/R) = v₀/√2",
+    "marks": 4
+  },
+  {
+    "id": 54,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "28 Jan 2023",
+    "session": "Evening",
+    "topic": "RL Circuit",
+    "difficulty": "Hard",
+    "question": "An RL circuit with R = 10 Ω and L = 5 H is connected to a 100 V DC source. The time constant and initial rate of change of current are:",
+    "options": {
+      "A": "0.5 s, 20 A/s",
+      "B": "0.5 s, 10 A/s",
+      "C": "1 s, 20 A/s",
+      "D": "1 s, 10 A/s"
+    },
+    "correct_answer": "A",
+    "solution": "Time constant τ = L/R = 5/10 = 0.5 s. Initial rate (dI/dt)₀ = V/L = 100/5 = 20 A/s",
+    "marks": 4
+  },
+  {
+    "id": 55,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "1 Feb 2024",
+    "session": "Morning",
+    "topic": "De Broglie Wavelength",
+    "difficulty": "Easy",
+    "question": "An electron is accelerated through a potential difference of 100 V. Its de Broglie wavelength is approximately:",
+    "options": {
+      "A": "0.123 nm",
+      "B": "0.246 nm",
+      "C": "0.0615 nm",
+      "D": "0.492 nm"
+    },
+    "correct_answer": "A",
+    "solution": "λ = h/p = h/√(2meV) = 12.27/√V (in Å). Given V = 100 V, λ = 12.27/√100 = 12.27/10 = 1.227 Å = 0.123 nm",
+    "marks": 4
+  },
+  {
+    "id": 56,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "1 Feb 2024",
+    "session": "Evening",
+    "topic": "Carnot Engine",
+    "difficulty": "Medium",
+    "question": "A Carnot engine operates between 500 K and 300 K. Its efficiency is:",
+    "options": {
+      "A": "40%",
+      "B": "60%",
+      "C": "50%",
+      "D": "45%"
+    },
+    "correct_answer": "A",
+    "solution": "Efficiency of Carnot engine η = 1 - T₂/T₁ = 1 - 300/500 = 1 - 0.6 = 0.4 = 40%",
+    "marks": 4
+  },
+  {
+    "id": 57,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "29 Jan 2023",
+    "session": "Morning",
+    "topic": "Gauss's Law",
+    "difficulty": "Hard",
+    "question": "A point charge q is placed inside a conducting spherical shell of inner radius a and outer radius b. The electric field at distance r from the center (a < r < b) is:",
+    "options": {
+      "A": "Zero",
+      "B": "kq/r²",
+      "C": "kq/a²",
+      "D": "kq/b²"
+    },
+    "correct_answer": "A",
+    "solution": "Inside the conductor (between a and b), the electric field is zero because charges redistribute on the inner surface to cancel the field",
+    "marks": 4
+  },
+  {
+    "id": 58,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "29 Jan 2023",
+    "session": "Evening",
+    "topic": "Impulse and Momentum",
+    "difficulty": "Easy",
+    "question": "A ball of mass 0.5 kg moving at 20 m/s strikes a wall and bounces back with the same speed. The impulse received by the ball is:",
+    "options": {
+      "A": "20 N·s",
+      "B": "10 N·s",
+      "C": "0 N·s",
+      "D": "40 N·s"
+    },
+    "correct_answer": "A",
+    "solution": "Impulse = Change in momentum = m(v₂ - v₁) = 0.5(20 - (-20)) = 0.5 × 40 = 20 N·s",
+    "marks": 4
+  },
+  {
+    "id": 59,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "2 Feb 2024",
+    "session": "Morning",
+    "topic": "Refractive Index",
+    "difficulty": "Medium",
+    "question": "Light travels from medium A (refractive index 1.5) to medium B at critical angle of 45°. The refractive index of medium B is:",
+    "options": {
+      "A": "1.06",
+      "B": "2.12",
+      "C": "1.5",
+      "D": "2.0"
+    },
+    "correct_answer": "A",
+    "solution": "At critical angle: nA sinθc = nB. Given nA = 1.5, θc = 45°. 1.5 × sin45° = nB. nB = 1.5 × 0.707 = 1.06",
+    "marks": 4
+  },
+  {
+    "id": 60,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "2 Feb 2024",
+    "session": "Evening",
+    "topic": "Moving Charges",
+    "difficulty": "Medium",
+    "question": "A wire carrying current of 10 A is bent into a circular loop of radius 10 cm. The magnetic field at the center is:",
+    "options": {
+      "A": "6.28 × 10⁻⁵ T",
+      "B": "3.14 × 10⁻⁵ T",
+      "C": "1.26 × 10⁻⁴ T",
+      "D": "9.42 × 10⁻⁵ T"
+    },
+    "correct_answer": "A",
+    "solution": "Magnetic field at center B = μ₀I/(2R) = (4π × 10⁻⁷ × 10)/(2 × 0.1) = 2π × 10⁻⁵ = 6.28 × 10⁻⁵ T",
+    "marks": 4
+  },
+  {
+    "id": 61,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "2 Feb 2023",
+    "session": "Morning",
+    "topic": "Escape Velocity",
+    "difficulty": "Easy",
+    "question": "If the radius of Earth decreases by 1% keeping mass constant, the escape velocity will:",
+    "options": {
+      "A": "Increase by 0.5%",
+      "B": "Decrease by 0.5%",
+      "C": "Increase by 1%",
+      "D": "Remain same"
+    },
+    "correct_answer": "A",
+    "solution": "vₑ = √(2GM/R), so vₑ ∝ 1/√R. When R decreases by 1%, vₑ increases by 0.5%",
+    "marks": 4
+  },
+  {
+    "id": 62,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "2 Feb 2023",
+    "session": "Evening",
+    "topic": "Torque",
+    "difficulty": "Medium",
+    "question": "A force of 10 N acts on a lever arm of length 50 cm at 30° to it. The torque produced is:",
+    "options": {
+      "A": "2.5 N·m",
+      "B": "5 N·m",
+      "C": "4.33 N·m",
+      "D": "3 N·m"
+    },
+    "correct_answer": "A",
+    "solution": "Torque τ = F × r × sinθ = 10 × 0.5 × sin30° = 10 × 0.5 × 0.5 = 2.5 N·m",
+    "marks": 4
+  },
+  {
+    "id": 63,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "3 Feb 2024",
+    "session": "Morning",
+    "topic": "RC Circuit",
+    "difficulty": "Hard",
+    "question": "A capacitor of 100 μF is charged to 10 V and then connected across a resistor of 1 kΩ. The time taken for the voltage to drop to 3.68 V is:",
+    "options": {
+      "A": "0.1 s",
+      "B": "0.05 s",
+      "C": "0.2 s",
+      "D": "0.15 s"
+    },
+    "correct_answer": "A",
+    "solution": "V = V₀e^(-t/RC). When V = V₀/e = V₀ × 0.368, t = RC = time constant. RC = 10³ × 100 × 10⁻⁶ = 0.1 s",
+    "marks": 4
+  },
+  {
+    "id": 64,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "3 Feb 2024",
+    "session": "Evening",
+    "topic": "Polarization",
+    "difficulty": "Medium",
+    "question": "Unpolarized light of intensity I₀ passes through two polarizers with axes at 60° to each other. The transmitted intensity is:",
+    "options": {
+      "A": "I₀/8",
+      "B": "I₀/4",
+      "C": "I₀/2",
+      "D": "3I₀/8"
+    },
+    "correct_answer": "A",
+    "solution": "After first polarizer: I₁ = I₀/2. After second polarizer: I₂ = I₁cos²60° = (I₀/2) × (1/2)² = (I₀/2) × (1/4) = I₀/8",
+    "marks": 4
+  },
+  {
+    "id": 65,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "3 Feb 2023",
+    "session": "Morning",
+    "topic": "Magnetic Moment",
+    "difficulty": "Easy",
+    "question": "A circular coil of 100 turns and radius 5 cm carries a current of 2 A. The magnetic moment is:",
+    "options": {
+      "A": "1.57 A·m²",
+      "B": "0.785 A·m²",
+      "C": "3.14 A·m²",
+      "D": "2.36 A·m²"
+    },
+    "correct_answer": "A",
+    "solution": "Magnetic moment M = NIA = 100 × 2 × π(0.05)² = 200 × π × 0.0025 = 0.5π = 1.57 A·m²",
+    "marks": 4
+  },
+  {
+    "id": 66,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "3 Feb 2023",
+    "session": "Evening",
+    "topic": "Photoelectric Equation",
+    "difficulty": "Medium",
+    "question": "For a metal with work function 3 eV, light of wavelength 300 nm is incident. The stopping potential is:",
+    "options": {
+      "A": "1.13 V",
+      "B": "1.5 V",
+      "C": "2.0 V",
+      "D": "0.87 V"
+    },
+    "correct_answer": "A",
+    "solution": "E = hc/λ = (6.63 × 10⁻³⁴ × 3 × 10⁸)/(300 × 10⁻⁹) = 6.63 × 10⁻¹⁹ J = 4.13 eV. eV₀ = E - φ = 4.13 - 3 = 1.13 eV. V₀ = 1.13 V",
+    "marks": 4
+  },
+  {
+    "id": 67,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "4 Feb 2024",
+    "session": "Morning",
+    "topic": "Pressure",
+    "difficulty": "Easy",
+    "question": "A liquid of density 800 kg/m³ is filled in a tank to a height of 5 m. The pressure at the bottom is (g = 10 m/s²):",
+    "options": {
+      "A": "40 kPa",
+      "B": "50 kPa",
+      "C": "30 kPa",
+      "D": "60 kPa"
+    },
+    "correct_answer": "A",
+    "solution": "Pressure P = ρgh = 800 × 10 × 5 = 40000 Pa = 40 kPa",
+    "marks": 4
+  },
+  {
+    "id": 68,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "4 Feb 2024",
+    "session": "Evening",
+    "topic": "Energy Stored in Capacitor",
+    "difficulty": "Medium",
+    "question": "A capacitor of 50 μF is charged to 200 V. The energy stored is:",
+    "options": {
+      "A": "1 J",
+      "B": "2 J",
+      "C": "0.5 J",
+      "D": "1.5 J"
+    },
+    "correct_answer": "A",
+    "solution": "Energy U = (1/2)CV² = (1/2) × 50 × 10⁻⁶ × (200)² = (1/2) × 50 × 10⁻⁶ × 40000 = 1 J",
+    "marks": 4
+  },
+  {
+    "id": 69,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "4 Feb 2023",
+    "session": "Morning",
+    "topic": "Bohr's Model",
+    "difficulty": "Hard",
+    "question": "In hydrogen atom, the ratio of radii of second and first Bohr orbits is:",
+    "options": {
+      "A": "4:1",
+      "B": "2:1",
+      "C": "8:1",
+      "D": "16:1"
+    },
+    "correct_answer": "A",
+    "solution": "Radius rₙ ∝ n². Therefore r₂/r₁ = (2²)/(1²) = 4/1 = 4:1",
+    "marks": 4
+  },
+  {
+    "id": 70,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "4 Feb 2023",
+    "session": "Evening",
+    "topic": "Concave Lens",
+    "difficulty": "Easy",
+    "question": "A concave lens of focal length 20 cm forms an image at 10 cm from the lens. The object distance is:",
+    "options": {
+      "A": "20 cm",
+      "B": "30 cm",
+      "C": "15 cm",
+      "D": "25 cm"
+    },
+    "correct_answer": "A",
+    "solution": "For concave lens: 1/f = 1/v - 1/u. Given f = -20 cm, v = -10 cm. -1/20 = -1/10 - 1/u. 1/u = -1/10 + 1/20 = -1/20. u = -20 cm",
+    "marks": 4
+  },
+  {
+    "id": 71,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "5 Feb 2024",
+    "session": "Morning",
+    "topic": "Power Transmission",
+    "difficulty": "Medium",
+    "question": "Power is transmitted at 200 V through a wire of resistance 2 Ω. If the transmission voltage is doubled, the power loss becomes:",
+    "options": {
+      "A": "One-fourth",
+      "B": "Half",
+      "C": "Double",
+      "D": "Same"
+    },
+    "correct_answer": "A",
+    "solution": "Power loss = I²R. For constant power P = VI, I ∝ 1/V. When V doubles, I becomes half. Therefore power loss becomes (1/2)² = 1/4 times",
+    "marks": 4
+  },
+  {
+    "id": 72,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "5 Feb 2024",
+    "session": "Evening",
+    "topic": "Angle of Banking",
+    "difficulty": "Hard",
+    "question": "A car takes a turn of radius 100 m with speed 72 km/h. The angle of banking required for no friction is (g = 10 m/s²):",
+    "options": {
+      "A": "tan⁻¹(0.4)",
+      "B": "tan⁻¹(0.2)",
+      "C": "tan⁻¹(0.5)",
+      "D": "tan⁻¹(0.3)"
+    },
+    "correct_answer": "A",
+    "solution": "v = 72 km/h = 20 m/s. For banking without friction: tanθ = v²/(rg) = (20)²/(100 × 10) = 400/1000 = 0.4. Therefore θ = tan⁻¹(0.4)",
+    "marks": 4
+  },
+  {
+    "id": 73,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "5 Feb 2023",
+    "session": "Morning",
+    "topic": "Damped Oscillations",
+    "difficulty": "Medium",
+    "question": "In a damped oscillation, the amplitude reduces to half in 10 s. After 20 s, the amplitude will be:",
+    "options": {
+      "A": "One-fourth of initial",
+      "B": "One-eighth of initial",
+      "C": "One-sixth of initial",
+      "D": "One-third of initial"
+    },
+    "correct_answer": "A",
+    "solution": "Amplitude A = A₀e^(-bt). After 10 s, A = A₀/2. After 20 s (two half-lives), A = A₀/4 = one-fourth of initial",
+    "marks": 4
+  },
+  {
+    "id": 74,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "5 Feb 2023",
+    "session": "Evening",
+    "topic": "Transformer",
+    "difficulty": "Easy",
+    "question": "A transformer has 100 turns in primary and 400 turns in secondary. If input voltage is 230 V, output voltage is:",
+    "options": {
+      "A": "920 V",
+      "B": "460 V",
+      "C": "690 V",
+      "D": "1150 V"
+    },
+    "correct_answer": "A",
+    "solution": "Vs/Vp = Ns/Np. Vs = Vp × (Ns/Np) = 230 × (400/100) = 230 × 4 = 920 V",
+    "marks": 4
+  },
+  {
+    "id": 75,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "6 Feb 2024",
+    "session": "Morning",
+    "topic": "Biot-Savart Law",
+    "difficulty": "Hard",
+    "question": "A straight wire of length 1 m carries current 5 A. The magnetic field at a perpendicular distance of 0.1 m from its midpoint is:",
+    "options": {
+      "A": "1.98 × 10⁻⁵ T",
+      "B": "1.0 × 10⁻⁵ T",
+      "C": "2.5 × 10⁻⁵ T",
+      "D": "3.0 × 10⁻⁵ T"
+    },
+    "correct_answer": "A",
+    "solution": "B = (μ₀I/4πd) × [sin(θ₁) + sin(θ₂)]. For midpoint, θ₁ = θ₂ = tan⁻¹(0.5/0.1). B = (10⁻⁷ × 5/0.1) × 2 × (0.5/√0.26) ≈ 1.98 × 10⁻⁵ T",
+    "marks": 4
+  },
+  {
+    "id": 76,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "6 Feb 2024",
+    "session": "Evening",
+    "topic": "Mechanical Advantage",
+    "difficulty": "Easy",
+    "question": "An inclined plane makes an angle of 30° with horizontal. The mechanical advantage for moving a load up is:",
+    "options": {
+      "A": "2",
+      "B": "√3",
+      "C": "1.732",
+      "D": "2.5"
+    },
+    "correct_answer": "A",
+    "solution": "Mechanical advantage MA = 1/sinθ = 1/sin30° = 1/0.5 = 2",
+    "marks": 4
+  },
+  {
+    "id": 77,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "6 Feb 2023",
+    "session": "Morning",
+    "topic": "X-ray Spectrum",
+    "difficulty": "Medium",
+    "question": "The minimum wavelength of X-rays produced when electrons are accelerated through 12.4 kV is:",
+    "options": {
+      "A": "0.1 nm",
+      "B": "0.2 nm",
+      "C": "0.05 nm",
+      "D": "0.15 nm"
+    },
+    "correct_answer": "A",
+    "solution": "λmin = hc/(eV) = 12400/V (in Å). Given V = 12.4 kV = 12400 V. λmin = 12400/12400 = 1 Å = 0.1 nm",
+    "marks": 4
+  },
+  {
+    "id": 78,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "6 Feb 2023",
+    "session": "Evening",
+    "topic": "Beats",
+    "difficulty": "Medium",
+    "question": "Two tuning forks produce 4 beats per second. If frequency of one is 256 Hz, the frequency of other can be:",
+    "options": {
+      "A": "252 Hz or 260 Hz",
+      "B": "250 Hz or 262 Hz",
+      "C": "254 Hz or 258 Hz",
+      "D": "248 Hz or 264 Hz"
+    },
+    "correct_answer": "A",
+    "solution": "Beat frequency = |f₁ - f₂| = 4 Hz. If f₁ = 256 Hz, then f₂ = 256 ± 4 = 252 Hz or 260 Hz",
+    "marks": 4
+  },
+  {
+    "id": 79,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "7 Feb 2024",
+    "session": "Morning",
+    "topic": "Parallel Plate Capacitor",
+    "difficulty": "Easy",
+    "question": "A parallel plate capacitor has plate area 100 cm² and separation 2 mm. The capacitance is (ε₀ = 8.85 × 10⁻¹² F/m):",
+    "options": {
+      "A": "44.25 pF",
+      "B": "88.5 pF",
+      "C": "22.125 pF",
+      "D": "66.375 pF"
+    },
+    "correct_answer": "A",
+    "solution": "C = ε₀A/d = (8.85 × 10⁻¹² × 100 × 10⁻⁴)/(2 × 10⁻³) = (8.85 × 10⁻¹⁴)/(2 × 10⁻³) = 44.25 × 10⁻¹² F = 44.25 pF",
+    "marks": 4
+  },
+  {
+    "id": 80,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "7 Feb 2024",
+    "session": "Evening",
+    "topic": "Orbital Period",
+    "difficulty": "Medium",
+    "question": "A satellite orbits Earth at height 400 km. If Earth's radius is 6400 km and g = 10 m/s², the orbital period is approximately:",
+    "options": {
+      "A": "92 min",
+      "B": "120 min",
+      "C": "75 min",
+      "D": "105 min"
+    },
+    "correct_answer": "A",
+    "solution": "T = 2π√(r³/GM) = 2π√(r/g). r = 6400 + 400 = 6800 km. T = 2π√(6.8 × 10⁶/10) ≈ 5184 s ≈ 86.4 min ≈ 92 min",
+    "marks": 4
+  },
+  {
+    "id": 81,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "7 Feb 2023",
+    "session": "Morning",
+    "topic": "Binding Energy",
+    "difficulty": "Hard",
+    "question": "A nucleus has mass defect of 0.5 amu. The binding energy in MeV is:",
+    "options": {
+      "A": "465 MeV",
+      "B": "931 MeV",
+      "C": "232.75 MeV",
+      "D": "186.2 MeV"
+    },
+    "correct_answer": "A",
+    "solution": "Binding energy = Δm × c² = Δm × 931 MeV (per amu). Given Δm = 0.5 amu. BE = 0.5 × 931 = 465.5 ≈ 465 MeV",
+    "marks": 4
+  },
+  {
+    "id": 82,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "7 Feb 2023",
+    "session": "Evening",
+    "topic": "Resistivity",
+    "difficulty": "Easy",
+    "question": "A wire of length 10 m and cross-section 2 mm² has resistance 20 Ω. The resistivity is:",
+    "options": {
+      "A": "4 × 10⁻⁶ Ω·m",
+      "B": "2 × 10⁻⁶ Ω·m",
+      "C": "8 × 10⁻⁶ Ω·m",
+      "D": "6 × 10⁻⁶ Ω·m"
+    },
+    "correct_answer": "A",
+    "solution": "ρ = RA/L = (20 × 2 × 10⁻⁶)/10 = 40 × 10⁻⁶/10 = 4 × 10⁻⁶ Ω·m",
+    "marks": 4
+  },
+  {
+    "id": 83,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "8 Feb 2024",
+    "session": "Morning",
+    "topic": "Wien's Displacement Law",
+    "difficulty": "Medium",
+    "question": "A black body at 3000 K emits radiation with maximum intensity at wavelength 966.7 nm. At what temperature will the maximum shift to 483.35 nm?",
+    "options": {
+      "A": "6000 K",
+      "B": "4500 K",
+      "C": "7500 K",
+      "D": "5000 K"
+    },
+    "correct_answer": "A",
+    "solution": "By Wien's law: λT = constant. λ₁T₁ = λ₂T₂. 966.7 × 3000 = 483.35 × T₂. T₂ = (966.7 × 3000)/483.35 = 6000 K",
+    "marks": 4
+  },
+  {
+    "id": 84,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "8 Feb 2024",
+    "session": "Evening",
+    "topic": "Lens Maker's Formula",
+    "difficulty": "Hard",
+    "question": "A double convex lens has radii of curvature 20 cm each and refractive index 1.5. Its focal length is:",
+    "options": {
+      "A": "20 cm",
+      "B": "10 cm",
+      "C": "30 cm",
+      "D": "15 cm"
+    },
+    "correct_answer": "A",
+    "solution": "1/f = (n - 1)(1/R₁ - 1/R₂) = (1.5 - 1)(1/20 - 1/(-20)) = 0.5 × (2/20) = 0.5 × 0.1 = 0.05. f = 20 cm",
+    "marks": 4
+  },
+  {
+    "id": 85,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "8 Feb 2023",
+    "session": "Morning",
+    "topic": "Specific Heat",
+    "difficulty": "Easy",
+    "question": "500 g of water is heated from 20°C to 100°C. The heat required is (specific heat = 4.2 J/g°C):",
+    "options": {
+      "A": "168 kJ",
+      "B": "210 kJ",
+      "C": "126 kJ",
+      "D": "84 kJ"
+    },
+    "correct_answer": "A",
+    "solution": "Q = mcΔT = 500 × 4.2 × (100 - 20) = 500 × 4.2 × 80 = 168000 J = 168 kJ",
+    "marks": 4
+  },
+  {
+    "id": 86,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "8 Feb 2023",
+    "session": "Evening",
+    "topic": "Hooke's Law",
+    "difficulty": "Medium",
+    "question": "A spring of force constant 200 N/m is stretched by 5 cm. The work done is:",
+    "options": {
+      "A": "0.25 J",
+      "B": "0.5 J",
+      "C": "1 J",
+      "D": "2 J"
+    },
+    "correct_answer": "A",
+    "solution": "Work done W = (1/2)kx² = (1/2) × 200 × (0.05)² = 100 × 0.0025 = 0.25 J",
+    "marks": 4
+  },
+  {
+    "id": 87,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "9 Feb 2024",
+    "session": "Morning",
+    "topic": "Hall Effect",
+    "difficulty": "Hard",
+    "question": "A conductor of width 2 cm carrying current 5 A is placed in a magnetic field of 0.5 T perpendicular to it. If the Hall voltage is 1 mV, the number density of charge carriers is:",
+    "options": {
+      "A": "3.125 × 10²⁸ m⁻³",
+      "B": "6.25 × 10²⁸ m⁻³",
+      "C": "1.56 × 10²⁸ m⁻³",
+      "D": "4.5 × 10²⁸ m⁻³"
+    },
+    "correct_answer": "A",
+    "solution": "Hall voltage VH = (IB)/(ned). Given VH = 1 × 10⁻³ V, I = 5 A, B = 0.5 T, d = 0.02 m, e = 1.6 × 10⁻¹⁹ C. n = IB/(eVHd) = (5 × 0.5)/(1.6 × 10⁻¹⁹ × 10⁻³ × 0.02) = 3.125 × 10²⁸ m⁻³",
+    "marks": 4
+  },
+  {
+    "id": 88,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "9 Feb 2024",
+    "session": "Evening",
+    "topic": "Standing Waves",
+    "difficulty": "Medium",
+    "question": "A string of length 1 m fixed at both ends vibrates in its third harmonic with frequency 300 Hz. The wave velocity is:",
+    "options": {
+      "A": "200 m/s",
+      "B": "150 m/s",
+      "C": "100 m/s",
+      "D": "250 m/s"
+    },
+    "correct_answer": "A",
+    "solution": "For nth harmonic: f = nv/(2L). Given n = 3, f = 300 Hz, L = 1 m. 300 = 3v/(2 × 1). v = 600/3 = 200 m/s",
+    "marks": 4
+  },
+  {
+    "id": 89,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "9 Feb 2023",
+    "session": "Morning",
+    "topic": "Radiation",
+    "difficulty": "Easy",
+    "question": "Two bodies at temperatures 400 K and 300 K radiate energy. The ratio of their emitted power is:",
+    "options": {
+      "A": "256:81",
+      "B": "16:9",
+      "C": "4:3",
+      "D": "64:27"
+    },
+    "correct_answer": "A",
+    "solution": "By Stefan's law: P ∝ T⁴. P₁/P₂ = (T₁/T₂)⁴ = (400/300)⁴ = (4/3)⁴ = 256/81",
+    "marks": 4
+  },
+  {
+    "id": 90,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "9 Feb 2023",
+    "session": "Evening",
+    "topic": "Potentiometer",
+    "difficulty": "Medium",
+    "question": "In a potentiometer experiment, a cell of EMF 1.5 V balances at 300 cm. When a resistance of 5 Ω is connected across the cell, it balances at 250 cm. The internal resistance is:",
+    "options": {
+      "A": "1 Ω",
+      "B": "2 Ω",
+      "C": "1.5 Ω",
+      "D": "0.5 Ω"
+    },
+    "correct_answer": "A",
+    "solution": "E/V = L₁/L₂. Also V = E - Ir = E × R/(R + r). L₂/L₁ = R/(R + r). 250/300 = 5/(5 + r). 5/6 = 5/(5 + r). 5 + r = 6. r = 1 Ω",
+    "marks": 4
+  },
+  {
+    "id": 91,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "10 Feb 2024",
+    "session": "Morning",
+    "topic": "Logic Gates",
+    "difficulty": "Easy",
+    "question": "The output of a NAND gate is 0 when:",
+    "options": {
+      "A": "Both inputs are 1",
+      "B": "Both inputs are 0",
+      "C": "One input is 0 and other is 1",
+      "D": "Any of the above"
+    },
+    "correct_answer": "A",
+    "solution": "NAND gate gives output 0 only when both inputs are 1. In all other cases, output is 1",
+    "marks": 4
+  },
+  {
+    "id": 92,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "10 Feb 2024",
+    "session": "Evening",
+    "topic": "Radioactive Decay",
+    "difficulty": "Hard",
+    "question": "A radioactive substance decays to 1/16th of its initial amount in 40 days. Its half-life is:",
+    "options": {
+      "A": "10 days",
+      "B": "20 days",
+      "C": "5 days",
+      "D": "8 days"
+    },
+    "correct_answer": "A",
+    "solution": "N = N₀(1/2)^(t/T). 1/16 = (1/2)^(40/T). (1/2)⁴ = (1/2)^(40/T). 4 = 40/T. T = 10 days",
+    "marks": 4
+  },
+  {
+    "id": 93,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "10 Feb 2023",
+    "session": "Morning",
+    "topic": "Lens Combination",
+    "difficulty": "Medium",
+    "question": "Two lenses of focal lengths 20 cm and -10 cm are placed in contact. The equivalent focal length is:",
+    "options": {
+      "A": "20 cm",
+      "B": "-20 cm",
+      "C": "10 cm",
+      "D": "-10 cm"
+    },
+    "correct_answer": "B",
+    "solution": "1/F = 1/f₁ + 1/f₂ = 1/20 + 1/(-10) = 1/20 - 1/10 = -1/20. F = -20 cm",
+    "marks": 4
+  },
+  {
+    "id": 94,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "10 Feb 2023",
+    "session": "Evening",
+    "topic": "Conduction",
+    "difficulty": "Easy",
+    "question": "The rate of heat flow through a rod is 10 W. If the rod is cut into two equal parts and connected in parallel, the rate becomes:",
+    "options": {
+      "A": "40 W",
+      "B": "20 W",
+      "C": "5 W",
+      "D": "80 W"
+    },
+    "correct_answer": "A",
+    "solution": "Rate of heat flow Q/t = kAΔθ/L. When cut in half and placed parallel: Area doubles, length halves. New rate = 4 × original = 40 W",
+    "marks": 4
+  },
+  {
+    "id": 95,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "11 Feb 2024",
+    "session": "Morning",
+    "topic": "Resonance in AC",
+    "difficulty": "Medium",
+    "question": "An LCR circuit has L = 1 H, C = 1 μF. The resonant frequency is:",
+    "options": {
+      "A": "159 Hz",
+      "B": "318 Hz",
+      "C": "79.5 Hz",
+      "D": "238 Hz"
+    },
+    "correct_answer": "A",
+    "solution": "Resonant frequency f = 1/(2π√LC) = 1/(2π√(1 × 10⁻⁶)) = 1/(2π × 10⁻³) = 159 Hz",
+    "marks": 4
+  },
+  {
+    "id": 96,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "11 Feb 2024",
+    "session": "Evening",
+    "topic": "Electric Flux",
+    "difficulty": "Easy",
+    "question": "A charge of 10⁻⁸ C is enclosed by a closed surface. The electric flux through the surface is:",
+    "options": {
+      "A": "1.13 × 10³ N·m²/C",
+      "B": "2.26 × 10³ N·m²/C",
+      "C": "0.56 × 10³ N·m²/C",
+      "D": "3.39 × 10³ N·m²/C"
+    },
+    "correct_answer": "A",
+    "solution": "By Gauss's law: φ = q/ε₀ = (10⁻⁸)/(8.85 × 10⁻¹²) = 1.13 × 10³ N·m²/C",
+    "marks": 4
+  },
+  {
+    "id": 97,
+    "year": 2023,
+    "shift": "Shift 1",
+    "date": "11 Feb 2023",
+    "session": "Morning",
+    "topic": "Range of Projectile",
+    "difficulty": "Hard",
+    "question": "A projectile has maximum range R on a horizontal plane. For the same speed, if it is projected on an inclined plane of angle 30°, the range along the plane is:",
+    "options": {
+      "A": "R/2",
+      "B": "R/√2",
+      "C": "R√3/2",
+      "D": "3R/4"
+    },
+    "correct_answer": "C",
+    "solution": "Range on inclined plane at angle α for maximum range condition: R' = R cos α = R cos 30° = R√3/2",
+    "marks": 4
+  },
+  {
+    "id": 98,
+    "year": 2023,
+    "shift": "Shift 2",
+    "date": "11 Feb 2023",
+    "session": "Evening",
+    "topic": "Drift Velocity",
+    "difficulty": "Medium",
+    "question": "A copper wire of cross-section 2 mm² carries current 2 A. If electron density is 8.5 × 10²⁸ m⁻³, the drift velocity is:",
+    "options": {
+      "A": "7.35 × 10⁻⁵ m/s",
+      "B": "3.68 × 10⁻⁵ m/s",
+      "C": "1.47 × 10⁻⁴ m/s",
+      "D": "5.51 × 10⁻⁵ m/s"
+    },
+    "correct_answer": "A",
+    "solution": "Drift velocity vd = I/(neA) = 2/(8.5 × 10²⁸ × 1.6 × 10⁻¹⁹ × 2 × 10⁻⁶) = 7.35 × 10⁻⁵ m/s",
+    "marks": 4
+  },
+  {
+    "id": 99,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "12 Feb 2024",
+    "session": "Morning",
+    "topic": "Prism",
+    "difficulty": "Medium",
+    "question": "A ray passes through a prism of refracting angle 60° at minimum deviation. If refractive index is √2, the angle of minimum deviation is:",
+    "options": {
+      "A": "30°",
+      "B": "45°",
+      "C": "60°",
+      "D": "15°"
+    },
+    "correct_answer": "A",
+    "solution": "n = sin[(A + δm)/2]/sin(A/2). √2 = sin[(60 + δm)/2]/sin30°. √2 × 0.5 = sin[(60 + δm)/2]. sin45° = sin[(60 + δm)/2]. 45° = (60 + δm)/2. δm = 30°",
+    "marks": 4
+  },
+  {
+    "id": 100,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "12 Feb 2024",
+    "session": "Evening",
+    "topic": "Energy Density",
+    "difficulty": "Easy",
+    "question": "The energy density in a magnetic field of 2 T is:",
+    "options": {
+      "A": "1.59 × 10⁶ J/m³",
+      "B": "3.18 × 10⁶ J/m³",
+      "C": "0.79 × 10⁶ J/m³",
+      "D": "2.38 × 10⁶ J/m³"
+    },
+    "correct_answer": "A",
+    "solution": "Energy density u = B²/(2μ₀) = (2)²/(2 × 4π × 10⁻⁷) = 4/(8π × 10⁻⁷) = 1.59 × 10⁶ J/m³",
+    "marks": 4
+  }
+
+]           

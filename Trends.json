@@ -1,0 +1,1601 @@
+{
+  "exam_trends": {
+    "class_10_boards": {
+      "exam_info": {
+        "name": "CBSE Class 10 Board Examination",
+        "duration": "3 hours per subject",
+        "total_marks": 80,
+        "internal_assessment": 20,
+        "analysis_period": "2014-2023"
+      },
+      "subjects": {
+        "mathematics": {
+          "total_weightage": 100,
+          "chapters": [
+            {
+              "name": "Real Numbers",
+              "weightage": 6,
+              "priority": "medium",
+              "average_questions": 2,
+              "difficulty": "easy",
+              "question_types": ["VSA", "SA", "LA"]
+            },
+            {
+              "name": "Polynomials",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": 3,
+              "difficulty": "medium",
+              "question_types": ["SA", "LA"]
+            },
+            {
+              "name": "Pair of Linear Equations",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": 4,
+              "difficulty": "medium",
+              "question_types": ["VSA", "SA", "LA"]
+            },
+            {
+              "name": "Quadratic Equations",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": 4,
+              "difficulty": "medium-hard",
+              "question_types": ["SA", "LA"]
+            },
+            {
+              "name": "Arithmetic Progressions",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": 3,
+              "difficulty": "medium",
+              "question_types": ["VSA", "SA", "LA"]
+            },
+            {
+              "name": "Triangles",
+              "weightage": 12,
+              "priority": "high",
+              "average_questions": 4,
+              "difficulty": "medium",
+              "question_types": ["SA", "LA"]
+            },
+            {
+              "name": "Coordinate Geometry",
+              "weightage": 9,
+              "priority": "high",
+              "average_questions": 3,
+              "difficulty": "medium",
+              "question_types": ["VSA", "SA", "LA"]
+            },
+            {
+              "name": "Trigonometry",
+              "weightage": 12,
+              "priority": "high",
+              "average_questions": 4,
+              "difficulty": "medium-hard",
+              "question_types": ["SA", "LA"]
+            },
+            {
+              "name": "Circles",
+              "weightage": 8,
+              "priority": "medium",
+              "average_questions": 3,
+              "difficulty": "medium",
+              "question_types": ["SA", "LA"]
+            },
+            {
+              "name": "Areas Related to Circles",
+              "weightage": 9,
+              "priority": "high",
+              "average_questions": 3,
+              "difficulty": "medium",
+              "question_types": ["SA", "LA"]
+            },
+            {
+              "name": "Surface Areas and Volumes",
+              "weightage": 9,
+              "priority": "high",
+              "average_questions": 3,
+              "difficulty": "medium-hard",
+              "question_types": ["SA", "LA"]
+            }
+          ],
+          "trends": {
+            "difficulty_progression": "Moderate to Hard in application-based questions",
+            "case_study_questions": "Introduced in 2020-21, 3 questions (12 marks)",
+            "formula_based": 35,
+            "application_based": 45,
+            "proof_based": 20
+          }
+        },
+        "science": {
+          "total_weightage": 100,
+          "physics_weightage": 33,
+          "chemistry_weightage": 33,
+          "biology_weightage": 34,
+          "physics_chapters": [
+            {
+              "name": "Electricity",
+              "weightage": 12,
+              "priority": "high",
+              "average_questions": 5,
+              "topics": ["Ohm's Law", "Series-Parallel Circuits", "Heating Effect", "Power"]
+            },
+            {
+              "name": "Magnetic Effects of Current",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": 4,
+              "topics": ["Magnetic Field", "Fleming's Rules", "Motor", "Generator"]
+            },
+            {
+              "name": "Light - Reflection and Refraction",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": 5,
+              "topics": ["Mirror Formula", "Lens Formula", "Refraction", "Sign Convention"]
+            },
+            {
+              "name": "Human Eye",
+              "weightage": 3,
+              "priority": "medium",
+              "average_questions": 2,
+              "topics": ["Eye Defects", "Lens Power", "Dispersion"]
+            }
+          ],
+          "chemistry_chapters": [
+            {
+              "name": "Chemical Reactions and Equations",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": 4,
+              "topics": ["Types of Reactions", "Balancing", "Oxidation-Reduction"]
+            },
+            {
+              "name": "Acids, Bases and Salts",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": 5,
+              "topics": ["pH Scale", "Neutralization", "Common Salts"]
+            },
+            {
+              "name": "Metals and Non-metals",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": 4,
+              "topics": ["Reactivity Series", "Extraction", "Corrosion"]
+            },
+            {
+              "name": "Carbon Compounds",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": 4,
+              "topics": ["Nomenclature", "Functional Groups", "Homologous Series"]
+            }
+          ],
+          "biology_chapters": [
+            {
+              "name": "Life Processes",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": 5,
+              "topics": ["Nutrition", "Respiration", "Transportation", "Excretion"]
+            },
+            {
+              "name": "Control and Coordination",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": 4,
+              "topics": ["Nervous System", "Hormones", "Plant Movements"]
+            },
+            {
+              "name": "Heredity and Evolution",
+              "weightage": 9,
+              "priority": "high",
+              "average_questions": 4,
+              "topics": ["Mendel's Laws", "Evolution", "Speciation"]
+            },
+            {
+              "name": "Our Environment",
+              "weightage": 7,
+              "priority": "medium",
+              "average_questions": 3,
+              "topics": ["Food Chain", "Ozone Layer", "Waste Management"]
+            }
+          ]
+        }
+      }
+    },
+    "class_12_boards": {
+      "exam_info": {
+        "name": "CBSE Class 12 Board Examination",
+        "duration": "3 hours per subject",
+        "total_marks": 70,
+        "internal_assessment": 30,
+        "analysis_period": "2014-2023"
+      },
+      "subjects": {
+        "physics": {
+          "total_weightage": 100,
+          "chapters": [
+            {
+              "name": "Electrostatics",
+              "weightage": 12,
+              "priority": "high",
+              "marks_range": "8-10",
+              "difficulty": "medium-hard",
+              "subtopics": ["Gauss Law", "Capacitance", "Dielectrics"]
+            },
+            {
+              "name": "Current Electricity",
+              "weightage": 11,
+              "priority": "high",
+              "marks_range": "7-9",
+              "difficulty": "medium",
+              "subtopics": ["Kirchhoff's Laws", "Wheatstone Bridge", "Potentiometer"]
+            },
+            {
+              "name": "Magnetic Effects",
+              "weightage": 10,
+              "priority": "high",
+              "marks_range": "7-8",
+              "difficulty": "medium-hard",
+              "subtopics": ["Biot-Savart", "Ampere's Law", "Moving Coil Galvanometer"]
+            },
+            {
+              "name": "Electromagnetic Induction",
+              "weightage": 10,
+              "priority": "high",
+              "marks_range": "7-8",
+              "difficulty": "hard",
+              "subtopics": ["Faraday's Law", "Lenz Law", "Self & Mutual Inductance"]
+            },
+            {
+              "name": "Optics",
+              "weightage": 12,
+              "priority": "high",
+              "marks_range": "8-10",
+              "difficulty": "medium",
+              "subtopics": ["Ray Optics", "Wave Optics", "Optical Instruments"]
+            },
+            {
+              "name": "Modern Physics",
+              "weightage": 13,
+              "priority": "high",
+              "marks_range": "9-11",
+              "difficulty": "medium",
+              "subtopics": ["Photoelectric Effect", "Bohr Model", "Nuclei", "Semiconductors"]
+            },
+            {
+              "name": "Alternating Current",
+              "weightage": 8,
+              "priority": "high",
+              "marks_range": "5-7",
+              "difficulty": "medium-hard",
+              "subtopics": ["AC Circuits", "Resonance", "Transformers"]
+            },
+            {
+              "name": "Electromagnetic Waves",
+              "weightage": 5,
+              "priority": "medium",
+              "marks_range": "3-4",
+              "difficulty": "easy",
+              "subtopics": ["EM Spectrum", "Properties"]
+            }
+          ]
+        },
+        "chemistry": {
+          "total_weightage": 100,
+          "chapters": [
+            {
+              "name": "Solid State",
+              "weightage": 6,
+              "priority": "high",
+              "marks_range": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Crystal Lattice", "Packing", "Defects"]
+            },
+            {
+              "name": "Solutions",
+              "weightage": 8,
+              "priority": "high",
+              "marks_range": "5-7",
+              "difficulty": "medium",
+              "subtopics": ["Colligative Properties", "Raoult's Law", "Henry's Law"]
+            },
+            {
+              "name": "Electrochemistry",
+              "weightage": 9,
+              "priority": "high",
+              "marks_range": "6-8",
+              "difficulty": "medium-hard",
+              "subtopics": ["Nernst Equation", "Conductance", "Electrolysis"]
+            },
+            {
+              "name": "Chemical Kinetics",
+              "weightage": 8,
+              "priority": "high",
+              "marks_range": "5-7",
+              "difficulty": "medium-hard",
+              "subtopics": ["Rate Laws", "Order", "Arrhenius Equation"]
+            },
+            {
+              "name": "d and f Block Elements",
+              "weightage": 9,
+              "priority": "high",
+              "marks_range": "6-8",
+              "difficulty": "medium",
+              "subtopics": ["Properties", "Oxidation States", "Compounds"]
+            },
+            {
+              "name": "Coordination Compounds",
+              "weightage": 9,
+              "priority": "high",
+              "marks_range": "6-8",
+              "difficulty": "medium-hard",
+              "subtopics": ["Nomenclature", "Isomerism", "Bonding Theories"]
+            },
+            {
+              "name": "Haloalkanes and Haloarenes",
+              "weightage": 7,
+              "priority": "high",
+              "marks_range": "5-6",
+              "difficulty": "medium",
+              "subtopics": ["Reactions", "Mechanisms", "Preparations"]
+            },
+            {
+              "name": "Alcohols, Phenols and Ethers",
+              "weightage": 7,
+              "priority": "high",
+              "marks_range": "5-6",
+              "difficulty": "medium",
+              "subtopics": ["Reactions", "Nomenclature", "Properties"]
+            },
+            {
+              "name": "Aldehydes and Ketones",
+              "weightage": 7,
+              "priority": "high",
+              "marks_range": "5-6",
+              "difficulty": "medium",
+              "subtopics": ["Nucleophilic Addition", "Aldol Condensation"]
+            },
+            {
+              "name": "Amines",
+              "weightage": 6,
+              "priority": "medium",
+              "marks_range": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Basicity", "Reactions", "Diazonium Salts"]
+            },
+            {
+              "name": "Biomolecules",
+              "weightage": 7,
+              "priority": "high",
+              "marks_range": "5-6",
+              "difficulty": "easy-medium",
+              "subtopics": ["Carbohydrates", "Proteins", "Vitamins"]
+            },
+            {
+              "name": "Polymers",
+              "weightage": 6,
+              "priority": "medium",
+              "marks_range": "4-5",
+              "difficulty": "easy",
+              "subtopics": ["Types", "Polymerization", "Important Polymers"]
+            }
+          ]
+        },
+        "mathematics": {
+          "total_weightage": 100,
+          "chapters": [
+            {
+              "name": "Relations and Functions",
+              "weightage": 8,
+              "priority": "high",
+              "marks_range": "5-7",
+              "difficulty": "medium",
+              "subtopics": ["Types of Relations", "Inverse Functions", "Binary Operations"]
+            },
+            {
+              "name": "Inverse Trigonometric Functions",
+              "weightage": 6,
+              "priority": "medium",
+              "marks_range": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Properties", "Domain-Range", "Equations"]
+            },
+            {
+              "name": "Matrices",
+              "weightage": 8,
+              "priority": "high",
+              "marks_range": "5-7",
+              "difficulty": "medium",
+              "subtopics": ["Operations", "Determinants", "Adjoint", "Inverse"]
+            },
+            {
+              "name": "Continuity and Differentiability",
+              "weightage": 10,
+              "priority": "high",
+              "marks_range": "7-9",
+              "difficulty": "medium-hard",
+              "subtopics": ["Continuity", "Derivatives", "Chain Rule", "Parametric"]
+            },
+            {
+              "name": "Application of Derivatives",
+              "weightage": 9,
+              "priority": "high",
+              "marks_range": "6-8",
+              "difficulty": "medium-hard",
+              "subtopics": ["Rate of Change", "Tangent-Normal", "Maxima-Minima"]
+            },
+            {
+              "name": "Integrals",
+              "weightage": 12,
+              "priority": "high",
+              "marks_range": "8-10",
+              "difficulty": "hard",
+              "subtopics": ["Indefinite", "Definite", "Methods", "Properties"]
+            },
+            {
+              "name": "Application of Integrals",
+              "weightage": 9,
+              "priority": "high",
+              "marks_range": "6-8",
+              "difficulty": "medium",
+              "subtopics": ["Area under Curves", "Area between Curves"]
+            },
+            {
+              "name": "Differential Equations",
+              "weightage": 8,
+              "priority": "high",
+              "marks_range": "5-7",
+              "difficulty": "medium-hard",
+              "subtopics": ["Formation", "Solutions", "Linear DE"]
+            },
+            {
+              "name": "Vector Algebra",
+              "weightage": 8,
+              "priority": "high",
+              "marks_range": "5-7",
+              "difficulty": "medium",
+              "subtopics": ["Dot Product", "Cross Product", "Scalar Triple Product"]
+            },
+            {
+              "name": "Three Dimensional Geometry",
+              "weightage": 10,
+              "priority": "high",
+              "marks_range": "7-9",
+              "difficulty": "medium-hard",
+              "subtopics": ["Direction Cosines", "Line", "Plane", "Distance"]
+            },
+            {
+              "name": "Probability",
+              "weightage": 12,
+              "priority": "high",
+              "marks_range": "8-10",
+              "difficulty": "medium-hard",
+              "subtopics": ["Conditional Probability", "Bayes Theorem", "Random Variables"]
+            }
+          ]
+        }
+      }
+    },
+    "jee_mains": {
+      "exam_info": {
+        "name": "JEE Main",
+        "duration": "3 hours",
+        "total_marks": 300,
+        "questions": 90,
+        "sections": 3,
+        "analysis_period": "2014-2023"
+      },
+      "subjects": {
+        "physics": {
+          "total_marks": 100,
+          "total_questions": 30,
+          "chapters": [
+            {
+              "name": "Modern Physics",
+              "weightage": 15,
+              "priority": "high",
+              "average_questions": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Photoelectric Effect", "Bohr Model", "Nuclei", "Semiconductors"]
+            },
+            {
+              "name": "Electrostatics",
+              "weightage": 12,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "medium-hard",
+              "subtopics": ["Gauss Law", "Capacitance", "Electric Field"]
+            },
+            {
+              "name": "Current Electricity",
+              "weightage": 11,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "medium",
+              "subtopics": ["Kirchhoff's Laws", "RC Circuits", "Potentiometer"]
+            },
+            {
+              "name": "Rotational Motion",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": "3",
+              "difficulty": "medium-hard",
+              "subtopics": ["Moment of Inertia", "Angular Momentum", "Rolling"]
+            },
+            {
+              "name": "Thermodynamics",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Laws", "Processes", "Heat Engines"]
+            },
+            {
+              "name": "Optics",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Wave Optics", "Ray Optics"]
+            },
+            {
+              "name": "Electromagnetic Induction",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "hard",
+              "subtopics": ["Faraday's Law", "Inductance", "AC Circuits"]
+            },
+            {
+              "name": "Mechanics (Others)",
+              "weightage": 15,
+              "priority": "high",
+              "average_questions": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Kinematics", "Laws of Motion", "Work-Energy", "Gravitation"]
+            },
+            {
+              "name": "Magnetic Effects",
+              "weightage": 7,
+              "priority": "medium",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Biot-Savart", "Ampere's Law", "Lorentz Force"]
+            },
+            {
+              "name": "SHM and Waves",
+              "weightage": 7,
+              "priority": "medium",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Oscillations", "Wave Motion", "Doppler Effect"]
+            }
+          ]
+        },
+        "chemistry": {
+          "total_marks": 100,
+          "total_questions": 30,
+          "chapters": [
+            {
+              "name": "Coordination Compounds",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["VBT", "CFT", "Isomerism", "Nomenclature"]
+            },
+            {
+              "name": "Chemical Bonding",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Hybridization", "MOT", "VSEPR"]
+            },
+            {
+              "name": "Chemical Kinetics",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium-hard",
+              "subtopics": ["Rate Laws", "Order", "Arrhenius Equation"]
+            },
+            {
+              "name": "Thermodynamics",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Laws", "Entropy", "Gibbs Energy"]
+            },
+            {
+              "name": "Equilibrium",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Chemical Equilibrium", "Ionic Equilibrium"]
+            },
+            {
+              "name": "p-Block Elements",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Group 15-18", "Compounds", "Trends"]
+            },
+            {
+              "name": "Organic Reaction Mechanisms",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["SN1/SN2", "E1/E2", "Addition", "Elimination"]
+            },
+            {
+              "name": "Electrochemistry",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "1-2",
+              "difficulty": "medium",
+              "subtopics": ["Nernst Equation", "Conductance", "Cells"]
+            },
+            {
+              "name": "Solutions",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "1-2",
+              "difficulty": "medium",
+              "subtopics": ["Colligative Properties", "Raoult's Law"]
+            },
+            {
+              "name": "d-Block Elements",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "1-2",
+              "difficulty": "medium",
+              "subtopics": ["Properties", "Compounds", "Oxidation States"]
+            },
+            {
+              "name": "Hydrocarbons",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "1-2",
+              "difficulty": "easy-medium",
+              "subtopics": ["Alkanes", "Alkenes", "Alkynes", "Aromatic"]
+            },
+            {
+              "name": "Biomolecules & Polymers",
+              "weightage": 6,
+              "priority": "medium",
+              "average_questions": "2",
+              "difficulty": "easy",
+              "subtopics": ["Carbohydrates", "Proteins", "Polymers"]
+            }
+          ]
+        },
+        "mathematics": {
+          "total_marks": 100,
+          "total_questions": 30,
+          "chapters": [
+            {
+              "name": "Integration",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": "3",
+              "difficulty": "medium-hard",
+              "subtopics": ["Definite", "Indefinite", "Applications"]
+            },
+            {
+              "name": "Matrices & Determinants",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Operations", "Determinants", "Applications"]
+            },
+            {
+              "name": "Differentiation",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Basic", "Applications", "Higher Order"]
+            },
+            {
+              "name": "Conic Sections",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium-hard",
+              "subtopics": ["Parabola", "Ellipse", "Hyperbola"]
+            },
+            {
+              "name": "Vectors",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Dot Product", "Cross Product", "Applications"]
+            },
+            {
+              "name": "Probability",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "2",
+              "difficulty": "medium",
+              "subtopics": ["Conditional", "Bayes", "Random Variables"]
+            },
+            {
+              "name": "Complex Numbers",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "1-2",
+              "difficulty": "medium",
+              "subtopics": ["Operations", "Arguments", "De Moivre"]
+            },
+            {
+              "name": "3D Geometry",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "1-2",
+              "difficulty": "medium-hard",
+              "subtopics": ["Line", "Plane", "Distance"]
+            },
+            {
+              "name": "Differential Equations",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "1-2",
+              "difficulty": "medium",
+              "subtopics": ["Order", "Degree", "Solutions"]
+            },
+            {
+              "name": "Limits & Continuity",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "1-2",
+              "difficulty": "easy-medium",
+              "subtopics": ["Limits", "Continuity", "Differentiability"]
+            },
+            {
+              "name": "Quadratic Equations",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "1-2",
+              "difficulty": "easy-medium",
+              "subtopics": ["Roots", "Nature", "Applications"]
+            },
+            {
+              "name": "Circles & Straight Lines",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Equation", "Tangent", "Normal"]
+            }
+          ]
+        }
+      },
+      "trends": {
+        "difficulty": {
+          "2019-2020": "Moderate",
+          "2021": "Easy-Moderate (COVID impact)",
+          "2022": "Moderate",
+          "2023": "Moderate-Tough"
+        },
+        "pattern_changes": [
+          "Introduced numerical value questions in 2021",
+          "More application-based questions",
+          "Reduced direct formula-based questions"
+        ]
+      }
+    },
+    "jee_advanced": {
+      "exam_info": {
+        "name": "JEE Advanced",
+        "duration": "3 hours (each paper)",
+        "total_marks": 360,
+        "papers": 2,
+        "analysis_period": "2014-2023"
+      },
+      "subjects": {
+        "physics": {
+          "total_marks": 120,
+          "chapters": [
+            {
+              "name": "Rotational Mechanics",
+              "weightage": 12,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "4-5",
+              "subtopics": ["Moment of Inertia", "Angular Momentum", "Torque", "Rolling"]
+            },
+            {
+              "name": "Electrostatics",
+              "weightage": 11,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "4",
+              "subtopics": ["Gauss Law", "Potential", "Capacitance"]
+            },
+            {
+              "name": "Modern Physics",
+              "weightage": 10,
+              "priority": "high",
+              "difficulty": "medium-hard",
+              "average_questions": "3-4",
+              "subtopics": ["Photoelectric", "Bohr Model", "Nuclear Physics"]
+            },
+            {
+              "name": "Current Electricity",
+              "weightage": 9,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "3",
+              "subtopics": ["Complex Circuits", "RC Circuits", "Transients"]
+            },
+            {
+              "name": "Optics",
+              "weightage": 9,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "3",
+              "subtopics": ["Wave Optics", "Ray Optics", "Interference"]
+            },
+            {
+              "name": "Thermodynamics",
+              "weightage": 8,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2-3",
+              "subtopics": ["Processes", "Heat Engines", "Laws"]
+            },
+            {
+              "name": "Electromagnetic Induction",
+              "weightage": 8,
+              "priority": "high",
+              "difficulty": "very hard",
+              "average_questions": "2-3",
+              "subtopics": ["Faraday's Law", "Inductance", "AC"]
+            },
+            {
+              "name": "Mechanics (General)",
+              "weightage": 15,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "5-6",
+              "subtopics": ["Kinematics", "Newton's Laws", "Work-Energy", "Collisions"]
+            },
+            {
+              "name": "Magnetic Effects",
+              "weightage": 8,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2-3",
+              "subtopics": ["Biot-Savart", "Ampere's Law", "Moving Charges"]
+            },
+            {
+              "name": "Waves & SHM",
+              "weightage": 10,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "3-4",
+              "subtopics": ["Oscillations", "Wave Motion", "Sound"]
+            }
+          ]
+        },
+        "chemistry": {
+          "total_marks": 120,
+          "chapters": [
+            {
+              "name": "Chemical Bonding",
+              "weightage": 9,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "3",
+              "subtopics": ["Hybridization", "MOT", "VSEPR", "Dipole Moment"]
+            },
+            {
+              "name": "Coordination Compounds",
+              "weightage": 8,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2-3",
+              "subtopics": ["VBT", "CFT", "Isomerism", "Stability"]
+            },
+            {
+              "name": "Organic Reaction Mechanisms",
+              "weightage": 10,
+              "priority": "high",
+              "difficulty": "very hard",
+              "average_questions": "3-4",
+              "subtopics": ["SN1/SN2", "E1/E2", "Addition", "Rearrangements"]
+            },
+            {
+              "name": "Chemical Kinetics",
+              "weightage": 7,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2-3",
+              "subtopics": ["Order", "Mechanisms", "Arrhenius"]
+            },
+            {
+              "name": "Thermodynamics",
+              "weightage": 8,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2-3",
+              "subtopics": ["Laws", "Entropy", "Gibbs Energy", "Spontaneity"]
+            },
+            {
+              "name": "Equilibrium",
+              "weightage": 8,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2-3",
+              "subtopics": ["Chemical Equilibrium", "Ionic Equilibrium", "Buffer"]
+            },
+            {
+              "name": "Electrochemistry",
+              "weightage": 7,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2",
+              "subtopics": ["Nernst Equation", "Cells", "Electrolysis"]
+            },
+            {
+              "name": "Solutions",
+              "weightage": 6,
+              "priority": "high",
+              "difficulty": "medium-hard",
+              "average_questions": "2",
+              "subtopics": ["Colligative Properties", "Raoult's Law"]
+            },
+            {
+              "name": "p-Block Elements",
+              "weightage": 7,
+              "priority": "high",
+              "difficulty": "medium",
+              "average_questions": "2-3",
+              "subtopics": ["Group Chemistry", "Compounds", "Reactions"]
+            },
+            {
+              "name": "Hydrocarbons",
+              "weightage": 7,
+              "priority": "high",
+              "difficulty": "medium-hard",
+              "average_questions": "2-3",
+              "subtopics": ["Alkenes", "Alkynes", "Aromatic", "Reactions"]
+            }
+          ]
+        },
+        "mathematics": {
+          "total_marks": 120,
+          "chapters": [
+            {
+              "name": "Calculus (Integration)",
+              "weightage": 12,
+              "priority": "high",
+              "difficulty": "very hard",
+              "average_questions": "4-5",
+              "subtopics": ["Definite", "Indefinite", "Areas", "Applications"]
+            },
+            {
+              "name": "Calculus (Differentiation)",
+              "weightage": 10,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "3-4",
+              "subtopics": ["Applications", "Maxima-Minima", "Tangent-Normal"]
+            },
+            {
+              "name": "Coordinate Geometry",
+              "weightage": 15,
+              "priority": "high",
+              "difficulty": "very hard",
+              "average_questions": "5-6",
+              "subtopics": ["Conics", "Circles", "Straight Lines"]
+            },
+            {
+              "name": "Algebra",
+              "weightage": 12,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "4-5",
+              "subtopics": ["Complex Numbers", "Matrices", "Quadratic"]
+            },
+            {
+              "name": "Vectors & 3D",
+              "weightage": 10,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "3-4",
+              "subtopics": ["Vector Algebra", "3D Geometry", "Planes"]
+            },
+            {
+              "name": "Probability",
+              "weightage": 8,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": "2-3",
+              "subtopics": ["Conditional", "Random Variables", "Bayes"]
+            },
+            {
+              "name": "Trigonometry",
+              "weightage": 7,
+              "priority": "medium",
+              "difficulty": "medium-hard",
+              "average_questions": "2-3",
+              "subtopics": ["Equations", "Inverse", "Identities"]
+            }
+          ]
+        }
+      },
+      "trends": {
+        "difficulty": "Consistently Very Hard",
+        "unique_features": [
+          "Multi-concept questions",
+          "Integer type answers",
+          "Matching type questions",
+          "Paragraph-based questions"
+        ]
+      }
+    },
+    "neet": {
+      "exam_info": {
+        "name": "NEET (UG)",
+        "duration": "3 hours 20 minutes",
+        "total_marks": 720,
+        "total_questions": 200,
+        "analysis_period": "2014-2023"
+      },
+      "subjects": {
+        "physics": {
+          "total_marks": 180,
+          "total_questions": 50,
+          "chapters": [
+            {
+              "name": "Optics",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": "5-6",
+              "difficulty": "medium",
+              "subtopics": ["Ray Optics", "Wave Optics", "Optical Instruments"]
+            },
+            {
+              "name": "Current Electricity",
+              "weightage": 9,
+              "priority": "high",
+              "average_questions": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Ohm's Law", "Kirchhoff's Laws", "RC Circuits"]
+            },
+            {
+              "name": "Modern Physics",
+              "weightage": 9,
+              "priority": "high",
+              "average_questions": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Atoms", "Nuclei", "Semiconductors"]
+            },
+            {
+              "name": "Electrostatics",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "4",
+              "difficulty": "medium",
+              "subtopics": ["Coulomb's Law", "Electric Field", "Capacitance"]
+            },
+            {
+              "name": "Magnetism",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "4",
+              "difficulty": "medium",
+              "subtopics": ["Magnetic Field", "Moving Charges", "Earth's Magnetism"]
+            },
+            {
+              "name": "Laws of Motion",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "easy-medium",
+              "subtopics": ["Newton's Laws", "Friction", "Circular Motion"]
+            },
+            {
+              "name": "Thermodynamics",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "medium",
+              "subtopics": ["Laws", "Processes", "Kinetic Theory"]
+            },
+            {
+              "name": "SHM & Waves",
+              "weightage": 6,
+              "priority": "medium",
+              "average_questions": "3",
+              "difficulty": "medium",
+              "subtopics": ["Oscillations", "Wave Motion"]
+            },
+            {
+              "name": "Work, Energy & Power",
+              "weightage": 6,
+              "priority": "medium",
+              "average_questions": "3",
+              "difficulty": "easy-medium",
+              "subtopics": ["Work", "Energy", "Power", "Collisions"]
+            },
+            {
+              "name": "Gravitation",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "2-3",
+              "difficulty": "easy-medium",
+              "subtopics": ["Newton's Law", "Satellites", "Kepler's Laws"]
+            }
+          ]
+        },
+        "chemistry": {
+          "total_marks": 180,
+          "total_questions": 50,
+          "chapters": [
+            {
+              "name": "Organic Chemistry (Reactions)",
+              "weightage": 15,
+              "priority": "high",
+              "average_questions": "7-8",
+              "difficulty": "medium",
+              "subtopics": ["Named Reactions", "Mechanisms", "Conversions"]
+            },
+            {
+              "name": "Chemical Bonding",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "medium",
+              "subtopics": ["Hybridization", "VSEPR", "MOT"]
+            },
+            {
+              "name": "Coordination Compounds",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "3",
+              "difficulty": "medium",
+              "subtopics": ["Nomenclature", "Isomerism", "Bonding"]
+            },
+            {
+              "name": "p-Block Elements",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "4",
+              "difficulty": "medium",
+              "subtopics": ["Group 15-18", "Compounds", "Reactions"]
+            },
+            {
+              "name": "d and f Block",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "3",
+              "difficulty": "medium",
+              "subtopics": ["Properties", "Compounds"]
+            },
+            {
+              "name": "Biomolecules",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "easy",
+              "subtopics": ["Carbohydrates", "Proteins", "Vitamins"]
+            },
+            {
+              "name": "Solutions",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Colligative Properties", "Raoult's Law"]
+            },
+            {
+              "name": "Chemical Kinetics",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Rate Laws", "Order", "Arrhenius"]
+            },
+            {
+              "name": "Electrochemistry",
+              "weightage": 5,
+              "priority": "high",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Nernst Equation", "Cells"]
+            },
+            {
+              "name": "Thermodynamics",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "2-3",
+              "difficulty": "medium",
+              "subtopics": ["Laws", "Enthalpy", "Entropy"]
+            },
+            {
+              "name": "General Organic Chemistry",
+              "weightage": 6,
+              "priority": "high",
+              "average_questions": "3",
+              "difficulty": "medium",
+              "subtopics": ["Isomerism", "Nomenclature", "GOC"]
+            },
+            {
+              "name": "Environmental Chemistry",
+              "weightage": 4,
+              "priority": "low",
+              "average_questions": "2",
+              "difficulty": "easy",
+              "subtopics": ["Pollution", "Green Chemistry"]
+            }
+          ]
+        },
+        "biology": {
+          "total_marks": 360,
+          "total_questions": 100,
+          "botany_weightage": 50,
+          "zoology_weightage": 50,
+          "botany_chapters": [
+            {
+              "name": "Plant Physiology",
+              "weightage": 12,
+              "priority": "high",
+              "average_questions": "6",
+              "difficulty": "medium",
+              "subtopics": ["Photosynthesis", "Respiration", "Plant Growth"]
+            },
+            {
+              "name": "Genetics and Evolution",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": "5",
+              "difficulty": "medium-hard",
+              "subtopics": ["Mendelian Genetics", "Molecular Basis", "Evolution"]
+            },
+            {
+              "name": "Reproduction in Plants",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "4",
+              "difficulty": "medium",
+              "subtopics": ["Sexual Reproduction", "Asexual Reproduction"]
+            },
+            {
+              "name": "Ecology",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "medium",
+              "subtopics": ["Ecosystem", "Biodiversity", "Environment"]
+            },
+            {
+              "name": "Morphology of Flowering Plants",
+              "weightage": 5,
+              "priority": "medium",
+              "average_questions": "2-3",
+              "difficulty": "easy-medium",
+              "subtopics": ["Root", "Stem", "Leaf", "Flower"]
+            },
+            {
+              "name": "Cell Biology",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "4",
+              "difficulty": "medium",
+              "subtopics": ["Cell Structure", "Cell Division", "Biomolecules"]
+            }
+          ],
+          "zoology_chapters": [
+            {
+              "name": "Human Physiology",
+              "weightage": 15,
+              "priority": "high",
+              "average_questions": "7-8",
+              "difficulty": "medium",
+              "subtopics": ["Digestion", "Respiration", "Circulation", "Excretion", "Neural Control"]
+            },
+            {
+              "name": "Human Reproduction",
+              "weightage": 8,
+              "priority": "high",
+              "average_questions": "4",
+              "difficulty": "medium",
+              "subtopics": ["Male & Female Reproductive System", "Pregnancy", "STDs"]
+            },
+            {
+              "name": "Genetics and Evolution",
+              "weightage": 10,
+              "priority": "high",
+              "average_questions": "5",
+              "difficulty": "medium-hard",
+              "subtopics": ["Inheritance", "Molecular Basis", "Evolution"]
+            },
+            {
+              "name": "Biotechnology",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "medium",
+              "subtopics": ["Principles", "Applications", "Genetic Engineering"]
+            },
+            {
+              "name": "Ecology",
+              "weightage": 7,
+              "priority": "high",
+              "average_questions": "3-4",
+              "difficulty": "medium",
+              "subtopics": ["Organisms & Environment", "Ecosystem", "Biodiversity"]
+            },
+            {
+              "name": "Animal Kingdom",
+              "weightage": 3,
+              "priority": "low",
+              "average_questions": "1-2",
+              "difficulty": "easy",
+              "subtopics": ["Classification", "Phyla"]
+            }
+          ]
+        }
+      },
+      "trends": {
+        "difficulty": {
+          "2019-2020": "Moderate",
+          "2021": "Easy (COVID impact)",
+          "2022": "Moderate",
+          "2023": "Moderate-Tough"
+        },
+        "pattern": "NCERT-based with application questions"
+      }
+    },
+    "gate": {
+      "exam_info": {
+        "name": "GATE",
+        "duration": "3 hours",
+        "total_marks": 100,
+        "sections": 3,
+        "analysis_period": "2014-2023",
+        "note": "Analysis for Computer Science & Engineering stream"
+      },
+      "subjects": {
+        "engineering_mathematics": {
+          "total_marks": 13,
+          "weightage": 13,
+          "chapters": [
+            {
+              "name": "Linear Algebra",
+              "weightage": 4,
+              "priority": "high",
+              "average_marks": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Matrix Operations", "Eigenvalues", "Vector Spaces"]
+            },
+            {
+              "name": "Calculus",
+              "weightage": 4,
+              "priority": "high",
+              "average_marks": "4-5",
+              "difficulty": "medium",
+              "subtopics": ["Limits", "Differentiation", "Integration", "Partial Derivatives"]
+            },
+            {
+              "name": "Probability & Statistics",
+              "weightage": 3,
+              "priority": "high",
+              "average_marks": "3-4",
+              "difficulty": "medium",
+              "subtopics": ["Probability", "Random Variables", "Distributions"]
+            },
+            {
+              "name": "Discrete Mathematics",
+              "weightage": 2,
+              "priority": "medium",
+              "average_marks": "2-3",
+              "difficulty": "easy-medium",
+              "subtopics": ["Sets", "Relations", "Functions", "Combinatorics"]
+            }
+          ]
+        },
+        "general_aptitude": {
+          "total_marks": 15,
+          "weightage": 15,
+          "chapters": [
+            {
+              "name": "Verbal Ability",
+              "weightage": 7,
+              "priority": "high",
+              "average_marks": "7-8",
+              "difficulty": "easy-medium",
+              "subtopics": ["Grammar", "Vocabulary", "Comprehension"]
+            },
+            {
+              "name": "Numerical Ability",
+              "weightage": 8,
+              "priority": "high",
+              "average_marks": "7-8",
+              "difficulty": "easy-medium",
+              "subtopics": ["Arithmetic", "Data Interpretation", "Reasoning"]
+            }
+          ]
+        },
+        "technical_section": {
+          "total_marks": 72,
+          "weightage": 72,
+          "chapters": [
+            {
+              "name": "Algorithms",
+              "weightage": 10,
+              "priority": "high",
+              "average_marks": "10-12",
+              "difficulty": "medium-hard",
+              "subtopics": ["Sorting", "Searching", "Greedy", "Dynamic Programming"]
+            },
+            {
+              "name": "Data Structures",
+              "weightage": 9,
+              "priority": "high",
+              "average_marks": "9-11",
+              "difficulty": "medium",
+              "subtopics": ["Arrays", "Trees", "Graphs", "Hashing"]
+            },
+            {
+              "name": "Theory of Computation",
+              "weightage": 8,
+              "priority": "high",
+              "average_marks": "8-10",
+              "difficulty": "medium-hard",
+              "subtopics": ["Automata", "Regular Languages", "Context-Free Languages"]
+            },
+            {
+              "name": "Operating Systems",
+              "weightage": 9,
+              "priority": "high",
+              "average_marks": "9-11",
+              "difficulty": "medium",
+              "subtopics": ["Process Management", "Memory Management", "Scheduling"]
+            },
+            {
+              "name": "Database Management Systems",
+              "weightage": 8,
+              "priority": "high",
+              "average_marks": "8-10",
+              "difficulty": "medium",
+              "subtopics": ["SQL", "Normalization", "Transactions", "Indexing"]
+            },
+            {
+              "name": "Computer Networks",
+              "weightage": 8,
+              "priority": "high",
+              "average_marks": "8-10",
+              "difficulty": "medium",
+              "subtopics": ["OSI Model", "TCP/IP", "Routing", "Network Security"]
+            },
+            {
+              "name": "Digital Logic",
+              "weightage": 6,
+              "priority": "medium",
+              "average_marks": "6-8",
+              "difficulty": "easy-medium",
+              "subtopics": ["Boolean Algebra", "Combinational Circuits", "Sequential Circuits"]
+            },
+            {
+              "name": "Computer Organization",
+              "weightage": 7,
+              "priority": "high",
+              "average_marks": "7-9",
+              "difficulty": "medium",
+              "subtopics": ["CPU Architecture", "Memory Hierarchy", "I/O Organization"]
+            },
+            {
+              "name": "Programming & Data Structures",
+              "weightage": 7,
+              "priority": "high",
+              "average_marks": "7-9",
+              "difficulty": "medium",
+              "subtopics": ["C Programming", "Pointers", "Recursion"]
+            }
+          ]
+        }
+      },
+      "trends": {
+        "difficulty": "Moderate to Hard",
+        "pattern": "MCQ + NAT (Numerical Answer Type)",
+        "marks_distribution": {
+          "1_mark": 25,
+          "2_mark": 30
+        }
+      }
+    }
+  },
+  "preparation_strategies": {
+    "class_10": {
+      "timeline": "6-8 months",
+      "daily_hours": "3-4 hours",
+      "focus": "NCERT + Board PYQs",
+      "key_tips": [
+        "Master NCERT thoroughly",
+        "Practice all NCERT examples and exercises",
+        "Solve previous 5 years question papers",
+        "Focus on high-weightage chapters"
+      ]
+    },
+    "class_12": {
+      "timeline": "10-12 months",
+      "daily_hours": "5-6 hours",
+      "focus": "NCERT + Board PYQs + Reference Books",
+      "key_tips": [
+        "Complete NCERT line by line",
+        "Solve numerical problems extensively",
+        "Practice derivations and diagrams",
+        "Solve previous 7 years papers"
+      ]
+    },
+    "jee_mains": {
+      "timeline": "18-24 months",
+      "daily_hours": "8-10 hours",
+      "focus": "NCERT + Advanced Problems + Mock Tests",
+      "key_tips": [
+        "Build conceptual clarity first",
+        "Solve topic-wise PYQs",
+        "Take regular mock tests",
+        "Analyze mistakes thoroughly",
+        "Focus on high-yield topics"
+      ]
+    },
+    "jee_advanced": {
+      "timeline": "24 months (after JEE Main prep)",
+      "daily_hours": "10-12 hours",
+      "focus": "Advanced Problem Solving + Multi-concept Questions",
+      "key_tips": [
+        "Master JEE Main level first",
+        "Practice complex multi-concept problems",
+        "Develop speed and accuracy",
+        "Solve full-length papers regularly",
+        "Focus on unconventional questions"
+      ]
+    },
+    "neet": {
+      "timeline": "18-24 months",
+      "daily_hours": "8-10 hours",
+      "focus": "NCERT + NCERT-based Questions + PYQs",
+      "key_tips": [
+        "NCERT is the Bible - master it completely",
+        "Practice diagrams and labeling",
+        "Solve NEET PYQs extensively",
+        "Focus on Biology (50% weightage)",
+        "Take topic tests regularly"
+      ]
+    },
+    "gate": {
+      "timeline": "6-8 months",
+      "daily_hours": "6-8 hours",
+      "focus": "Standard Books + Previous Years + Mock Tests",
+      "key_tips": [
+        "Cover all subjects systematically",
+        "Solve previous 10+ years papers",
+        "Focus on high-weightage subjects",
+        "Practice numerical extensively",
+        "Take full-length mock tests"
+      ]
+    }
+  },
+  "metadata": {
+    "version": "2.0",
+    "last_updated": "2023-12-31",
+    "data_sources": ["Official Question Papers", "Coaching Institute Analysis", "Student Performance Data"],
+    "disclaimer": "Trends are based on historical data and may vary. Always refer to official exam patterns."
+  }
+}

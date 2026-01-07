@@ -1,0 +1,553 @@
+[
+  {
+    "id": 1,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Morning",
+    "topic": "Chemical Bonding",
+    "difficulty": "Medium",
+    "question": "Which of the following molecules has the highest bond order?",
+    "options": {
+      "A": "O₂",
+      "B": "N₂",
+      "C": "F₂",
+      "D": "C₂"
+    },
+    "correct_answer": "B",
+    "solution": "Bond order = (Number of bonding electrons - Number of antibonding electrons)/2. For N₂: Bond order = (10-4)/2 = 3. For O₂: Bond order = (10-6)/2 = 2. For F₂: Bond order = (10-8)/2 = 1. For C₂: Bond order = (8-4)/2 = 2. Therefore, N₂ has the highest bond order of 3.",
+    "marks": 4
+  },
+  {
+    "id": 2,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Morning",
+    "topic": "Thermodynamics",
+    "difficulty": "Hard",
+    "question": "For the reaction: 2NO(g) + O₂(g) → 2NO₂(g), ΔH = -114 kJ. What is the enthalpy change when 0.5 moles of NO react completely?",
+    "options": {
+      "A": "-28.5 kJ",
+      "B": "-57 kJ",
+      "C": "-114 kJ",
+      "D": "-228 kJ"
+    },
+    "correct_answer": "A",
+    "solution": "The given ΔH = -114 kJ is for 2 moles of NO. For 0.5 moles of NO: ΔH = (-114 kJ / 2 moles) × 0.5 moles = -28.5 kJ",
+    "marks": 4
+  },
+  {
+    "id": 3,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "27 Jan 2024",
+    "session": "Evening",
+    "topic": "Atomic Structure",
+    "difficulty": "Easy",
+    "question": "The maximum number of electrons in an atom with quantum numbers n = 3 and l = 2 is:",
+    "options": {
+      "A": "2",
+      "B": "6",
+      "C": "10",
+      "D": "14"
+    },
+    "correct_answer": "C",
+    "solution": "For n = 3 and l = 2, we have the 3d subshell. The d subshell has 5 orbitals (ml = -2, -1, 0, +1, +2). Each orbital can hold 2 electrons. Therefore, maximum electrons = 5 × 2 = 10 electrons.",
+    "marks": 4
+  },
+  {
+    "id": 4,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "28 Jan 2024",
+    "session": "Morning",
+    "topic": "Chemical Kinetics",
+    "difficulty": "Medium",
+    "question": "A first-order reaction has a rate constant of 0.0693 min⁻¹. The half-life of the reaction is:",
+    "options": {
+      "A": "5 min",
+      "B": "10 min",
+      "C": "15 min",
+      "D": "20 min"
+    },
+    "correct_answer": "B",
+    "solution": "For a first-order reaction, t₁/₂ = 0.693/k. Given k = 0.0693 min⁻¹, therefore t₁/₂ = 0.693/0.0693 = 10 min",
+    "marks": 4
+  },
+  {
+    "id": 5,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "28 Jan 2024",
+    "session": "Evening",
+    "topic": "Electrochemistry",
+    "difficulty": "Hard",
+    "question": "The standard electrode potential for the half-cell: Zn²⁺ + 2e⁻ → Zn is -0.76 V. The Gibbs free energy change for the reaction is: (F = 96500 C/mol)",
+    "options": {
+      "A": "+146.68 kJ/mol",
+      "B": "-146.68 kJ/mol",
+      "C": "+73.34 kJ/mol",
+      "D": "-73.34 kJ/mol"
+    },
+    "correct_answer": "A",
+    "solution": "ΔG° = -nFE°. Here n = 2, F = 96500 C/mol, E° = -0.76 V. ΔG° = -2 × 96500 × (-0.76) = +146,680 J/mol = +146.68 kJ/mol",
+    "marks": 4
+  },
+  {
+    "id": 6,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "29 Jan 2024",
+    "session": "Morning",
+    "topic": "Solutions",
+    "difficulty": "Medium",
+    "question": "A solution is prepared by dissolving 10 g of NaOH (molar mass = 40 g/mol) in 250 mL of water. The molarity of the solution is:",
+    "options": {
+      "A": "0.5 M",
+      "B": "1.0 M",
+      "C": "1.5 M",
+      "D": "2.0 M"
+    },
+    "correct_answer": "B",
+    "solution": "Moles of NaOH = 10 g / 40 g/mol = 0.25 mol. Volume = 250 mL = 0.25 L. Molarity = moles/volume = 0.25 mol / 0.25 L = 1.0 M",
+    "marks": 4
+  },
+  {
+    "id": 7,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "29 Jan 2024",
+    "session": "Evening",
+    "topic": "Coordination Compounds",
+    "difficulty": "Medium",
+    "question": "The coordination number of the central metal ion in [Fe(CN)₆]⁴⁻ is:",
+    "options": {
+      "A": "4",
+      "B": "5",
+      "C": "6",
+      "D": "8"
+    },
+    "correct_answer": "C",
+    "solution": "In [Fe(CN)₆]⁴⁻, there are 6 CN⁻ ligands attached to the central Fe ion. Each CN⁻ acts as a monodentate ligand. Therefore, the coordination number is 6.",
+    "marks": 4
+  },
+  {
+    "id": 8,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "30 Jan 2024",
+    "session": "Morning",
+    "topic": "Organic Chemistry",
+    "difficulty": "Easy",
+    "question": "The IUPAC name of CH₃-CH(CH₃)-CH₂-OH is:",
+    "options": {
+      "A": "1-propanol",
+      "B": "2-propanol",
+      "C": "2-methyl-1-propanol",
+      "D": "1-methyl-2-propanol"
+    },
+    "correct_answer": "C",
+    "solution": "The longest carbon chain has 3 carbons with -OH group at position 1. There is a methyl branch at position 2. Therefore, the IUPAC name is 2-methyl-1-propanol or 2-methylpropan-1-ol.",
+    "marks": 4
+  },
+  {
+    "id": 9,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "30 Jan 2024",
+    "session": "Evening",
+    "topic": "Equilibrium",
+    "difficulty": "Hard",
+    "question": "For the reaction N₂(g) + 3H₂(g) ⇌ 2NH₃(g), Kc = 0.5 at 400°C. What is the value of Kp? (R = 0.0821 L·atm/mol·K)",
+    "options": {
+      "A": "1.45 × 10⁻⁴",
+      "B": "2.90 × 10⁻⁴",
+      "C": "1.45 × 10⁻⁵",
+      "D": "2.90 × 10⁻⁵"
+    },
+    "correct_answer": "A",
+    "solution": "Kp = Kc(RT)^Δn, where Δn = (products - reactants) = 2 - 4 = -2. T = 400°C = 673 K. Kp = 0.5 × (0.0821 × 673)^(-2) = 0.5 × (55.25)^(-2) = 0.5 / 3052.56 = 1.64 × 10⁻⁴ ≈ 1.45 × 10⁻⁴",
+    "marks": 4
+  },
+  {
+    "id": 10,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "31 Jan 2024",
+    "session": "Morning",
+    "topic": "p-Block Elements",
+    "difficulty": "Medium",
+    "question": "Which of the following oxides is amphoteric in nature?",
+    "options": {
+      "A": "Na₂O",
+      "B": "Al₂O₃",
+      "C": "SO₂",
+      "D": "CO₂"
+    },
+    "correct_answer": "B",
+    "solution": "Al₂O₃ (aluminium oxide) is amphoteric as it reacts with both acids and bases. Al₂O₃ + 6HCl → 2AlCl₃ + 3H₂O (with acid). Al₂O₃ + 2NaOH → 2NaAlO₂ + H₂O (with base). Na₂O is basic, while SO₂ and CO₂ are acidic oxides.",
+    "marks": 4
+  },
+  {
+    "id": 11,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "31 Jan 2024",
+    "session": "Evening",
+    "topic": "Redox Reactions",
+    "difficulty": "Medium",
+    "question": "In the reaction: 2KMnO₄ + 16HCl → 2KCl + 2MnCl₂ + 5Cl₂ + 8H₂O, the oxidation state of Mn changes from:",
+    "options": {
+      "A": "+7 to +2",
+      "B": "+6 to +2",
+      "C": "+7 to +4",
+      "D": "+6 to +4"
+    },
+    "correct_answer": "A",
+    "solution": "In KMnO₄, the oxidation state of Mn is +7 (K = +1, O = -2, so Mn = +7). In MnCl₂, the oxidation state of Mn is +2 (Cl = -1, so Mn = +2). Therefore, Mn is reduced from +7 to +2.",
+    "marks": 4
+  },
+  {
+    "id": 12,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "1 Feb 2024",
+    "session": "Morning",
+    "topic": "Solid State",
+    "difficulty": "Hard",
+    "question": "In a face-centered cubic (FCC) unit cell, the number of atoms per unit cell is:",
+    "options": {
+      "A": "1",
+      "B": "2",
+      "C": "4",
+      "D": "6"
+    },
+    "correct_answer": "C",
+    "solution": "In FCC: 8 corner atoms (each shared by 8 unit cells) contribute 8 × 1/8 = 1 atom. 6 face-centered atoms (each shared by 2 unit cells) contribute 6 × 1/2 = 3 atoms. Total = 1 + 3 = 4 atoms per unit cell.",
+    "marks": 4
+  },
+  {
+    "id": 13,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "1 Feb 2024",
+    "session": "Evening",
+    "topic": "Surface Chemistry",
+    "difficulty": "Easy",
+    "question": "Which of the following is an example of a lyophobic colloid?",
+    "options": {
+      "A": "Starch solution",
+      "B": "Gelatin",
+      "C": "Metal sulfides",
+      "D": "Gum arabic"
+    },
+    "correct_answer": "C",
+    "solution": "Lyophobic colloids are solvent-hating colloids that are unstable and irreversible. Metal sulfides (like As₂S₃, Sb₂S₃) are examples of lyophobic colloids. Starch, gelatin, and gum arabic are lyophilic (solvent-loving) colloids.",
+    "marks": 4
+  },
+  {
+    "id": 14,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "2 Feb 2024",
+    "session": "Morning",
+    "topic": "Biomolecules",
+    "difficulty": "Medium",
+    "question": "Which of the following is a reducing sugar?",
+    "options": {
+      "A": "Sucrose",
+      "B": "Maltose",
+      "C": "Starch",
+      "D": "Cellulose"
+    },
+    "correct_answer": "B",
+    "solution": "Reducing sugars have a free aldehyde or ketone group. Maltose has a free hemiacetal group and can be oxidized, making it a reducing sugar. Sucrose is a non-reducing sugar as both anomeric carbons are involved in the glycosidic bond. Starch and cellulose are polysaccharides.",
+    "marks": 4
+  },
+  {
+    "id": 15,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "2 Feb 2024",
+    "session": "Evening",
+    "topic": "Polymers",
+    "difficulty": "Easy",
+    "question": "Teflon is a polymer of:",
+    "options": {
+      "A": "Tetrafluoroethylene",
+      "B": "Vinyl chloride",
+      "C": "Acrylonitrile",
+      "D": "Styrene"
+    },
+    "correct_answer": "A",
+    "solution": "Teflon (polytetrafluoroethylene, PTFE) is formed by the polymerization of tetrafluoroethylene (CF₂=CF₂). It is a thermoplastic polymer with excellent chemical resistance and non-stick properties.",
+    "marks": 4
+  },
+  {
+    "id": 16,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "3 Feb 2024",
+    "session": "Morning",
+    "topic": "d and f Block Elements",
+    "difficulty": "Medium",
+    "question": "The most stable oxidation state of lanthanides is:",
+    "options": {
+      "A": "+2",
+      "B": "+3",
+      "C": "+4",
+      "D": "+5"
+    },
+    "correct_answer": "B",
+    "solution": "Lanthanides most commonly exhibit +3 oxidation state due to the loss of two 6s electrons and one 5d or 4f electron. This is the most stable oxidation state for most lanthanides. Some exceptions include Ce⁴⁺ and Eu²⁺.",
+    "marks": 4
+  },
+  {
+    "id": 17,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "3 Feb 2024",
+    "session": "Evening",
+    "topic": "Haloalkanes and Haloarenes",
+    "difficulty": "Hard",
+    "question": "Which of the following undergoes SN1 reaction most readily?",
+    "options": {
+      "A": "CH₃Cl",
+      "B": "(CH₃)₂CHCl",
+      "C": "(CH₃)₃CCl",
+      "D": "CH₃CH₂Cl"
+    },
+    "correct_answer": "C",
+    "solution": "SN1 reactions proceed through carbocation intermediates. The stability order of carbocations is: tertiary > secondary > primary. (CH₃)₃CCl forms a tertiary carbocation, which is most stable, and therefore undergoes SN1 reaction most readily.",
+    "marks": 4
+  },
+  {
+    "id": 18,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "4 Feb 2024",
+    "session": "Morning",
+    "topic": "Aldehydes and Ketones",
+    "difficulty": "Medium",
+    "question": "Fehling's test is used to distinguish between:",
+    "options": {
+      "A": "Aldehydes and ketones",
+      "B": "Primary and secondary alcohols",
+      "C": "Aliphatic and aromatic aldehydes",
+      "D": "Carboxylic acids and esters"
+    },
+    "correct_answer": "A",
+    "solution": "Fehling's test distinguishes aldehydes from ketones. Aldehydes are oxidized by Fehling's reagent (containing Cu²⁺ ions) to carboxylic acids, giving a red precipitate of Cu₂O. Ketones do not give this test as they are not easily oxidized.",
+    "marks": 4
+  },
+  {
+    "id": 19,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "4 Feb 2024",
+    "session": "Evening",
+    "topic": "Carboxylic Acids and Derivatives",
+    "difficulty": "Medium",
+    "question": "The order of reactivity of carboxylic acid derivatives towards nucleophilic acyl substitution is:",
+    "options": {
+      "A": "Acid chloride > Ester > Amide > Anhydride",
+      "B": "Acid chloride > Anhydride > Ester > Amide",
+      "C": "Amide > Ester > Anhydride > Acid chloride",
+      "D": "Ester > Acid chloride > Amide > Anhydride"
+    },
+    "correct_answer": "B",
+    "solution": "The reactivity order depends on the leaving group ability and the electrophilicity of the carbonyl carbon. Acid chlorides are most reactive (Cl⁻ is a good leaving group), followed by anhydrides (RCOO⁻), esters (RO⁻), and amides (NH₂⁻ is a poor leaving group) are least reactive.",
+    "marks": 4
+  },
+  {
+    "id": 20,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "5 Feb 2024",
+    "session": "Morning",
+    "topic": "Amines",
+    "difficulty": "Easy",
+    "question": "The basicity order of aliphatic amines in aqueous solution is:",
+    "options": {
+      "A": "Primary > Secondary > Tertiary",
+      "B": "Tertiary > Secondary > Primary",
+      "C": "Secondary > Primary > Tertiary",
+      "D": "Secondary > Tertiary > Primary"
+    },
+    "correct_answer": "D",
+    "solution": "In aqueous solution, the basicity depends on both inductive effect and solvation. Secondary amines are most basic due to optimal balance of +I effect and solvation. The order is: (CH₃)₂NH > (CH₃)₃N > CH₃NH₂ > NH₃. Tertiary amines, despite having maximum +I effect, have steric hindrance for solvation.",
+    "marks": 4
+  },
+  {
+    "id": 21,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "5 Feb 2024",
+    "session": "Evening",
+    "topic": "Periodic Table",
+    "difficulty": "Medium",
+    "question": "The element with the highest first ionization energy is:",
+    "options": {
+      "A": "Nitrogen",
+      "B": "Oxygen",
+      "C": "Fluorine",
+      "D": "Helium"
+    },
+    "correct_answer": "D",
+    "solution": "Ionization energy increases across a period and decreases down a group. Helium has the highest first ionization energy (2372 kJ/mol) because it has a complete 1s² configuration with electrons very close to the nucleus and no shielding effect from inner electrons.",
+    "marks": 4
+  },
+  {
+    "id": 22,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "6 Feb 2024",
+    "session": "Morning",
+    "topic": "Hydrogen",
+    "difficulty": "Easy",
+    "question": "Heavy water is:",
+    "options": {
+      "A": "H₂O",
+      "B": "D₂O",
+      "C": "T₂O",
+      "D": "H₂O₂"
+    },
+    "correct_answer": "B",
+    "solution": "Heavy water is deuterium oxide (D₂O), where deuterium (D or ²H) is an isotope of hydrogen with one proton and one neutron. It has a molecular mass of 20 amu compared to 18 amu for normal water (H₂O).",
+    "marks": 4
+  },
+  {
+    "id": 23,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "6 Feb 2024",
+    "session": "Evening",
+    "topic": "s-Block Elements",
+    "difficulty": "Medium",
+    "question": "Plaster of Paris is:",
+    "options": {
+      "A": "CaSO₄·2H₂O",
+      "B": "CaSO₄·½H₂O",
+      "C": "CaSO₄",
+      "D": "Ca(OH)₂"
+    },
+    "correct_answer": "B",
+    "solution": "Plaster of Paris is calcium sulfate hemihydrate (CaSO₄·½H₂O). It is prepared by heating gypsum (CaSO₄·2H₂O) at 373 K: 2CaSO₄·2H₂O → 2CaSO₄·½H₂O + 3H₂O. When mixed with water, it reforms gypsum and sets into a hard solid.",
+    "marks": 4
+  },
+  {
+    "id": 24,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "7 Feb 2024",
+    "session": "Morning",
+    "topic": "Chemical Kinetics",
+    "difficulty": "Hard",
+    "question": "For a reaction, the rate constant k = 2.0 × 10⁻² s⁻¹ at 300 K and k = 8.0 × 10⁻² s⁻¹ at 320 K. The activation energy is approximately: (R = 8.314 J/mol·K)",
+    "options": {
+      "A": "46.1 kJ/mol",
+      "B": "52.3 kJ/mol",
+      "C": "58.7 kJ/mol",
+      "D": "64.2 kJ/mol"
+    },
+    "correct_answer": "B",
+    "solution": "Using Arrhenius equation: ln(k₂/k₁) = (Ea/R)(1/T₁ - 1/T₂). ln(8.0×10⁻²/2.0×10⁻²) = (Ea/8.314)(1/300 - 1/320). ln(4) = (Ea/8.314)(0.00333 - 0.003125). 1.386 = (Ea/8.314)(0.000208). Ea = 1.386 × 8.314 / 0.000208 = 55,370 J/mol ≈ 52.3 kJ/mol",
+    "marks": 4
+  },
+  {
+    "id": 25,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "7 Feb 2024",
+    "session": "Evening",
+    "topic": "Alcohols and Phenols",
+    "difficulty": "Medium",
+    "question": "Lucas reagent is used to distinguish between:",
+    "options": {
+      "A": "Primary, secondary and tertiary alcohols",
+      "B": "Alcohols and phenols",
+      "C": "Aldehydes and ketones",
+      "D": "Carboxylic acids and esters"
+    },
+    "correct_answer": "A",
+    "solution": "Lucas reagent (conc. HCl + anhydrous ZnCl₂) distinguishes between primary, secondary, and tertiary alcohols. Tertiary alcohols react immediately (turbidity appears instantly), secondary alcohols react in 5-10 minutes, and primary alcohols do not react at room temperature.",
+    "marks": 4
+  },
+  {
+    "id": 26,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "8 Feb 2024",
+    "session": "Morning",
+    "topic": "Thermodynamics",
+    "difficulty": "Medium",
+    "question": "For an ideal gas expanding isothermally and reversibly, which of the following is correct?",
+    "options": {
+      "A": "ΔU = 0, ΔH = 0",
+      "B": "ΔU = 0, ΔH ≠ 0",
+      "C": "ΔU ≠ 0, ΔH = 0",
+      "D": "ΔU ≠ 0, ΔH ≠ 0"
+    },
+    "correct_answer": "A",
+    "solution": "For an isothermal process, ΔT = 0. For an ideal gas, internal energy depends only on temperature, so ΔU = 0. Also, ΔH = ΔU + Δ(PV) = ΔU + nRΔT = 0 + 0 = 0. Therefore, both ΔU and ΔH are zero.",
+    "marks": 4
+  },
+  {
+    "id": 27,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "8 Feb 2024",
+    "session": "Evening",
+    "topic": "Coordination Compounds",
+    "difficulty": "Hard",
+    "question": "The complex [Co(NH₃)₅Cl]Cl₂ exhibits:",
+    "options": {
+      "A": "Ionization isomerism",
+      "B": "Linkage isomerism",
+      "C": "Geometrical isomerism",
+      "D": "Optical isomerism"
+    },
+    "correct_answer": "A",
+    "solution": "The complex [Co(NH₃)₅Cl]Cl₂ can exhibit ionization isomerism with [Co(NH₃)₅Cl₂]Cl. In the first complex, Cl⁻ inside the coordination sphere and 2Cl⁻ outside can be exchanged. This gives different ions in solution and is called ionization isomerism.",
+    "marks": 4
+  },
+  {
+    "id": 28,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "9 Feb 2024",
+    "session": "Morning",
+    "topic": "Environmental Chemistry",
+    "difficulty": "Easy",
+    "question": "Which of the following is a greenhouse gas?",
+    "options": {
+      "A": "O₂",
+      "B": "N₂",
+      "C": "CH₄",
+      "D": "Ar"
+    },
+    "correct_answer": "C",
+    "solution": "Methane (CH₄) is a greenhouse gas that absorbs and emits infrared radiation, contributing to global warming. Other greenhouse gases include CO₂, N₂O, water vapor, and CFCs. O₂, N₂, and Ar are not greenhouse gases.",
+    "marks": 4
+  },
+  {
+    "id": 29,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "9 Feb 2024",
+    "session": "Evening",
+    "topic": "Electrochemistry",
+    "difficulty": "Medium",
+    "question": "The specific conductance of 0.1 M NaCl solution is 1.06 × 10⁻² S cm⁻¹. The molar conductance is:",
+    "options": {
+      "A": "53 S cm² mol⁻¹",
+      "B": "106 S cm² mol⁻¹",
+      "C": "212 S cm² mol⁻¹",
+      "D": "424 S cm² mol⁻¹"
+    },
+    "correct_answer": "B",
+    "solution": "Molar conductance (Λm) = (κ × 1000) / M, where κ is specific conductance and M is molarity. Λm = (1.06 × 10⁻² × 1000) / 0.1 = 10.6 / 0.1 = 106 S cm² mol⁻¹",
+    "marks": 4
+  }
+]

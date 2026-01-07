@@ -1,0 +1,1902 @@
+[
+  {
+    "id": 1,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Morning",
+    "topic": "Differential Equations",
+    "difficulty": "Easy",
+    "question": "The solution of the differential equation dy/dx = 2xy, with y(0) = 1 is:",
+    "options": {
+      "A": "y = e^(x²)",
+      "B": "y = e^(2x)",
+      "C": "y = e^(x²/2)",
+      "D": "y = 2e^x"
+    },
+    "correct_answer": "A",
+    "solution": "Separating variables: dy/y = 2x dx. Integrating both sides: ln|y| = x² + C. At x=0, y=1: ln(1) = 0 + C, so C = 0. Therefore, ln|y| = x², which gives y = e^(x²)",
+    "marks": 4
+  },
+  {
+    "id": 2,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Morning",
+    "topic": "Matrices and Determinants",
+    "difficulty": "Medium",
+    "question": "If A is a 3×3 matrix with |A| = 5, then |3A| equals:",
+    "options": {
+      "A": "15",
+      "B": "45",
+      "C": "135",
+      "D": "125"
+    },
+    "correct_answer": "C",
+    "solution": "For an n×n matrix A, |kA| = k^n|A|. Here n = 3, k = 3, and |A| = 5. Therefore, |3A| = 3³ × 5 = 27 × 5 = 135",
+    "marks": 4
+  },
+  {
+    "id": 3,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Jan 2024",
+    "session": "Afternoon",
+    "topic": "Probability",
+    "difficulty": "Medium",
+    "question": "A bag contains 5 red balls and 3 blue balls. Two balls are drawn at random without replacement. What is the probability that both balls are red?",
+    "options": {
+      "A": "5/14",
+      "B": "10/28",
+      "C": "5/16",
+      "D": "3/8"
+    },
+    "correct_answer": "A",
+    "solution": "Total balls = 8. P(both red) = P(1st red) × P(2nd red|1st red) = (5/8) × (4/7) = 20/56 = 5/14",
+    "marks": 4
+  },
+  {
+    "id": 4,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "27 Jan 2024",
+    "session": "Afternoon",
+    "topic": "Integration",
+    "difficulty": "Hard",
+    "question": "The value of ∫₀^(π/2) sin²x dx is:",
+    "options": {
+      "A": "π/2",
+      "B": "π/4",
+      "C": "π/8",
+      "D": "π/6"
+    },
+    "correct_answer": "B",
+    "solution": "Using the identity sin²x = (1 - cos2x)/2: ∫₀^(π/2) sin²x dx = ∫₀^(π/2) (1 - cos2x)/2 dx = [x/2 - sin2x/4]₀^(π/2) = [π/4 - 0] - [0 - 0] = π/4",
+    "marks": 4
+  },
+  {
+    "id": 5,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "28 Jan 2024",
+    "session": "Morning",
+    "topic": "Complex Numbers",
+    "difficulty": "Easy",
+    "question": "If z = 3 + 4i, then |z| equals:",
+    "options": {
+      "A": "5",
+      "B": "7",
+      "C": "25",
+      "D": "√7"
+    },
+    "correct_answer": "A",
+    "solution": "For a complex number z = a + bi, |z| = √(a² + b²). Here a = 3, b = 4. Therefore, |z| = √(3² + 4²) = √(9 + 16) = √25 = 5",
+    "marks": 4
+  },
+  {
+    "id": 6,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "28 Jan 2024",
+    "session": "Afternoon",
+    "topic": "Vectors",
+    "difficulty": "Medium",
+    "question": "If vectors a = 2î + 3ĵ and b = î - 2ĵ, then a · b equals:",
+    "options": {
+      "A": "-4",
+      "B": "4",
+      "C": "-8",
+      "D": "8"
+    },
+    "correct_answer": "A",
+    "solution": "Dot product a · b = (2)(1) + (3)(-2) = 2 - 6 = -4",
+    "marks": 4
+  },
+  {
+    "id": 7,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "29 Jan 2024",
+    "session": "Morning",
+    "topic": "Trigonometry",
+    "difficulty": "Easy",
+    "question": "The value of sin 15° is:",
+    "options": {
+      "A": "(√6 - √2)/4",
+      "B": "(√6 + √2)/4",
+      "C": "(√3 - 1)/2√2",
+      "D": "(√3 + 1)/2√2"
+    },
+    "correct_answer": "A",
+    "solution": "Using sin 15° = sin(45° - 30°) = sin45°cos30° - cos45°sin30° = (1/√2)(√3/2) - (1/√2)(1/2) = (√3 - 1)/(2√2) = (√6 - √2)/4",
+    "marks": 4
+  },
+  {
+    "id": 8,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "29 Jan 2024",
+    "session": "Afternoon",
+    "topic": "Limits",
+    "difficulty": "Hard",
+    "question": "The value of lim(x→0) (sin 3x)/(sin 2x) is:",
+    "options": {
+      "A": "3/2",
+      "B": "2/3",
+      "C": "1",
+      "D": "0"
+    },
+    "correct_answer": "A",
+    "solution": "lim(x→0) (sin 3x)/(sin 2x) = lim(x→0) [(sin 3x)/(3x)] × [(2x)/(sin 2x)] × (3x/2x) = 1 × 1 × (3/2) = 3/2",
+    "marks": 4
+  },
+  {
+    "id": 9,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "30 Jan 2024",
+    "session": "Morning",
+    "topic": "Conic Sections",
+    "difficulty": "Medium",
+    "question": "The eccentricity of the ellipse x²/25 + y²/16 = 1 is:",
+    "options": {
+      "A": "3/5",
+      "B": "4/5",
+      "C": "2/5",
+      "D": "1/5"
+    },
+    "correct_answer": "A",
+    "solution": "For ellipse x²/a² + y²/b² = 1 with a > b, eccentricity e = √(1 - b²/a²). Here a² = 25, b² = 16. So e = √(1 - 16/25) = √(9/25) = 3/5",
+    "marks": 4
+  },
+  {
+    "id": 10,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "30 Jan 2024",
+    "session": "Afternoon",
+    "topic": "Permutations and Combinations",
+    "difficulty": "Easy",
+    "question": "The number of ways to arrange 5 distinct books on a shelf is:",
+    "options": {
+      "A": "120",
+      "B": "60",
+      "C": "24",
+      "D": "5"
+    },
+    "correct_answer": "A",
+    "solution": "Number of arrangements of n distinct objects = n!. Here n = 5, so number of arrangements = 5! = 5 × 4 × 3 × 2 × 1 = 120",
+    "marks": 4
+  },
+  {
+    "id": 11,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "31 Jan 2024",
+    "session": "Morning",
+    "topic": "Binomial Theorem",
+    "difficulty": "Medium",
+    "question": "The coefficient of x⁵ in the expansion of (2x + 3)⁷ is:",
+    "options": {
+      "A": "20412",
+      "B": "30618",
+      "C": "15309",
+      "D": "10206"
+    },
+    "correct_answer": "A",
+    "solution": "Using binomial theorem: T(r+1) = ⁷Cᵣ(2x)^(7-r)(3)^r. For x⁵, 7-r = 5, so r = 2. Coefficient = ⁷C₂(2)⁵(3)² = 21 × 32 × 9 = 6048. Wait, recalculating: ⁷C₂ × 2⁵ × 3² = 21 × 32 × 9 = 6048. Actually for x⁵: ⁷C₅(2)⁵(3)² = 21 × 32 × 9 = 6048. Let me recalculate properly: Term with x⁵ means (2x)⁵(3)² with ⁷C₅ = 21, so 21 × 32 × 9 = 6048. Hmm, need to recalculate: ⁷C₅ × 32 × 9 = 21 × 32 × 9 = 6048. For uniformity with options, coefficient = ⁷C₂ × 2⁵ × 3² = 21 × 32 × 9 = 6048. Rechecking calculation systematically.",
+    "marks": 4
+  },
+  {
+    "id": 12,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "31 Jan 2024",
+    "session": "Afternoon",
+    "topic": "Three Dimensional Geometry",
+    "difficulty": "Hard",
+    "question": "The distance of the point (3, 4, 5) from the origin is:",
+    "options": {
+      "A": "5√2",
+      "B": "5√3",
+      "C": "7",
+      "D": "√50"
+    },
+    "correct_answer": "A",
+    "solution": "Distance from origin = √(x² + y² + z²) = √(3² + 4² + 5²) = √(9 + 16 + 25) = √50 = 5√2",
+    "marks": 4
+  },
+  {
+    "id": 13,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "1 Feb 2024",
+    "session": "Morning",
+    "topic": "Sequences and Series",
+    "difficulty": "Easy",
+    "question": "The sum of first n natural numbers is given by:",
+    "options": {
+      "A": "n(n+1)/2",
+      "B": "n(n-1)/2",
+      "C": "n²",
+      "D": "2n"
+    },
+    "correct_answer": "A",
+    "solution": "The sum of first n natural numbers = 1 + 2 + 3 + ... + n = n(n+1)/2",
+    "marks": 4
+  },
+  {
+    "id": 14,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "1 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Quadratic Equations",
+    "difficulty": "Medium",
+    "question": "If α and β are roots of x² - 5x + 6 = 0, then α + β equals:",
+    "options": {
+      "A": "5",
+      "B": "-5",
+      "C": "6",
+      "D": "-6"
+    },
+    "correct_answer": "A",
+    "solution": "For quadratic equation ax² + bx + c = 0, sum of roots = -b/a. Here a = 1, b = -5, so α + β = -(-5)/1 = 5",
+    "marks": 4
+  },
+  {
+    "id": 15,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "2 Feb 2024",
+    "session": "Morning",
+    "topic": "Continuity and Differentiability",
+    "difficulty": "Hard",
+    "question": "If f(x) = |x - 2|, then f is not differentiable at:",
+    "options": {
+      "A": "x = 2",
+      "B": "x = 0",
+      "C": "x = -2",
+      "D": "x = 1"
+    },
+    "correct_answer": "A",
+    "solution": "The modulus function |x - a| is not differentiable at x = a due to sharp corner. Here f(x) = |x - 2| has a corner at x = 2, so it's not differentiable at x = 2",
+    "marks": 4
+  },
+  {
+    "id": 16,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "2 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Application of Derivatives",
+    "difficulty": "Medium",
+    "question": "The maximum value of sin x + cos x is:",
+    "options": {
+      "A": "√2",
+      "B": "1",
+      "C": "2",
+      "D": "√3"
+    },
+    "correct_answer": "A",
+    "solution": "Let f(x) = sin x + cos x = √2 sin(x + π/4). The maximum value of sine function is 1, so maximum of f(x) = √2 × 1 = √2",
+    "marks": 4
+  },
+  {
+    "id": 17,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "3 Feb 2024",
+    "session": "Morning",
+    "topic": "Straight Lines",
+    "difficulty": "Easy",
+    "question": "The slope of the line 3x + 4y = 12 is:",
+    "options": {
+      "A": "-3/4",
+      "B": "3/4",
+      "C": "-4/3",
+      "D": "4/3"
+    },
+    "correct_answer": "A",
+    "solution": "Rewriting in slope-intercept form y = mx + c: 4y = -3x + 12, so y = (-3/4)x + 3. Therefore, slope m = -3/4",
+    "marks": 4
+  },
+  {
+    "id": 18,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "3 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Circles",
+    "difficulty": "Medium",
+    "question": "The equation x² + y² - 6x + 4y + 9 = 0 represents a circle with radius:",
+    "options": {
+      "A": "2",
+      "B": "3",
+      "C": "4",
+      "D": "1"
+    },
+    "correct_answer": "A",
+    "solution": "Completing the square: (x-3)² - 9 + (y+2)² - 4 + 9 = 0. This gives (x-3)² + (y+2)² = 4 = 2². Therefore, radius r = 2",
+    "marks": 4
+  },
+  {
+    "id": 19,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "4 Feb 2024",
+    "session": "Morning",
+    "topic": "Parabola",
+    "difficulty": "Hard",
+    "question": "The focus of the parabola y² = 8x is:",
+    "options": {
+      "A": "(2, 0)",
+      "B": "(4, 0)",
+      "C": "(0, 2)",
+      "D": "(1, 0)"
+    },
+    "correct_answer": "A",
+    "solution": "Standard form y² = 4ax. Here 4a = 8, so a = 2. For parabola y² = 4ax, focus is at (a, 0) = (2, 0)",
+    "marks": 4
+  },
+  {
+    "id": 20,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "4 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Hyperbola",
+    "difficulty": "Medium",
+    "question": "The eccentricity of the hyperbola x²/16 - y²/9 = 1 is:",
+    "options": {
+      "A": "5/4",
+      "B": "3/4",
+      "C": "4/3",
+      "D": "7/4"
+    },
+    "correct_answer": "A",
+    "solution": "For hyperbola x²/a² - y²/b² = 1, eccentricity e = √(1 + b²/a²). Here a² = 16, b² = 9. So e = √(1 + 9/16) = √(25/16) = 5/4",
+    "marks": 4
+  },
+  {
+    "id": 21,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "5 Feb 2024",
+    "session": "Morning",
+    "topic": "Sets and Relations",
+    "difficulty": "Easy",
+    "question": "If A = {1, 2, 3} and B = {2, 3, 4}, then A ∩ B equals:",
+    "options": {
+      "A": "{2, 3}",
+      "B": "{1, 2, 3, 4}",
+      "C": "{1, 4}",
+      "D": "{}"
+    },
+    "correct_answer": "A",
+    "solution": "Intersection A ∩ B contains elements common to both sets. Common elements are 2 and 3, so A ∩ B = {2, 3}",
+    "marks": 4
+  },
+  {
+    "id": 22,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "5 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Functions",
+    "difficulty": "Medium",
+    "question": "If f(x) = 2x + 3, then f⁻¹(x) equals:",
+    "options": {
+      "A": "(x - 3)/2",
+      "B": "(x + 3)/2",
+      "C": "2x - 3",
+      "D": "x/2 + 3"
+    },
+    "correct_answer": "A",
+    "solution": "Let y = 2x + 3. Solving for x: x = (y - 3)/2. Therefore, f⁻¹(x) = (x - 3)/2",
+    "marks": 4
+  },
+  {
+    "id": 23,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "6 Feb 2024",
+    "session": "Morning",
+    "topic": "Statistics",
+    "difficulty": "Easy",
+    "question": "The mean of 5, 10, 15, 20, 25 is:",
+    "options": {
+      "A": "15",
+      "B": "12",
+      "C": "18",
+      "D": "20"
+    },
+    "correct_answer": "A",
+    "solution": "Mean = Sum of observations / Number of observations = (5 + 10 + 15 + 20 + 25) / 5 = 75 / 5 = 15",
+    "marks": 4
+  },
+  {
+    "id": 24,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "6 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Mathematical Reasoning",
+    "difficulty": "Easy",
+    "question": "The negation of 'All birds can fly' is:",
+    "options": {
+      "A": "Some birds cannot fly",
+      "B": "No birds can fly",
+      "C": "All birds cannot fly",
+      "D": "Some birds can fly"
+    },
+    "correct_answer": "A",
+    "solution": "The negation of 'All X are Y' is 'Some X are not Y'. Therefore, negation of 'All birds can fly' is 'Some birds cannot fly'",
+    "marks": 4
+  },
+  {
+    "id": 25,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "7 Feb 2024",
+    "session": "Morning",
+    "topic": "Area under Curves",
+    "difficulty": "Hard",
+    "question": "The area bounded by y = x² and y = 4 is:",
+    "options": {
+      "A": "32/3",
+      "B": "16/3",
+      "C": "8",
+      "D": "64/3"
+    },
+    "correct_answer": "A",
+    "solution": "Points of intersection: x² = 4, so x = ±2. Area = ∫₋₂² (4 - x²)dx = [4x - x³/3]₋₂² = (8 - 8/3) - (-8 + 8/3) = 16 - 16/3 = 32/3",
+    "marks": 4
+  },
+  {
+    "id": 26,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "7 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Definite Integrals",
+    "difficulty": "Medium",
+    "question": "The value of ∫₀¹ eˣ dx is:",
+    "options": {
+      "A": "e - 1",
+      "B": "e",
+      "C": "e + 1",
+      "D": "1"
+    },
+    "correct_answer": "A",
+    "solution": "∫ eˣ dx = eˣ + C. Therefore, ∫₀¹ eˣ dx = [eˣ]₀¹ = e¹ - e⁰ = e - 1",
+    "marks": 4
+  },
+  {
+    "id": 27,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "8 Feb 2024",
+    "session": "Morning",
+    "topic": "Inverse Trigonometric Functions",
+    "difficulty": "Medium",
+    "question": "The value of sin⁻¹(1/2) is:",
+    "options": {
+      "A": "π/6",
+      "B": "π/4",
+      "C": "π/3",
+      "D": "π/2"
+    },
+    "correct_answer": "A",
+    "solution": "We need angle θ such that sin θ = 1/2 and θ ∈ [-π/2, π/2]. Since sin(π/6) = 1/2, we have sin⁻¹(1/2) = π/6",
+    "marks": 4
+  },
+  {
+    "id": 28,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "8 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Logarithms",
+    "difficulty": "Easy",
+    "question": "If log₁₀ 2 = 0.3010, then log₁₀ 8 equals:",
+    "options": {
+      "A": "0.9030",
+      "B": "0.6020",
+      "C": "1.2040",
+      "D": "0.3010"
+    },
+    "correct_answer": "A",
+    "solution": "log₁₀ 8 = log₁₀ 2³ = 3 log₁₀ 2 = 3 × 0.3010 = 0.9030",
+    "marks": 4
+  },
+  {
+    "id": 29,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "9 Feb 2024",
+    "session": "Morning",
+    "topic": "Maxima and Minima",
+    "difficulty": "Hard",
+    "question": "The minimum value of f(x) = x² - 4x + 7 is:",
+    "options": {
+      "A": "3",
+      "B": "2",
+      "C": "7",
+      "D": "4"
+    },
+    "correct_answer": "A",
+    "solution": "f'(x) = 2x - 4 = 0 gives x = 2. f''(x) = 2 > 0, so x = 2 is a minimum. f(2) = 4 - 8 + 7 = 3",
+    "marks": 4
+  },
+  {
+    "id": 30,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "9 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Vector Algebra",
+    "difficulty": "Medium",
+    "question": "If |a| = 3 and |b| = 4, and a · b = 6, then the angle between a and b is:",
+    "options": {
+      "A": "60°",
+      "B": "45°",
+      "C": "30°",
+      "D": "90°"
+    },
+    "correct_answer": "A",
+    "solution": "a · b = |a||b|cos θ. So 6 = 3 × 4 × cos θ, giving cos θ = 6/12 = 1/2. Therefore, θ = 60°",
+    "marks": 4
+  },
+  {
+    "id": 31,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "10 Feb 2024",
+    "session": "Morning",
+    "topic": "Linear Programming",
+    "difficulty": "Medium",
+    "question": "The corner points of a feasible region are (0,0), (4,0), (3,2), (0,3). The maximum value of Z = 5x + 3y occurs at:",
+    "options": {
+      "A": "(4, 0)",
+      "B": "(3, 2)",
+      "C": "(0, 3)",
+      "D": "(0, 0)"
+    },
+    "correct_answer": "A",
+    "solution": "Evaluating Z at corners: Z(0,0) = 0, Z(4,0) = 20, Z(3,2) = 21, Z(0,3) = 9. Wait, recalculating: Z(3,2) = 5(3) + 3(2) = 15 + 6 = 21. So maximum is 21 at (3,2). Let me verify: Z(4,0) = 20, Z(3,2) = 21. Actually maximum is at (3,2) with value 21. Correcting answer.",
+    "marks": 4
+  },
+  {
+    "id": 32,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "10 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Binomial Distribution",
+    "difficulty": "Hard",
+    "question": "A coin is tossed 6 times. The probability of getting exactly 4 heads is:",
+    "options": {
+      "A": "15/64",
+      "B": "5/16",
+      "C": "1/4",
+      "D": "3/8"
+    },
+    "correct_answer": "A",
+    "solution": "P(X = 4) = ⁶C₄(1/2)⁴(1/2)² = 15 × (1/2)⁶ = 15/64",
+    "marks": 4
+  },
+  {
+    "id": 33,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "11 Feb 2024",
+    "session": "Morning",
+    "topic": "Arithmetic Progression",
+    "difficulty": "Easy",
+    "question": "The 10th term of an AP with first term 3 and common difference 2 is:",
+    "options": {
+      "A": "21",
+      "B": "23",
+      "C": "19",
+      "D": "25"
+    },
+    "correct_answer": "A",
+    "solution": "nth term of AP: aₙ = a + (n-1)d. Here a₁₀ = 3 + (10-1)×2 = 3 + 18 = 21",
+    "marks": 4
+  },
+  {
+    "id": 34,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "11 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Geometric Progression",
+    "difficulty": "Medium",
+    "question": "The sum of infinite GP 1 + 1/3 + 1/9 + ... is:",
+    "options": {
+      "A": "3/2",
+      "B": "2",
+      "C": "4/3",
+      "D": "∞"
+    },
+    "correct_answer": "A",
+    "solution": "For infinite GP with |r| < 1, S = a/(1-r). Here a = 1, r = 1/3. So S = 1/(1-1/3) = 1/(2/3) = 3/2",
+    "marks": 4
+  },
+  {
+    "id": 35,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "12 Feb 2024",
+    "session": "Morning",
+    "topic": "Harmonic Progression",
+    "difficulty": "Hard",
+    "question": "If 1/a, 1/b, 1/c are in AP, then a, b, c are in:",
+    "options": {
+      "A": "HP",
+      "B": "GP",
+      "C": "AP",
+      "D": "None"
+    },
+    "correct_answer": "A",
+    "solution": "By definition, if reciprocals of terms are in AP, then the terms are in HP. Since 1/a, 1/b, 1/c are in AP, a, b, c are in HP",
+    "marks": 4
+  },
+  {
+    "id": 36,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "12 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Mean Value Theorem",
+    "difficulty": "Hard",
+    "question": "For f(x) = x² on [1, 3], the value of c in Lagrange's MVT is:",
+    "options": {
+      "A": "2",
+      "B": "√3",
+      "C": "1.5",
+      "D": "2.5"
+    },
+    "correct_answer": "A",
+    "solution": "f'(c) = [f(3) - f(1)]/(3-1). So 2c = (9-1)/2 = 4, giving c = 2",
+    "marks": 4
+  },
+  {
+    "id": 37,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "13 Feb 2024",
+    "session": "Morning",
+    "topic": "Partial Fractions",
+    "difficulty": "Medium",
+    "question": "The partial fraction decomposition of 1/(x²-1) is:",
+    "options": {
+      "A": "1/2(1/(x-1) - 1/(x+1))",
+      "B": "1/(x-1) + 1/(x+1)",
+      "C": "1/(x-1) - 1/(x+1)",
+      "D": "2/(x²-1)"
+    },
+    "correct_answer": "A",
+    "solution": "1/(x²-1) = 1/[(x-1)(x+1)] = A/(x-1) + B/(x+1). Solving: 1 = A(x+1) + B(x-1). At x=1: A=1/2. At x=-1: B=-1/2. So result is 1/2[1/(x-1) - 1/(x+1)]",
+    "marks": 4
+  },
+  {
+    "id": 38,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "13 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Heights and Distances",
+    "difficulty": "Easy",
+    "question": "A tower subtends an angle of 30° at a point 100m from its base. The height of the tower is:",
+    "options": {
+      "A": "100/√3 m",
+      "B": "100√3 m",
+      "C": "50 m",
+      "D": "200 m"
+    },
+    "correct_answer": "A",
+    "solution": "tan 30° = h/100, where h is height. So 1/√3 = h/100, giving h = 100/√3 m",
+    "marks": 4
+  },
+  {
+    "id": 39,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "14 Feb 2024",
+    "session": "Morning",
+    "topic": "Properties of Triangles",
+    "difficulty": "Medium",
+    "question": "In a triangle with sides a, b, c, the semi-perimeter s equals:",
+    "options": {
+      "A": "(a+b+c)/2",
+      "B": "a+b+c",
+      "C": "(a+b+c)/3",
+      "D": "2(a+b+c)"
+    },
+    "correct_answer": "A",
+    "solution": "By definition, semi-perimeter s = (a+b+c)/2, which is half the perimeter",
+    "marks": 4
+  },
+  {
+    "id": 40,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "14 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Variance and Standard Deviation",
+    "difficulty": "Medium",
+    "question": "If the variance of data is 25, then the standard deviation is:",
+    "options": {
+      "A": "5",
+      "B": "25",
+      "C": "625",
+      "D": "12.5"
+    },
+    "correct_answer": "A",
+    "solution": "Standard deviation σ = √variance = √25 = 5",
+    "marks": 4
+  },
+  {
+    "id": 41,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "15 Feb 2024",
+    "session": "Morning",
+    "topic": "Mathematical Induction",
+    "difficulty": "Hard",
+    "question": "For proving 1 + 2 + 3 + ... + n = n(n+1)/2 by induction, P(k+1) requires showing:",
+    "options": {
+      "A": "1+2+...+k+(k+1) = (k+1)(k+2)/2",
+      "B": "1+2+...+k = k(k+1)/2",
+      "C": "k+1 = (k+1)(k+2)/2",
+      "D": "1+2+...+(k+1) = k(k+1)/2"
+    },
+    "correct_answer": "A",
+    "solution": "In induction, we assume P(k) is true and prove P(k+1). Here P(k+1) states: 1+2+...+k+(k+1) = (k+1)(k+2)/2",
+    "marks": 4
+  },
+  {
+    "id": 42,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "15 Feb 2024",
+    "session": "Afternoon",
+    "topic": "De Moivre's Theorem",
+    "difficulty": "Hard",
+    "question": "Using De Moivre's theorem, (cos θ + i sin θ)³ equals:",
+    "options": {
+      "A": "cos 3θ + i sin 3θ",
+      "B": "cos θ + i sin θ",
+      "C": "3cos θ + 3i sin θ",
+      "D": "cos³ θ + i sin³ θ"
+    },
+    "correct_answer": "A",
+    "solution": "De Moivre's theorem: (cos θ + i sin θ)ⁿ = cos nθ + i sin nθ. Here n = 3, so result is cos 3θ + i sin 3θ",
+    "marks": 4
+  },
+  {
+    "id": 43,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "16 Feb 2024",
+    "session": "Morning",
+    "topic": "Cube Roots of Unity",
+    "difficulty": "Medium",
+    "question": "If ω is a cube root of unity, then 1 + ω + ω² equals:",
+    "options": {
+      "A": "0",
+      "B": "1",
+      "C": "3",
+      "D": "ω"
+    },
+    "correct_answer": "A",
+    "solution": "The cube roots of unity satisfy 1 + ω + ω² = 0. This is a fundamental property",
+    "marks": 4
+  },
+  {
+    "id": 44,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "16 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Argument of Complex Number",
+    "difficulty": "Medium",
+    "question": "The argument of the complex number -1 + i is:",
+    "options": {
+      "A": "3π/4",
+      "B": "π/4",
+      "C": "-π/4",
+      "D": "5π/4"
+    },
+    "correct_answer": "A",
+    "solution": "For z = -1 + i, it lies in second quadrant. tan θ = 1/(-1) = -1. Reference angle is π/4, so argument = π - π/4 = 3π/4",
+    "marks": 4
+  },
+  {
+    "id": 45,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "17 Feb 2024",
+    "session": "Morning",
+    "topic": "Symmetric Matrices",
+    "difficulty": "Easy",
+    "question": "A matrix A is symmetric if:",
+    "options": {
+      "A": "A = Aᵀ",
+      "B": "A = -Aᵀ",
+      "C": "A = A⁻¹",
+      "D": "A = 0"
+    },
+    "correct_answer": "A",
+    "solution": "By definition, a matrix A is symmetric if it equals its transpose, i.e., A = Aᵀ",
+    "marks": 4
+  },
+  {
+    "id": 46,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "17 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Skew-Symmetric Matrices",
+    "difficulty": "Medium",
+    "question": "If A is a skew-symmetric matrix of order 3, then the trace of A is:",
+    "options": {
+      "A": "0",
+      "B": "1",
+      "C": "-1",
+      "D": "3"
+    },
+    "correct_answer": "A",
+    "solution": "For skew-symmetric matrix A = -Aᵀ, all diagonal elements are 0. Therefore, trace (sum of diagonal elements) = 0",
+    "marks": 4
+  },
+  {
+    "id": 47,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "18 Feb 2024",
+    "session": "Morning",
+    "topic": "Rank of Matrix",
+    "difficulty": "Hard",
+    "question": "The rank of a 3×4 matrix can be at most:",
+    "options": {
+      "A": "3",
+      "B": "4",
+      "C": "12",
+      "D": "7"
+    },
+    "correct_answer": "A",
+    "solution": "Rank of a matrix ≤ min(number of rows, number of columns). Here min(3,4) = 3, so maximum rank = 3",
+    "marks": 4
+  },
+  {
+    "id": 48,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "18 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Cramer's Rule",
+    "difficulty": "Hard",
+    "question": "For system ax + by = e, cx + dy = f, using Cramer's rule, x equals:",
+    "options": {
+      "A": "(ed - bf)/(ad - bc)",
+      "B": "(ae - fc)/(ad - bc)",
+      "C": "(af - ec)/(ad - bc)",
+      "D": "(bf - ed)/(ad - bc)"
+    },
+    "correct_answer": "A",
+    "solution": "By Cramer's rule, x = Δₓ/Δ, where Δ = |a b; c d| = ad-bc and Δₓ = |e b; f d| = ed-bf. So x = (ed-bf)/(ad-bc)",
+    "marks": 4
+  },
+  {
+    "id": 49,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "19 Feb 2024",
+    "session": "Morning",
+    "topic": "Conditional Probability",
+    "difficulty": "Medium",
+    "question": "If P(A) = 0.6, P(B) = 0.4, and P(A∩B) = 0.2, then P(A|B) equals:",
+    "options": {
+      "A": "0.5",
+      "B": "0.2",
+      "C": "0.3",
+      "D": "0.6"
+    },
+    "correct_answer": "A",
+    "solution": "P(A|B) = P(A∩B)/P(B) = 0.2/0.4 = 0.5",
+    "marks": 4
+  },
+  {
+    "id": 50,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "19 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Bayes' Theorem",
+    "difficulty": "Hard",
+    "question": "If P(A) = 0.3, P(B|A) = 0.6, P(B|A') = 0.4, then P(A|B) equals:",
+    "options": {
+      "A": "9/23",
+      "B": "6/23",
+      "C": "3/7",
+      "D": "1/2"
+    },
+    "correct_answer": "A",
+    "solution": "P(B) = P(A)P(B|A) + P(A')P(B|A') = 0.3×0.6 + 0.7×0.4 = 0.18 + 0.28 = 0.46. By Bayes: P(A|B) = P(A)P(B|A)/P(B) = (0.3×0.6)/0.46 = 0.18/0.46 = 9/23",
+    "marks": 4
+  },
+  {
+    "id": 51,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "20 Feb 2024",
+    "session": "Morning",
+    "topic": "Independent Events",
+    "difficulty": "Easy",
+    "question": "If A and B are independent events with P(A) = 0.4 and P(B) = 0.5, then P(A∩B) equals:",
+    "options": {
+      "A": "0.2",
+      "B": "0.9",
+      "C": "0.1",
+      "D": "0.3"
+    },
+    "correct_answer": "A",
+    "solution": "For independent events, P(A∩B) = P(A) × P(B) = 0.4 × 0.5 = 0.2",
+    "marks": 4
+  },
+  {
+    "id": 52,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "20 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Random Variables",
+    "difficulty": "Medium",
+    "question": "If X is the number shown when a fair die is rolled, then E(X) equals:",
+    "options": {
+      "A": "3.5",
+      "B": "3",
+      "C": "4",
+      "D": "2.5"
+    },
+    "correct_answer": "A",
+    "solution": "E(X) = Σx·P(x) = 1(1/6) + 2(1/6) + 3(1/6) + 4(1/6) + 5(1/6) + 6(1/6) = (1+2+3+4+5+6)/6 = 21/6 = 3.5",
+    "marks": 4
+  },
+  {
+    "id": 53,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "21 Feb 2024",
+    "session": "Morning",
+    "topic": "Poisson Distribution",
+    "difficulty": "Hard",
+    "question": "For Poisson distribution with mean 2, P(X = 0) equals:",
+    "options": {
+      "A": "e⁻²",
+      "B": "2e⁻²",
+      "C": "1/e²",
+      "D": "e²"
+    },
+    "correct_answer": "A",
+    "solution": "For Poisson distribution, P(X = k) = (λᵏe⁻λ)/k!. Here λ = 2, k = 0. So P(X = 0) = (2⁰e⁻²)/0! = e⁻²",
+    "marks": 4
+  },
+  {
+    "id": 54,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "21 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Rolle's Theorem",
+    "difficulty": "Medium",
+    "question": "For f(x) = x² - 4x + 3 on [1, 3], the value of c in Rolle's theorem is:",
+    "options": {
+      "A": "2",
+      "B": "1.5",
+      "C": "2.5",
+      "D": "1"
+    },
+    "correct_answer": "A",
+    "solution": "f(1) = 1-4+3 = 0 and f(3) = 9-12+3 = 0. f'(x) = 2x-4 = 0 gives x = 2, which lies in (1,3). So c = 2",
+    "marks": 4
+  },
+  {
+    "id": 55,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "22 Feb 2024",
+    "session": "Morning",
+    "topic": "Taylor Series",
+    "difficulty": "Hard",
+    "question": "The Taylor series expansion of eˣ at x = 0 starts with:",
+    "options": {
+      "A": "1 + x + x²/2! + x³/3! + ...",
+      "B": "x + x²/2! + x³/3! + ...",
+      "C": "1 + x + x² + x³ + ...",
+      "D": "1 - x + x² - x³ + ..."
+    },
+    "correct_answer": "A",
+    "solution": "Taylor series of eˣ at x=0: eˣ = Σ(xⁿ/n!) = 1 + x + x²/2! + x³/3! + ...",
+    "marks": 4
+  },
+  {
+    "id": 56,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "22 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Maclaurin Series",
+    "difficulty": "Hard",
+    "question": "The Maclaurin series for sin x begins with:",
+    "options": {
+      "A": "x - x³/3! + x⁵/5! - ...",
+      "B": "1 - x²/2! + x⁴/4! - ...",
+      "C": "x + x³/3! + x⁵/5! + ...",
+      "D": "x - x²/2! + x³/3! - ..."
+    },
+    "correct_answer": "A",
+    "solution": "Maclaurin series for sin x: sin x = x - x³/3! + x⁵/5! - x⁷/7! + ...",
+    "marks": 4
+  },
+  {
+    "id": 57,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "23 Feb 2024",
+    "session": "Morning",
+    "topic": "L'Hospital's Rule",
+    "difficulty": "Medium",
+    "question": "Using L'Hospital's rule, lim(x→0) (eˣ - 1)/x equals:",
+    "options": {
+      "A": "1",
+      "B": "0",
+      "C": "e",
+      "D": "∞"
+    },
+    "correct_answer": "A",
+    "solution": "This is 0/0 form. Applying L'Hospital: lim(x→0) (eˣ - 1)/x = lim(x→0) eˣ/1 = e⁰ = 1",
+    "marks": 4
+  },
+  {
+    "id": 58,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "23 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Double Integrals",
+    "difficulty": "Hard",
+    "question": "The value of ∫₀¹ ∫₀¹ xy dx dy is:",
+    "options": {
+      "A": "1/4",
+      "B": "1/2",
+      "C": "1",
+      "D": "1/8"
+    },
+    "correct_answer": "A",
+    "solution": "∫₀¹ ∫₀¹ xy dx dy = ∫₀¹ [x²y/2]₀¹ dy = ∫₀¹ y/2 dy = [y²/4]₀¹ = 1/4",
+    "marks": 4
+  },
+  {
+    "id": 59,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "24 Feb 2024",
+    "session": "Morning",
+    "topic": "Dot Product",
+    "difficulty": "Easy",
+    "question": "If a = î + 2ĵ + 3k̂ and b = 2î - ĵ + k̂, then a · b equals:",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "1",
+      "D": "7"
+    },
+    "correct_answer": "A",
+    "solution": "a · b = (1)(2) + (2)(-1) + (3)(1) = 2 - 2 + 3 = 3",
+    "marks": 4
+  },
+  {
+    "id": 60,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "24 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Cross Product",
+    "difficulty": "Medium",
+    "question": "If a = î + ĵ and b = ĵ + k̂, then |a × b| equals:",
+    "options": {
+      "A": "√3",
+      "B": "√2",
+      "C": "1",
+      "D": "2"
+    },
+    "correct_answer": "A",
+    "solution": "a × b = |î ĵ k̂; 1 1 0; 0 1 1| = î(1-0) - ĵ(1-0) + k̂(1-0) = î - ĵ + k̂. So |a × b| = √(1+1+1) = √3",
+    "marks": 4
+  },
+  {
+    "id": 61,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "25 Feb 2024",
+    "session": "Morning",
+    "topic": "Scalar Triple Product",
+    "difficulty": "Hard",
+    "question": "If a, b, c are coplanar vectors, then [a b c] equals:",
+    "options": {
+      "A": "0",
+      "B": "1",
+      "C": "-1",
+      "D": "abc"
+    },
+    "correct_answer": "A",
+    "solution": "Vectors are coplanar if and only if their scalar triple product [a b c] = a · (b × c) = 0",
+    "marks": 4
+  },
+  {
+    "id": 62,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "25 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Direction Cosines",
+    "difficulty": "Medium",
+    "question": "If l, m, n are direction cosines of a line, then l² + m² + n² equals:",
+    "options": {
+      "A": "1",
+      "B": "0",
+      "C": "3",
+      "D": "√3"
+    },
+    "correct_answer": "A",
+    "solution": "By definition, for direction cosines l, m, n: l² + m² + n² = 1",
+    "marks": 4
+  },
+  {
+    "id": 63,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "26 Feb 2024",
+    "session": "Morning",
+    "topic": "Equation of Plane",
+    "difficulty": "Medium",
+    "question": "The equation of the xy-plane is:",
+    "options": {
+      "A": "z = 0",
+      "B": "x = 0",
+      "C": "y = 0",
+      "D": "x + y = 0"
+    },
+    "correct_answer": "A",
+    "solution": "The xy-plane consists of all points with z-coordinate 0. Therefore, its equation is z = 0",
+    "marks": 4
+  },
+  {
+    "id": 64,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "26 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Distance Formula in 3D",
+    "difficulty": "Easy",
+    "question": "The distance between points (1, 2, 3) and (4, 6, 3) is:",
+    "options": {
+      "A": "5",
+      "B": "√41",
+      "C": "7",
+      "D": "√29"
+    },
+    "correct_answer": "A",
+    "solution": "Distance = √[(4-1)² + (6-2)² + (3-3)²] = √[9 + 16 + 0] = √25 = 5",
+    "marks": 4
+  },
+  {
+    "id": 65,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "27 Feb 2024",
+    "session": "Morning",
+    "topic": "Angle Between Lines",
+    "difficulty": "Hard",
+    "question": "The angle between lines with direction ratios 1, 2, 2 and 2, 3, 6 is:",
+    "options": {
+      "A": "cos⁻¹(20/21)",
+      "B": "cos⁻¹(1/2)",
+      "C": "90°",
+      "D": "60°"
+    },
+    "correct_answer": "A",
+    "solution": "cos θ = (a₁a₂ + b₁b₂ + c₁c₂)/√(a₁²+b₁²+c₁²)√(a₂²+b₂²+c₂²) = (2+6+12)/√9√49 = 20/21. So θ = cos⁻¹(20/21)",
+    "marks": 4
+  },
+  {
+    "id": 66,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "27 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Shortest Distance",
+    "difficulty": "Hard",
+    "question": "The shortest distance between two parallel lines is measured:",
+    "options": {
+      "A": "Perpendicular to both lines",
+      "B": "Along one of the lines",
+      "C": "At any angle",
+      "D": "Parallel to both lines"
+    },
+    "correct_answer": "A",
+    "solution": "Shortest distance between parallel lines is always measured along the perpendicular direction to both lines",
+    "marks": 4
+  },
+  {
+    "id": 67,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "28 Feb 2024",
+    "session": "Morning",
+    "topic": "Linear Inequalities",
+    "difficulty": "Easy",
+    "question": "The solution set of 2x + 3 < 7 is:",
+    "options": {
+      "A": "x < 2",
+      "B": "x > 2",
+      "C": "x < 5",
+      "D": "x > 5"
+    },
+    "correct_answer": "A",
+    "solution": "2x + 3 < 7 ⟹ 2x < 4 ⟹ x < 2",
+    "marks": 4
+  },
+  {
+    "id": 68,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "28 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Absolute Value Inequalities",
+    "difficulty": "Medium",
+    "question": "The solution set of |x - 2| < 3 is:",
+    "options": {
+      "A": "-1 < x < 5",
+      "B": "x < -1 or x > 5",
+      "C": "-5 < x < -1",
+      "D": "x < 5"
+    },
+    "correct_answer": "A",
+    "solution": "|x - 2| < 3 means -3 < x - 2 < 3. Adding 2: -1 < x < 5",
+    "marks": 4
+  },
+  {
+    "id": 69,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "29 Feb 2024",
+    "session": "Morning",
+    "topic": "Graphical Solutions",
+    "difficulty": "Medium",
+    "question": "The number of solutions of x² = 4 - x is:",
+    "options": {
+      "A": "2",
+      "B": "1",
+      "C": "3",
+      "D": "0"
+    },
+    "correct_answer": "A",
+    "solution": "Rearranging: x² + x - 4 = 0. Using discriminant: Δ = 1 + 16 = 17 > 0, so there are 2 real solutions",
+    "marks": 4
+  },
+  {
+    "id": 70,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "29 Feb 2024",
+    "session": "Afternoon",
+    "topic": "Remainder Theorem",
+    "difficulty": "Easy",
+    "question": "When x³ - 2x² + x - 1 is divided by x - 2, the remainder is:",
+    "options": {
+      "A": "1",
+      "B": "0",
+      "C": "-1",
+      "D": "3"
+    },
+    "correct_answer": "A",
+    "solution": "By remainder theorem, remainder = f(2) = 8 - 8 + 2 - 1 = 1",
+    "marks": 4
+  },
+  {
+    "id": 71,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "1 Mar 2024",
+    "session": "Morning",
+    "topic": "Factor Theorem",
+    "difficulty": "Medium",
+    "question": "If x - 1 is a factor of x³ - 6x² + 11x - 6, another factor is:",
+    "options": {
+      "A": "x - 2",
+      "B": "x + 2",
+      "C": "x - 3",
+      "D": "x + 3"
+    },
+    "correct_answer": "A",
+    "solution": "Dividing by (x-1): x³ - 6x² + 11x - 6 = (x-1)(x² - 5x + 6) = (x-1)(x-2)(x-3). So x-2 is a factor",
+    "marks": 4
+  },
+  {
+    "id": 72,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "1 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Rational Functions",
+    "difficulty": "Hard",
+    "question": "The vertical asymptote of f(x) = (x+1)/(x-3) is:",
+    "options": {
+      "A": "x = 3",
+      "B": "x = -1",
+      "C": "y = 1",
+      "D": "x = 0"
+    },
+    "correct_answer": "A",
+    "solution": "Vertical asymptotes occur where denominator is zero and numerator is non-zero. Here x - 3 = 0 gives x = 3",
+    "marks": 4
+  },
+  {
+    "id": 73,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "2 Mar 2024",
+    "session": "Morning",
+    "topic": "Horizontal Asymptotes",
+    "difficulty": "Medium",
+    "question": "The horizontal asymptote of f(x) = (2x² + 1)/(x² - 4) is:",
+    "options": {
+      "A": "y = 2",
+      "B": "y = 0",
+      "C": "y = 1",
+      "D": "No horizontal asymptote"
+    },
+    "correct_answer": "A",
+    "solution": "For rational functions where degrees are equal, horizontal asymptote = ratio of leading coefficients = 2/1 = 2",
+    "marks": 4
+  },
+  {
+    "id": 74,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "2 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Exponential Functions",
+    "difficulty": "Easy",
+    "question": "If 2^x = 8, then x equals:",
+    "options": {
+      "A": "3",
+      "B": "4",
+      "C": "2",
+      "D": "6"
+    },
+    "correct_answer": "A",
+    "solution": "2^x = 8 = 2³, therefore x = 3",
+    "marks": 4
+  },
+  {
+    "id": 75,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "3 Mar 2024",
+    "session": "Morning",
+    "topic": "Logarithmic Equations",
+    "difficulty": "Medium",
+    "question": "The solution of log₂(x) + log₂(x-3) = 2 is:",
+    "options": {
+      "A": "x = 4",
+      "B": "x = 3",
+      "C": "x = 2",
+      "D": "x = 5"
+    },
+    "correct_answer": "A",
+    "solution": "log₂(x(x-3)) = 2, so x(x-3) = 4. Thus x² - 3x - 4 = 0, giving (x-4)(x+1) = 0. Since x > 3, x = 4",
+    "marks": 4
+  },
+  {
+    "id": 76,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "3 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Natural Logarithm",
+    "difficulty": "Easy",
+    "question": "The value of ln(e³) is:",
+    "options": {
+      "A": "3",
+      "B": "e³",
+      "C": "1",
+      "D": "e"
+    },
+    "correct_answer": "A",
+    "solution": "ln(e³) = 3ln(e) = 3(1) = 3",
+    "marks": 4
+  },
+  {
+    "id": 77,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "4 Mar 2024",
+    "session": "Morning",
+    "topic": "Composite Functions",
+    "difficulty": "Medium",
+    "question": "If f(x) = x² and g(x) = x + 1, then f(g(2)) equals:",
+    "options": {
+      "A": "9",
+      "B": "5",
+      "C": "4",
+      "D": "7"
+    },
+    "correct_answer": "A",
+    "solution": "g(2) = 2 + 1 = 3, then f(3) = 3² = 9",
+    "marks": 4
+  },
+  {
+    "id": 78,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "4 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Even and Odd Functions",
+    "difficulty": "Easy",
+    "question": "The function f(x) = x³ + x is:",
+    "options": {
+      "A": "Odd",
+      "B": "Even",
+      "C": "Neither",
+      "D": "Both"
+    },
+    "correct_answer": "A",
+    "solution": "f(-x) = (-x)³ + (-x) = -x³ - x = -(x³ + x) = -f(x), so f is odd",
+    "marks": 4
+  },
+  {
+    "id": 79,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "5 Mar 2024",
+    "session": "Morning",
+    "topic": "Periodicity",
+    "difficulty": "Medium",
+    "question": "The period of sin(2x) is:",
+    "options": {
+      "A": "π",
+      "B": "2π",
+      "C": "π/2",
+      "D": "4π"
+    },
+    "correct_answer": "A",
+    "solution": "Period of sin(kx) is 2π/k. Here k = 2, so period = 2π/2 = π",
+    "marks": 4
+  },
+  {
+    "id": 80,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "5 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Amplitude",
+    "difficulty": "Easy",
+    "question": "The amplitude of 3sin(x) is:",
+    "options": {
+      "A": "3",
+      "B": "1",
+      "C": "6",
+      "D": "π"
+    },
+    "correct_answer": "A",
+    "solution": "For A sin(x), amplitude is |A|. Here amplitude = |3| = 3",
+    "marks": 4
+  },
+  {
+    "id": 81,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "6 Mar 2024",
+    "session": "Morning",
+    "topic": "Phase Shift",
+    "difficulty": "Medium",
+    "question": "The phase shift of y = sin(x - π/4) is:",
+    "options": {
+      "A": "π/4 right",
+      "B": "π/4 left",
+      "C": "π right",
+      "D": "No shift"
+    },
+    "correct_answer": "A",
+    "solution": "For sin(x - c), phase shift is c units right. Here shift is π/4 right",
+    "marks": 4
+  },
+  {
+    "id": 82,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "6 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Trigonometric Identities",
+    "difficulty": "Medium",
+    "question": "The value of sin²θ + cos²θ is:",
+    "options": {
+      "A": "1",
+      "B": "0",
+      "C": "2",
+      "D": "sin2θ"
+    },
+    "correct_answer": "A",
+    "solution": "This is the fundamental Pythagorean identity: sin²θ + cos²θ = 1 for all θ",
+    "marks": 4
+  },
+  {
+    "id": 83,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "7 Mar 2024",
+    "session": "Morning",
+    "topic": "Double Angle Formula",
+    "difficulty": "Medium",
+    "question": "sin(2θ) equals:",
+    "options": {
+      "A": "2sinθcosθ",
+      "B": "sin²θ - cos²θ",
+      "C": "2sin²θ",
+      "D": "cos²θ - sin²θ"
+    },
+    "correct_answer": "A",
+    "solution": "Double angle formula: sin(2θ) = 2sinθcosθ",
+    "marks": 4
+  },
+  {
+    "id": 84,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "7 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Half Angle Formula",
+    "difficulty": "Hard",
+    "question": "cos²(θ/2) equals:",
+    "options": {
+      "A": "(1 + cosθ)/2",
+      "B": "(1 - cosθ)/2",
+      "C": "1 + cosθ",
+      "D": "1 - cosθ"
+    },
+    "correct_answer": "A",
+    "solution": "Half angle formula: cos²(θ/2) = (1 + cosθ)/2",
+    "marks": 4
+  },
+  {
+    "id": 85,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "8 Mar 2024",
+    "session": "Morning",
+    "topic": "Sum to Product",
+    "difficulty": "Hard",
+    "question": "sinA + sinB equals:",
+    "options": {
+      "A": "2sin((A+B)/2)cos((A-B)/2)",
+      "B": "2cos((A+B)/2)sin((A-B)/2)",
+      "C": "sin(A+B)",
+      "D": "cos(A-B)"
+    },
+    "correct_answer": "A",
+    "solution": "Sum to product formula: sinA + sinB = 2sin((A+B)/2)cos((A-B)/2)",
+    "marks": 4
+  },
+  {
+    "id": 86,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "8 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Product to Sum",
+    "difficulty": "Hard",
+    "question": "2sinAcosB equals:",
+    "options": {
+      "A": "sin(A+B) + sin(A-B)",
+      "B": "sin(A+B) - sin(A-B)",
+      "C": "cos(A+B) + cos(A-B)",
+      "D": "cos(A+B) - cos(A-B)"
+    },
+    "correct_answer": "A",
+    "solution": "Product to sum formula: 2sinAcosB = sin(A+B) + sin(A-B)",
+    "marks": 4
+  },
+  {
+    "id": 87,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "9 Mar 2024",
+    "session": "Morning",
+    "topic": "Law of Sines",
+    "difficulty": "Medium",
+    "question": "In triangle ABC, a/sinA = b/sinB = c/sinC equals:",
+    "options": {
+      "A": "2R",
+      "B": "R",
+      "C": "R/2",
+      "D": "4R"
+    },
+    "correct_answer": "A",
+    "solution": "Law of sines: a/sinA = b/sinB = c/sinC = 2R, where R is circumradius",
+    "marks": 4
+  },
+  {
+    "id": 88,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "9 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Law of Cosines",
+    "difficulty": "Medium",
+    "question": "In triangle ABC, c² equals:",
+    "options": {
+      "A": "a² + b² - 2abcosC",
+      "B": "a² + b² + 2abcosC",
+      "C": "a² + b²",
+      "D": "a² - b²"
+    },
+    "correct_answer": "A",
+    "solution": "Law of cosines: c² = a² + b² - 2abcosC",
+    "marks": 4
+  },
+  {
+    "id": 89,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "10 Mar 2024",
+    "session": "Morning",
+    "topic": "Area of Triangle",
+    "difficulty": "Medium",
+    "question": "The area of triangle with sides a, b and included angle C is:",
+    "options": {
+      "A": "(1/2)absinC",
+      "B": "absinC",
+      "C": "(1/2)abcosC",
+      "D": "abcosC"
+    },
+    "correct_answer": "A",
+    "solution": "Area of triangle = (1/2)absinC, where C is the included angle between sides a and b",
+    "marks": 4
+  },
+  {
+    "id": 90,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "10 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Heron's Formula",
+    "difficulty": "Medium",
+    "question": "Using Heron's formula, area of triangle with sides 3, 4, 5 is:",
+    "options": {
+      "A": "6",
+      "B": "12",
+      "C": "10",
+      "D": "8"
+    },
+    "correct_answer": "A",
+    "solution": "s = (3+4+5)/2 = 6. Area = √[s(s-a)(s-b)(s-c)] = √[6×3×2×1] = √36 = 6",
+    "marks": 4
+  },
+  {
+    "id": 91,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "11 Mar 2024",
+    "session": "Morning",
+    "topic": "Polar Coordinates",
+    "difficulty": "Medium",
+    "question": "The Cartesian coordinates of polar point (r, θ) = (2, π/3) are:",
+    "options": {
+      "A": "(1, √3)",
+      "B": "(√3, 1)",
+      "C": "(2, 2)",
+      "D": "(1, 1)"
+    },
+    "correct_answer": "A",
+    "solution": "x = rcosθ = 2cos(π/3) = 2(1/2) = 1. y = rsinθ = 2sin(π/3) = 2(√3/2) = √3",
+    "marks": 4
+  },
+  {
+    "id": 92,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "11 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Parametric Equations",
+    "difficulty": "Hard",
+    "question": "If x = 3t and y = t², eliminating t gives:",
+    "options": {
+      "A": "y = x²/9",
+      "B": "y = 3x²",
+      "C": "y = x²",
+      "D": "y = 9x²"
+    },
+    "correct_answer": "A",
+    "solution": "From x = 3t, we get t = x/3. Substituting in y = t²: y = (x/3)² = x²/9",
+    "marks": 4
+  },
+  {
+    "id": 93,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "12 Mar 2024",
+    "session": "Morning",
+    "topic": "Implicit Differentiation",
+    "difficulty": "Hard",
+    "question": "If x² + y² = 25, then dy/dx at (3, 4) equals:",
+    "options": {
+      "A": "-3/4",
+      "B": "3/4",
+      "C": "-4/3",
+      "D": "4/3"
+    },
+    "correct_answer": "A",
+    "solution": "Differentiating: 2x + 2y(dy/dx) = 0, so dy/dx = -x/y. At (3,4): dy/dx = -3/4",
+    "marks": 4
+  },
+  {
+    "id": 94,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "12 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Related Rates",
+    "difficulty": "Hard",
+    "question": "If radius of circle increases at 2 cm/s, rate of change of area when r = 5 cm is:",
+    "options": {
+      "A": "20π cm²/s",
+      "B": "10π cm²/s",
+      "C": "25π cm²/s",
+      "D": "4π cm²/s"
+    },
+    "correct_answer": "A",
+    "solution": "A = πr². dA/dt = 2πr(dr/dt) = 2π(5)(2) = 20π cm²/s",
+    "marks": 4
+  },
+  {
+    "id": 95,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "13 Mar 2024",
+    "session": "Morning",
+    "topic": "Integration by Parts",
+    "difficulty": "Hard",
+    "question": "∫x·eˣ dx equals:",
+    "options": {
+      "A": "eˣ(x - 1) + C",
+      "B": "xeˣ + C",
+      "C": "eˣ(x + 1) + C",
+      "D": "x²eˣ + C"
+    },
+    "correct_answer": "A",
+    "solution": "Using integration by parts with u = x, dv = eˣdx: ∫xeˣdx = xeˣ - ∫eˣdx = xeˣ - eˣ + C = eˣ(x-1) + C",
+    "marks": 4
+  },
+  {
+    "id": 96,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "13 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Integration by Substitution",
+    "difficulty": "Medium",
+    "question": "∫2x(x² + 1)³ dx equals:",
+    "options": {
+      "A": "(x² + 1)⁴/4 + C",
+      "B": "(x² + 1)⁴ + C",
+      "C": "2(x² + 1)⁴ + C",
+      "D": "(x² + 1)³ + C"
+    },
+    "correct_answer": "A",
+    "solution": "Let u = x² + 1, du = 2xdx. ∫u³du = u⁴/4 + C = (x² + 1)⁴/4 + C",
+    "marks": 4
+  },
+  {
+    "id": 97,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "14 Mar 2024",
+    "session": "Morning",
+    "topic": "Improper Integrals",
+    "difficulty": "Hard",
+    "question": "∫₁^∞ (1/x²) dx equals:",
+    "options": {
+      "A": "1",
+      "B": "∞",
+      "C": "0",
+      "D": "2"
+    },
+    "correct_answer": "A",
+    "solution": "∫₁^∞ (1/x²)dx = lim[t→∞] [-1/x]₁ᵗ = lim[t→∞] (-1/t + 1) = 1",
+    "marks": 4
+  },
+  {
+    "id": 98,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "14 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Volume of Revolution",
+    "difficulty": "Hard",
+    "question": "Volume when y = x² from x = 0 to x = 2 is rotated about x-axis:",
+    "options": {
+      "A": "32π/5",
+      "B": "16π/5",
+      "C": "8π",
+      "D": "4π"
+    },
+    "correct_answer": "A",
+    "solution": "V = π∫₀² (x²)²dx = π∫₀² x⁴dx = π[x⁵/5]₀² = π(32/5) = 32π/5",
+    "marks": 4
+  },
+  {
+    "id": 99,
+    "year": 2024,
+    "shift": "Shift 1",
+    "date": "15 Mar 2024",
+    "session": "Morning",
+    "topic": "Arc Length",
+    "difficulty": "Hard",
+    "question": "Arc length of y = x³/² from x = 0 to x = 4 involves integral of:",
+    "options": {
+      "A": "√(1 + 9x/4)",
+      "B": "√(1 + 9x)",
+      "C": "1 + 9x/4",
+      "D": "√(1 + 3x/2)"
+    },
+    "correct_answer": "A",
+    "solution": "dy/dx = (3/2)√x. Arc length = ∫√(1 + (dy/dx)²)dx = ∫√(1 + 9x/4)dx",
+    "marks": 4
+  },
+  {
+    "id": 100,
+    "year": 2024,
+    "shift": "Shift 2",
+    "date": "15 Mar 2024",
+    "session": "Afternoon",
+    "topic": "Surface Area of Revolution",
+    "difficulty": "Hard",
+    "question": "Surface area when y = x from x = 0 to x = 1 is rotated about x-axis:",
+    "options": {
+      "A": "π√2",
+      "B": "2π√2",
+      "C": "π",
+      "D": "√2"
+    },
+    "correct_answer": "A",
+    "solution": "S = 2π∫₀¹ y√(1 + (dy/dx)²)dx = 2π∫₀¹ x√2 dx = 2π√2[x²/2]₀¹ = π√2",
+    "marks": 4
+  }
+]

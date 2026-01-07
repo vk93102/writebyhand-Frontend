@@ -1,0 +1,1012 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+  Image,
+  Platform,
+  Linking,
+} from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
+import {
+  getUserCoins,
+  requestCoinWithdrawal,
+  getWithdrawalHistory,
+  cancelWithdrawal,
+} from '../services/api';
+import RazorpayCheckout from 'react-native-razorpay';
+
+interface WithdrawalScreenProps {
+  userId: string;
+  onClose: () => void;
+  onWithdrawalSuccess: () => void;
+}
+
+interface WithdrawalItem {
+  withdrawal_id: string;
+  coins_amount: number;
+  rupees_amount: number;
+  payout_method: string;
+  status: string;
+  created_at: string;
+  completed_at?: string;
+  failure_reason?: string;
+}
+
+export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
+  userId,
+  onClose,
+  onWithdrawalSuccess,
+}) => {
+  const [userCoins, setUserCoins] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [withdrawalHistory, setWithdrawalHistory] = useState<WithdrawalItem[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // Withdrawal form states
+  const [coinsAmount, setCoinsAmount] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [razorpayKeyId, setRazorpayKeyId] = useState('');
+
+  useEffect(() => {
+    loadUserCoins();
+    loadRazorpayKey();
+  }, []);
+
+  const loadRazorpayKey = async () => {
+    try {
+      const { getRazorpayKey } = require('../services/api');
+      const data = await getRazorpayKey();
+      setRazorpayKeyId(data.key_id || '');
+    } catch (error) {
+      console.error('Failed to load Razorpay key:', error);
+    }
+  };
+
+  const loadUserCoins = async () => {
+    try {
+      const data = await getUserCoins(userId);
+      setUserCoins(data.total_coins || 0);
+    } catch (error: any) {
+      console.error('Failed to load coins:', error);
+    }
+  };
+
+  const loadWithdrawalHistory = async () => {
+    try {
+      setHistoryLoading(true);
+      const data = await getWithdrawalHistory(userId);
+      setWithdrawalHistory(data.withdrawals || []);
+      setShowHistory(true);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to load withdrawal history');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    try {
+      // Clear previous errors
+      setErrorMessage('');
+      
+      // Trim input
+      const coinsInput = coinsAmount.trim();
+      
+      // Validate coins amount is not empty
+      if (!coinsInput) {
+        setErrorMessage('Please enter the number of coins to withdraw');
+        Alert.alert('Required Field', 'Please enter the number of coins to withdraw');
+        return;
+      }
+
+      // Validation
+      const coins = parseInt(coinsInput);
+      if (isNaN(coins) || coins <= 0) {
+        const msg = 'Please enter a valid number of coins';
+        setErrorMessage(msg);
+        Alert.alert('Invalid Amount', msg);
+        return;
+      }
+
+      if (coins < 100) {
+        const msg = 'Minimum withdrawal is 100 coins (₹10)';
+        setErrorMessage(msg);
+        Alert.alert('Minimum Withdrawal', msg + '. Please enter at least 100 coins.');
+        return;
+      }
+
+      if (coins > userCoins) {
+        const msg = `Insufficient balance. You have ${userCoins} coins but tried to withdraw ${coins} coins`;
+        setErrorMessage(msg);
+        Alert.alert(
+          'Insufficient Balance', 
+          `You only have ${userCoins} coins available.\n\nYou attempted to withdraw ${coins} coins.\n\nPlease enter an amount less than or equal to ${userCoins} coins.`
+        );
+        return;
+      }
+
+      // Account holder name only required for UPI and Bank
+      if (payoutMethod !== 'razorpay' && !accountHolderName.trim()) {
+        const msg = 'Account holder name is required';
+        setErrorMessage(msg);
+        Alert.alert('Required Field', msg + '. Please enter your full name as per your bank account.');
+        return;
+      }
+
+      if (payoutMethod === 'upi') {
+        if (!upiId.trim()) {
+          const msg = 'UPI ID is required';
+          setErrorMessage(msg);
+          Alert.alert('Required Field', msg + '. Please enter your UPI ID (e.g., yourname@paytm)');
+          return;
+        }
+        // Validate UPI ID format
+        const upiPattern = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/;
+        if (!upiPattern.test(upiId.trim())) {
+          const msg = 'Invalid UPI ID format';
+          setErrorMessage(msg);
+          Alert.alert('Invalid UPI ID', 'Please enter a valid UPI ID (e.g., yourname@paytm, yourname@phonepe)');
+          return;
+        }
+      }
+
+      if (payoutMethod === 'bank') {
+        if (!accountNumber.trim()) {
+          const msg = 'Bank account number is required';
+          setErrorMessage(msg);
+          Alert.alert('Required Field', msg + '. Please enter your account number.');
+          return;
+        }
+        if (!ifscCode.trim()) {
+          const msg = 'IFSC code is required';
+          setErrorMessage(msg);
+          Alert.alert('Required Field', msg + '. Please enter your bank\'s IFSC code.');
+          return;
+        }
+        // Validate account number (basic check)
+        if (accountNumber.trim().length < 9 || accountNumber.trim().length > 18) {
+          const msg = 'Invalid account number (must be 9-18 digits)';
+          setErrorMessage(msg);
+          Alert.alert('Invalid Account Number', 'Please enter a valid bank account number (9-18 digits)');
+          return;
+        }
+        // Validate IFSC code format
+        const ifscPattern = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+        if (!ifscPattern.test(ifscCode.trim().toUpperCase())) {
+          const msg = 'Invalid IFSC code format';
+          setErrorMessage(msg);
+          Alert.alert('Invalid IFSC Code', 'Please enter a valid IFSC code (e.g., SBIN0001234)');
+          return;
+        }
+      }
+
+      // Handle Razorpay payment gateway
+      if (payoutMethod === 'razorpay') {
+        handleRazorpayWithdrawal(coins);
+        return;
+      }
+
+      setLoading(true);
+
+      const result = await requestCoinWithdrawal(
+        userId,
+        coins,
+        payoutMethod,
+        accountHolderName,
+        payoutMethod === 'upi' ? upiId : undefined,
+        payoutMethod === 'bank' ? accountNumber : undefined,
+        payoutMethod === 'bank' ? ifscCode : undefined
+      );
+
+      Alert.alert(
+        'Withdrawal Requested',
+        `Successfully requested withdrawal of ${coins} coins (₹${result.amount}). ${result.message}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Reset form
+              setCoinsAmount('');
+              setAccountHolderName('');
+              setUpiId('');
+              setAccountNumber('');
+              setIfscCode('');
+              loadUserCoins();
+              onWithdrawalSuccess();
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      let errMsg = 'Failed to process withdrawal request';
+      
+      if (error.message) {
+        errMsg = error.message;
+      } else if (error.response?.data?.error) {
+        errMsg = error.response.data.error;
+      } else if (error.response?.data?.message) {
+        errMsg = error.response.data.message;
+      }
+      
+      setErrorMessage(errMsg);
+      Alert.alert(
+        'Withdrawal Failed', 
+        `${errMsg}\n\nPlease check your details and try again.`
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRazorpayWithdrawal = async (coins: number) => {
+    try {
+      if (!razorpayKeyId) {
+        Alert.alert('Error', 'Razorpay is not configured. Please try UPI or Bank transfer.');
+        return;
+      }
+
+      const rupees = coins / 10;
+      setLoading(true);
+      
+      // Create Razorpay order
+      const { default: api } = require('../services/api');
+      const orderResponse = await api.post('/razorpay/create-order/', {
+        amount: rupees,
+        currency: 'INR',
+        receipt: `withdrawal_${Date.now()}`,
+        user_id: userId,
+        notes: {
+          coins_amount: coins,
+          type: 'coin_withdrawal',
+          user_id: userId,
+        },
+      });
+
+      if (!orderResponse.data.success) {
+        throw new Error(orderResponse.data.error || 'Failed to create payment order');
+      }
+
+      const { order_id, amount, currency, key_id } = orderResponse.data;
+
+      // Razorpay checkout options with all payment methods enabled
+      const options = {
+        description: `Withdraw ${coins} coins to your account`,
+        image: 'https://i.imgur.com/3g7nmJC.png', // Your app logo
+        currency: currency || 'INR',
+        key: key_id || razorpayKeyId,
+        amount: amount.toString(),
+        name: 'EdTech - Coin Withdrawal',
+        order_id: order_id,
+        prefill: {
+          email: `${userId.replace(/[^a-zA-Z0-9]/g, '')}@edtech.app`,
+          contact: '9999999999',
+          name: accountHolderName || 'EdTech User',
+        },
+        theme: { color: colors.primary },
+        modal: {
+          ondismiss: () => {
+            console.log('Razorpay checkout dismissed');
+          },
+          escape: true,
+          backdropclose: false,
+        },
+        method: {
+          netbanking: true,
+          card: true,
+          upi: true,
+          wallet: true,
+        },
+      };
+
+      console.log('Opening Razorpay with options:', JSON.stringify(options, null, 2));
+      setLoading(false);
+
+      // Open Razorpay Checkout
+      if (Platform.OS === 'web') {
+        // For web, open Razorpay in a new window
+        const checkoutUrl = `https://api.razorpay.com/v1/checkout/embedded?order_id=${order_id}&key_id=${key_id || razorpayKeyId}`;
+        console.log('Opening web checkout:', checkoutUrl);
+        Linking.openURL(checkoutUrl).catch(err => {
+          console.error('Failed to open Razorpay:', err);
+          Alert.alert(
+            'Payment Gateway',
+            `Order created successfully!\n\nOrder ID: ${order_id}\nAmount: ₹${(amount / 100).toFixed(2)}\n\nPlease complete payment at Razorpay dashboard.`,
+            [{ text: 'OK', onPress: () => loadUserCoins() }]
+          );
+        });
+      } else {
+        // For mobile (Android/iOS), use native SDK
+        console.log('Opening native Razorpay checkout');
+        RazorpayCheckout.open(options)
+          .then((data: any) => {
+            // Payment success
+            Alert.alert(
+              'Payment Successful!',
+              `Payment ID: ${data.razorpay_payment_id}\n\n${coins} coins have been withdrawn successfully!`,
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    setCoinsAmount('');
+                    setAccountHolderName('');
+                    loadUserCoins();
+                    onWithdrawalSuccess();
+                  },
+                },
+              ]
+            );
+          })
+          .catch((error: any) => {
+            // Payment failed/cancelled
+            if (error.code === 0) {
+              Alert.alert('Payment Cancelled', 'You cancelled the payment.');
+            } else if (error.code === 2) {
+              Alert.alert('Payment Failed', error.description || 'Payment verification failed.');
+            } else {
+              Alert.alert('Payment Error', error.description || 'An error occurred during payment.');
+            }
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
+    } catch (error: any) {
+      let errMsg = 'Failed to process Razorpay withdrawal';
+      
+      if (error.message) {
+        errMsg = error.message;
+      } else if (error.response?.data?.error) {
+        errMsg = error.response.data.error;
+      } else if (error.response?.data?.message) {
+        errMsg = error.response.data.message;
+      }
+      
+      setErrorMessage(errMsg);
+      Alert.alert(
+        'Withdrawal Failed', 
+        `${errMsg}\n\nPlease try again or contact support if the problem persists.`
+      );
+      setLoading(false);
+    }
+  };
+
+  const handleCancelWithdrawal = async (withdrawalId: string) => {
+    Alert.alert(
+      'Cancel Withdrawal',
+      'Are you sure you want to cancel this withdrawal? Coins will be refunded to your account.',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              const result = await cancelWithdrawal(withdrawalId);
+              Alert.alert('Success', result.message);
+              loadWithdrawalHistory();
+              loadUserCoins();
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to cancel withdrawal');
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const calculateRupees = () => {
+    const coins = parseInt(coinsAmount);
+    if (isNaN(coins)) return '0.00';
+    return (coins / 10).toFixed(2);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return colors.success;
+      case 'pending':
+      case 'processing':
+        return colors.warning;
+      case 'failed':
+      case 'cancelled':
+        return colors.error;
+      default:
+        return colors.textMuted;
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <MaterialIcons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Image source={require('../../assets/coins.png')} style={styles.headerImage} />
+          <Text style={styles.headerTitle}>Withdraw Coins</Text>
+        </View>
+      </View>
+
+      {/* Coin Balance Card */}
+      <View style={styles.balanceCard}>
+        <View style={styles.balanceRow}>
+          <MaterialIcons name="account-balance-wallet" size={32} color={colors.primary} />
+          <View style={styles.balanceInfo}>
+            <Text style={styles.balanceLabel}>Available Balance</Text>
+            <Text style={styles.balanceAmount}>{userCoins} Coins</Text>
+            <Text style={styles.balanceRupees}>≈ ₹{(userCoins / 10).toFixed(2)}</Text>
+          </View>
+        </View>
+        <View style={styles.conversionInfo}>
+          <MaterialIcons name="info-outline" size={16} color={colors.textMuted} />
+          <Text style={styles.conversionText}>10 Coins = ₹1</Text>
+        </View>
+      </View>
+
+      {/* Withdrawal Form */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Withdrawal Details</Text>
+
+        {/* Error Message Display */}
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <MaterialIcons name="error" size={20} color={colors.error} />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+
+        {/* Coins Amount */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Coins to Withdraw (Min: 100)</Text>
+          <TextInput
+            style={[styles.input, errorMessage ? styles.inputError : null]}
+            placeholder="Enter coins amount"
+            placeholderTextColor={colors.textMuted}
+            keyboardType="numeric"
+            value={coinsAmount}
+            onChangeText={(val) => {
+              setCoinsAmount(val);
+              setErrorMessage(''); // Clear error when user types
+            }}
+          />
+          {coinsAmount && (
+            <Text style={styles.conversionHint}>= ₹{calculateRupees()}</Text>
+          )}
+        </View>
+
+        {/* Account Holder Name */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Account Holder Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter full name"
+            placeholderTextColor={colors.textMuted}
+            value={accountHolderName}
+            onChangeText={setAccountHolderName}
+          />
+        </View>
+
+        {/* Payout Method */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Payout Method</Text>
+          <View style={styles.payoutMethodGrid}>
+            <TouchableOpacity
+              style={[
+                styles.payoutMethodButton,
+                payoutMethod === 'razorpay' && styles.payoutMethodButtonActive,
+              ]}
+              onPress={() => setPayoutMethod('razorpay')}
+            >
+              <MaterialIcons
+                name="credit-card"
+                size={24}
+                color={payoutMethod === 'razorpay' ? colors.white : colors.primary}
+              />
+              <Text
+                style={[
+                  styles.payoutMethodText,
+                  payoutMethod === 'razorpay' && styles.payoutMethodTextActive,
+                ]}
+              >
+                Razorpay
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.payoutMethodButton,
+                payoutMethod === 'upi' && styles.payoutMethodButtonActive,
+              ]}
+              onPress={() => setPayoutMethod('upi')}
+            >
+              <MaterialIcons
+                name="payment"
+                size={24}
+                color={payoutMethod === 'upi' ? colors.white : colors.primary}
+              />
+              <Text
+                style={[
+                  styles.payoutMethodText,
+                  payoutMethod === 'upi' && styles.payoutMethodTextActive,
+                ]}
+              >
+                UPI
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.payoutMethodButton,
+                payoutMethod === 'bank' && styles.payoutMethodButtonActive,
+              ]}
+              onPress={() => setPayoutMethod('bank')}
+            >
+              <MaterialIcons
+                name="account-balance"
+                size={24}
+                color={payoutMethod === 'bank' ? colors.white : colors.primary}
+              />
+              <Text
+                style={[
+                  styles.payoutMethodText,
+                  payoutMethod === 'bank' && styles.payoutMethodTextActive,
+                ]}
+              >
+                Bank
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Razorpay Info */}
+        {payoutMethod === 'razorpay' && (
+          <View style={styles.razorpayInfo}>
+            <MaterialIcons name="info" size={20} color={colors.primary} />
+            <Text style={styles.razorpayInfoText}>
+              Using Razorpay Payment Gateway. You can pay via Cards, UPI, Net Banking, or Wallets. Secure and instant processing.
+            </Text>
+          </View>
+        )}
+
+        {/* UPI ID */}
+        {payoutMethod === 'upi' && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>UPI ID</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="yourname@paytm"
+              placeholderTextColor={colors.textMuted}
+              value={upiId}
+              onChangeText={setUpiId}
+              autoCapitalize="none"
+            />
+          </View>
+        )}
+
+        {/* Bank Details */}
+        {payoutMethod === 'bank' && (
+          <>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Account Number</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter account number"
+                placeholderTextColor={colors.textMuted}
+                keyboardType="numeric"
+                value={accountNumber}
+                onChangeText={setAccountNumber}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>IFSC Code</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter IFSC code"
+                placeholderTextColor={colors.textMuted}
+                value={ifscCode}
+                onChangeText={setIfscCode}
+                autoCapitalize="characters"
+              />
+            </View>
+          </>
+        )}
+
+        {/* Withdraw Button */}
+        <TouchableOpacity
+          style={[styles.withdrawButton, loading && styles.withdrawButtonDisabled]}
+          onPress={handleWithdraw}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color={colors.white} />
+          ) : (
+            <>
+              <MaterialIcons name={payoutMethod === 'razorpay' ? 'credit-card' : 'send'} size={20} color={colors.white} />
+              <Text style={styles.withdrawButtonText}>
+                {payoutMethod === 'razorpay' ? 'Pay with Razorpay' : 'Request Withdrawal'}
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+        <Text style={styles.processingNote}>
+          * Processing time: 1-3 business days
+        </Text>
+      </View>
+
+      {/* Withdrawal History */}
+      <View style={styles.section}>
+        <TouchableOpacity
+          style={styles.historyHeader}
+          onPress={loadWithdrawalHistory}
+          disabled={historyLoading}
+        >
+          <Text style={styles.sectionTitle}>Withdrawal History</Text>
+          {historyLoading ? (
+            <ActivityIndicator size="small" color={colors.primary} />
+          ) : (
+            <MaterialIcons
+              name={showHistory ? 'expand-less' : 'expand-more'}
+              size={24}
+              color={colors.primary}
+            />
+          )}
+        </TouchableOpacity>
+
+        {showHistory && (
+          <View style={styles.historyList}>
+            {withdrawalHistory.length === 0 ? (
+              <Text style={styles.emptyText}>No withdrawals yet</Text>
+            ) : (
+              withdrawalHistory.map((item) => (
+                <View key={item.withdrawal_id} style={styles.historyItem}>
+                  <View style={styles.historyItemHeader}>
+                    <View style={styles.historyItemInfo}>
+                      <Text style={styles.historyItemAmount}>
+                        {item.coins_amount} Coins
+                      </Text>
+                      <Text style={styles.historyItemRupees}>
+                        ₹{item.rupees_amount.toFixed(2)}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: getStatusColor(item.status) },
+                      ]}
+                    >
+                      <Text style={styles.statusBadgeText}>
+                        {item.status.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.historyItemDetails}>
+                    <Text style={styles.historyItemDetail}>
+                      Method: {item.payout_method.toUpperCase()}
+                    </Text>
+                    <Text style={styles.historyItemDetail}>
+                      Date: {formatDate(item.created_at)}
+                    </Text>
+                  </View>
+                  {item.failure_reason && (
+                    <Text style={styles.failureReason}>{item.failure_reason}</Text>
+                  )}
+                  {item.status === 'pending' && (
+                    <TouchableOpacity
+                      style={styles.cancelButton}
+                      onPress={() => handleCancelWithdrawal(item.withdrawal_id)}
+                    >
+                      <Text style={styles.cancelButtonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))
+            )}
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.lg,
+    backgroundColor: colors.white,
+    ...shadows.sm,
+  },
+  closeButton: {
+    padding: spacing.sm,
+    marginRight: spacing.md,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  headerImage: {
+    width: 40,
+    height: 40,
+    marginRight: spacing.md,
+  },
+  headerTitle: {
+    ...typography.h2,
+    color: colors.text,
+  },
+  balanceCard: {
+    backgroundColor: colors.white,
+    margin: spacing.lg,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.md,
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  balanceInfo: {
+    marginLeft: spacing.md,
+    flex: 1,
+  },
+  balanceLabel: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  balanceAmount: {
+    ...typography.h1,
+    color: colors.text,
+    marginTop: spacing.xs,
+  },
+  balanceRupees: {
+    ...typography.body,
+    color: colors.primary,
+    marginTop: spacing.xs,
+  },
+  conversionInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+  },
+  conversionText: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginLeft: spacing.xs,
+  },
+  section: {
+    backgroundColor: colors.white,
+    margin: spacing.lg,
+    marginTop: 0,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.sm,
+  },
+  sectionTitle: {
+    ...typography.h3,
+    color: colors.text,
+    marginBottom: spacing.md,
+  },
+  inputGroup: {
+    marginBottom: spacing.lg,
+  },
+  inputLabel: {
+    ...typography.body,
+    color: colors.text,
+    marginBottom: spacing.sm,
+    fontWeight: '600',
+  },
+  input: {
+    ...typography.body,
+    backgroundColor: colors.background,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    color: colors.text,
+  },
+  conversionHint: {
+    ...typography.caption,
+    color: colors.primary,
+    marginTop: spacing.xs,
+    fontWeight: '600',
+  },
+  payoutMethodRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  payoutMethodGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  payoutMethodButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    backgroundColor: colors.white,
+  },
+  payoutMethodButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  payoutMethodText: {
+    ...typography.body,
+    color: colors.primary,
+    marginLeft: spacing.sm,
+    fontWeight: '600',
+  },
+  payoutMethodTextActive: {
+    color: colors.white,
+  },
+  withdrawButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.success,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginTop: spacing.md,
+    ...shadows.sm,
+  },
+  withdrawButtonDisabled: {
+    opacity: 0.6,
+  },
+  withdrawButtonText: {
+    ...typography.body,
+    color: colors.white,
+    fontWeight: '600',
+    marginLeft: spacing.sm,
+  },
+  processingNote: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.md,
+    fontStyle: 'italic',
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  historyList: {
+    marginTop: spacing.md,
+  },
+  emptyText: {
+    ...typography.body,
+    color: colors.textMuted,
+    textAlign: 'center',
+    padding: spacing.lg,
+  },
+  historyItem: {
+    backgroundColor: colors.background,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+  },
+  historyItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  historyItemInfo: {
+    flex: 1,
+  },
+  historyItemAmount: {
+    ...typography.h4,
+    color: colors.text,
+  },
+  historyItemRupees: {
+    ...typography.body,
+    color: colors.primary,
+    marginTop: spacing.xs,
+  },
+  statusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
+  },
+  statusBadgeText: {
+    ...typography.caption,
+    color: colors.white,
+    fontWeight: '600',
+  },
+  historyItemDetails: {
+    marginTop: spacing.sm,
+  },
+  historyItemDetail: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginBottom: spacing.xs,
+  },
+  failureReason: {
+    ...typography.caption,
+    color: colors.error,
+    marginTop: spacing.sm,
+    fontStyle: 'italic',
+  },
+  cancelButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.error,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.sm,
+    marginTop: spacing.sm,
+  },
+  cancelButtonText: {
+    ...typography.caption,
+    color: colors.white,
+    fontWeight: '600',
+  },
+  razorpayInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: colors.secondary,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  razorpayInfoText: {
+    ...typography.caption,
+    color: colors.text,
+    flex: 1,
+    lineHeight: 18,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.errorLight,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.error,
+  },
+  errorText: {
+    ...typography.body,
+    color: colors.error,
+    marginLeft: spacing.sm,
+    flex: 1,
+    fontWeight: '600',
+  },
+  inputError: {
+    borderColor: colors.error,
+    borderWidth: 2,
+  },
+});
