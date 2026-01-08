@@ -81,9 +81,9 @@ const isWeb = Platform.OS === 'web';
 
 export default function App() {
   // Authentication State
-  const [appScreen, setAppScreen] = useState<AppScreenType>('landing');
+  const [appScreen, setAppScreen] = useState<AppScreenType>('auth');
   const [user, setUser] = useState<User | null>(null);
-  const [showLanding, setShowLanding] = useState(true);
+  const [showLanding, setShowLanding] = useState(false);
 
   const [screenWidth, setScreenWidth] = useState(initialWidth);
   const [activeTab, setActiveTab] = useState<TabType>('text');

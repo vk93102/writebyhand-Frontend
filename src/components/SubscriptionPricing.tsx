@@ -25,7 +25,7 @@ import {
 
 // Import promo code functions (added inline for now)
 const validatePromoCode = async (code: string, userId: string, plan: string, amount: number) => {
-  const response = await fetch(`http://localhost:8000/api/promo/validate/`, {
+  const response = await fetch(`https://ed-tech-backend-tzn8.onrender.com/api/promo/validate/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code, user_id: userId, plan, amount }),
@@ -36,7 +36,7 @@ const validatePromoCode = async (code: string, userId: string, plan: string, amo
 };
 
 const applyPromoCode = async (code: string, userId: string, subscriptionId: string | null, originalAmount: number, discountedAmount: number) => {
-  const response = await fetch(`http://localhost:8000/api/promo/apply/`, {
+  const response = await fetch(`https://ed-tech-backend-tzn8.onrender.com/api/promo/apply/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code, user_id: userId, subscription_id: subscriptionId, original_amount: originalAmount, discounted_amount: discountedAmount }),
