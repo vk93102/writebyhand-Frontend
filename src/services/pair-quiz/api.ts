@@ -23,7 +23,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 60000, // 30 second timeout
+  timeout: 30000, // 30 second timeout
 });
 
 // Auth token management (persist in AsyncStorage)

@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import { API_BASE_URL } from '../../config/api';
 
 // Socket.IO connection URL
-const SOCKET_URL = API_BASE_URL.replace('/api', ''); // Remove /api suffix
+const SOCKET_URL = process.env.EXPO_PUBLIC_SOCKET_URL || 'https://socket-edtech.onrender.com';
 
 export interface PairQuizState {
   sessionId: string;
