@@ -89,7 +89,7 @@ const QUICK_ACCESS: QuickAccess[] = [
   },
   {
     id: 'dailyQuiz',
-    title: 'Daily Quiz',
+    title: 'Play & Win',
     icon: 'emoji-events',
     color: '#FFD700',
     feature: 'daily-quiz',
@@ -283,7 +283,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
           </View>
         </View>
 
-        {/* Daily Quiz Banner */}
+        {/* Play & Win Banner */}
         <TouchableOpacity 
           style={styles.dailyQuizBanner}
           onPress={() => setShowDailyQuiz(true)}
@@ -294,7 +294,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
               <MaterialIcons name="emoji-events" size={32} color="#FFD700" />
             </View>
             <View style={styles.dailyQuizText}>
-              <Text style={styles.dailyQuizTitle}>Daily Quiz 🎯</Text>
+              <Text style={styles.dailyQuizTitle}>Play & Win 🎯</Text>
               <Text style={styles.dailyQuizSubtitle}>
                 Answer 5 questions • Earn up to {quizSettings ? (quizSettings.daily_quiz.attempt_bonus + (5 * quizSettings.daily_quiz.coins_per_correct)) : 35} coins
               </Text>
@@ -503,7 +503,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
       </View>
     </ScrollView>
 
-    {/* Daily Quiz Modal */}
+    {/* Play & Win Modal */}
     <Modal
       visible={showDailyQuiz}
       animationType="slide"
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
 
-  /* Daily Quiz Banner */
+  /* Play & Win Banner */
   dailyQuizBanner: {
     marginHorizontal: spacing.lg,
     marginTop: spacing.lg,

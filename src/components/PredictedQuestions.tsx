@@ -88,7 +88,7 @@ export const PredictedQuestions: React.FC<PredictedQuestionsProps> = ({ predicte
             </View>
             <Text style={styles.questionTitle}>Get Prediction of Questions and Concepts </Text>
             <Text style={styles.questionSubtitle}>
-              Get instant AI-powered answers with step-by-step explanations
+             Get predictions of concepts and predictions
             </Text>
           </View>
 
@@ -919,13 +919,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  loadingContainer: {
+  scrollContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 20,
-    backgroundColor: 'transparent',
-    minHeight: 400,
   },
   emptyContentContainer: {
     paddingBottom: spacing.xxxl,

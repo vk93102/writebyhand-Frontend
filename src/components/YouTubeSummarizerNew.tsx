@@ -5,10 +5,12 @@ import { colors, spacing, borderRadius, typography, shadows } from '../styles/th
 import AnimatedLoader from './AnimatedLoader';
 import LoadingWebm from './LoadingWebm';
 
+import { API_BASE_URL } from '../config/api';
+
 const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 const isMobile = width < 768;
-const API_BASE = 'http://127.0.0.1:8000/api';
+const API_BASE = API_BASE_URL;
 
 interface YouTubeSummarizerProps {
   summaryData?: any;

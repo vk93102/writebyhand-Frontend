@@ -384,11 +384,11 @@ export const generatePredictedQuestions = async (
  */
 
 /**
- * Daily Quiz API
+ * Play & Win API
  */
 
 /**
- * Get today's Daily Quiz
+ * Get today's Play & Win
  * @param userId - User identifier
  */
 export const getDailyQuiz = async (userId: string) => {
@@ -398,7 +398,7 @@ export const getDailyQuiz = async (userId: string) => {
     });
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to get Daily Quiz');
+    throw new Error(error.response?.data?.error || error.message || 'Failed to get Play & Win');
   }
 };
 
@@ -475,7 +475,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
 };
 
 /**
- * Start the Daily Quiz and award participation coins
+ * Start the Play & Win and award participation coins
  * @param userId - User identifier
  * @param quizId - Quiz id returned from getDailyQuiz
  */
@@ -487,12 +487,12 @@ export const startDailyQuiz = async (userId: string, quizId: string) => {
     });
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to start Daily Quiz');
+    throw new Error(error.response?.data?.error || error.message || 'Failed to start Play & Win');
   }
 };
 
 /**
- * Submit Daily Quiz answers
+ * Submit Play & Win answers
  * @param userId - User identifier
  * @param quizId - Quiz ID
  * @param answers - User's answers {question_id: option_index} e.g. {"1": 0, "2": 2}

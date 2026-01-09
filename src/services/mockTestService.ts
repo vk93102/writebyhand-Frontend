@@ -206,14 +206,14 @@ export const generateMockTest = (config: QuizConfig): any => {
 };
 
 /**
- * Get random questions from Daily Quiz JSON
+ * Get random questions from Play & Win JSON
  */
 export const getDailyQuizQuestions = (numQuestions: number = 20, language: 'english' | 'hindi' = 'english'): any => {
   try {
     const allQuestions = (language === 'hindi' ? hindiDailyQuizData : dailyQuizData) as MockTestQuestion[];
     
     if (allQuestions.length === 0) {
-      throw new Error('No daily quiz questions available');
+      throw new Error('No Play & Win questions available');
     }
 
     // Shuffle and select random questions
@@ -224,14 +224,14 @@ export const getDailyQuizQuestions = (numQuestions: number = 20, language: 'engl
     const normalizedQuestions = selected.map(normalizeQuestion);
 
     return {
-      title: language === 'hindi' ? 'दैनिक प्रश्नोत्तरी' : 'Daily Quiz',
+      title: language === 'hindi' ? 'दैनिक प्रश्नोत्तरी' : 'Play & Win',
       topic: language === 'hindi' ? 'सामान्य ज्ञान' : 'General Knowledge',
       difficulty: 'mixed',
       questions: normalizedQuestions,
-      timeLimit: numQuestions * 1, // 1 minute per question for daily quiz
+      timeLimit: numQuestions * 1, // 1 minute per question for Play & Win
     };
   } catch (error: any) {
-    throw new Error(`Failed to get daily quiz questions: ${error.message}`);
+    throw new Error(`Failed to get Play & Win questions: ${error.message}`);
   }
 };
 
@@ -240,21 +240,24 @@ export const getDailyQuizQuestions = (numQuestions: number = 20, language: 'engl
  */
 export const getQuizSettings = async (): Promise<any> => {
   try {
+    console.log('Fetching quiz settings from:', `${API_BASE_URL}/quiz/settings/`);
     const response = await fetch(`${API_BASE_URL}/quiz/settings/`);
     
     if (!response.ok) {
+      console.warn(`Quiz settings endpoint returned ${response.status}, using defaults`);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
     const data = await response.json();
     
     if (!data.success) {
+      console.warn('Quiz settings API returned success=false, using defaults');
       throw new Error(data.message || 'Failed to fetch quiz settings');
     }
     
     return data.settings;
   } catch (error: any) {
-    console.error('Error fetching quiz settings:', error);
+    console.log('Using default quiz settings due to API error:', error.message);
     // Return default values as fallback
     return {
       daily_quiz: {

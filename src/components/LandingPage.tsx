@@ -59,7 +59,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onLogin,
       iconColor: '#EA580C',
       bgColor: '#FFEDD5',
       title: 'Daily Challenges',
-      description: 'Earn coins by completing Daily Quizzes and climb the leaderboard.',
+      description: 'Earn coins by completing Play & Winzes and climb the leaderboard.',
     },
   ];
 

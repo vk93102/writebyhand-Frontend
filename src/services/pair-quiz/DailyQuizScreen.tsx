@@ -13,11 +13,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
-import { getDailyQuiz, submitDailyQuiz, startDailyQuiz, getUserCoins } from '../services/api';
-import { getDailyQuizQuestions } from '../services/mockTestService';
-import LoadingWebm from './LoadingWebm';
-import { DailyQuizResults } from './DailyQuizResults';
+import { colors, spacing, borderRadius, typography, shadows } from '../../styles/theme';
+import { getDailyQuiz, submitDailyQuiz, startDailyQuiz, getUserCoins } from '../../services/api';
+import { getDailyQuizQuestions, getQuizSettings } from '../../services/mockTestService';
+import LoadingWebm from '../../components/LoadingWebm';
+import { DailyQuizResults } from '../../components/DailyQuizResults';
 
 // UUID generator function
 const generateUUID = (): string => {
@@ -71,11 +71,43 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
     return String(value);
   };
 
+  const loadQuizSettings = async () => {
+    try {
+      const settings = await getQuizSettings();
+      setQuizSettings(settings);
+      console.log('Loaded quiz settings:', settings);
+    } catch (error) {
+      console.error('Failed to load quiz settings:', error);
+      // Use default fallback values
+      setQuizSettings({
+        daily_quiz: {
+          attempt_bonus: 5,
+          coins_per_correct: 5,
+          perfect_score_bonus: 10,
+        }
+      });
+    }
+  };
+
   useEffect(() => {
     // initial load
+    loadQuizSettings();
     loadQuiz();
     loadUserCoins();
   }, []);
+
+  // Reload quiz data when modal becomes visible to ensure questions render immediately
+  useEffect(() => {
+    if (visible) {
+      setLoading(true);
+      setQuizData(null);
+      setQuizState('not-started');
+      setResults(null);
+      setAnswers({});
+      setCurrentQuestionIndex(0);
+      loadQuiz();
+    }
+  }, [visible]);
 
   // Reload quiz when language changes
   useEffect(() => {
@@ -144,9 +176,8 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       }
     } catch (error: any) {
       console.error('❌ Failed to load quiz:', error);
-      // Use default coin values since we can't load from API
-      const attemptBonus = 5;
-      const coinsPerCorrect = 10;
+      const attemptBonus = quizSettings?.daily_quiz?.attempt_bonus ?? 5;
+      const coinsPerCorrect = quizSettings?.daily_quiz?.coins_per_correct ?? 5;
       setQuizData({ questions: [], coins: { attempt_bonus: attemptBonus, per_correct_answer: coinsPerCorrect, max_possible: attemptBonus } });
       setQuizState('not-started');
     } finally {
@@ -158,12 +189,11 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
     try {
       console.log('Starting quiz with ID:', quizData.quiz_id);
       console.log('Quiz has questions:', quizData.questions?.length);
-
-      // For now, skip the backend start call and just proceed
-      // This allows the quiz to work even if the backend endpoint is missing
-      // await startDailyQuiz(userId, quizData.quiz_id);
-      // console.log('Quiz started successfully on backend');
-
+      
+      // Start quiz on backend first
+      await startDailyQuiz(userId, quizData.quiz_id);
+      console.log('Quiz started successfully on backend');
+      
       // Award attempt bonus coins locally
       const coinsAwarded = quizData?.coins?.attempt_bonus ?? 5;
       setAttemptCoinsAwarded(coinsAwarded);
@@ -266,12 +296,79 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       animateCoins();
     } catch (error: any) {
       console.error('Submit quiz error:', error);
-      Alert.alert('Error', error.message || 'Failed to submit quiz');
+      console.log('Falling back to local calculation...');
+      
+      // Fallback: Calculate results locally
+      const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+      let correctAnswers = 0;
+      const questionResults = [];
+      
+      quizData.questions.forEach((question: any, index: number) => {
+        // Answers are stored with string keys ("1", "2", etc.)
+        const questionKey = String(index + 1);
+        const userAnswer = answers[questionKey];
+        const isCorrect = userAnswer === question.correctAnswer;
+        if (isCorrect) correctAnswers++;
+        
+        questionResults.push({
+          question: question.question,
+          selectedAnswer: userAnswer,
+          correctAnswer: question.correctAnswer,
+          isCorrect,
+          explanation: question.explanation || 'No explanation available',
+          options: question.options,
+        });
+      });
+      
+      const totalQuestions = quizData.questions.length;
+      const scorePercentage = Math.round((correctAnswers / totalQuestions) * 100);
+      
+      // Calculate coins using quiz settings or defaults
+      const coinsPerCorrect = quizSettings?.daily_quiz?.coins_per_correct || 5;
+      const attemptBonus = quizSettings?.daily_quiz?.attempt_bonus || 5;
+      const perfectBonus = quizSettings?.daily_quiz?.perfect_score_bonus || 10;
+      
+      const baseCoins = correctAnswers * coinsPerCorrect;
+      const attemptCoins = attemptBonus;
+      const perfectCoins = scorePercentage === 100 ? perfectBonus : 0;
+      const totalCoinsEarned = baseCoins + attemptCoins + perfectCoins;
+      
+      const localResults = {
+        success: true,
+        result: {
+          score: correctAnswers,
+          total_questions: totalQuestions,
+          percentage: scorePercentage,
+          time_taken: timeTaken,
+          coins_earned: totalCoinsEarned,
+          breakdown: {
+            correct_answers: baseCoins,
+            attempt_bonus: attemptCoins,
+            perfect_score_bonus: perfectCoins,
+          },
+          questions: questionResults,
+        },
+        total_coins: totalCoinsEarned, // For compatibility
+      };
+      
+      console.log('Local calculation results:', localResults);
+      setAttemptCoinsAwarded(totalCoinsEarned);
+      setResults(localResults);
+      setQuizState('completed');
+      animateCoins();
+      
+      // Show success message instead of error
+      Alert.alert(
+        'Quiz Completed!',
+        `You scored ${correctAnswers}/${totalQuestions} and earned ${totalCoinsEarned} coins!`,
+        [{ text: 'View Results' }]
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // If loading and we don't have quiz data yet, show full-screen loader.
   // Error loading quiz - show error screen
   if (quizState === 'error') {
     return (
@@ -293,7 +390,6 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
     );
   }
 
-  // If loading and we don't have quiz data yet, show full-screen loader.
   if (loading && !quizData) {
     return (
       <View style={styles.loadingContainer}>

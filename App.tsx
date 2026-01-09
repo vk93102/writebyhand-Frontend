@@ -72,7 +72,7 @@ const isWeb = Platform.OS === 'web';
   { id: 'predicted-questions' as PageType, label: 'Predicted Questions', icon: 'psychology' },
   { id: 'previous-papers' as PageType, label: 'Previous Papers', icon: 'description' },
   { id: 'trends' as PageType, label: 'PYQ Features', icon: 'analytics' },
-  { id: 'daily-quiz' as PageType, label: 'Daily Quiz', icon: 'emoji-events' },
+  { id: 'daily-quiz' as PageType, label: 'Play & Win', icon: 'emoji-events' },
   { id: 'youtube-summarizer' as PageType, label: 'YouTube Summarizer', icon: 'ondemand-video' },
   { id: 'withdrawal' as PageType, label: 'Withdraw Coins', icon: 'account-balance-wallet' },
   { id: 'usage' as PageType, label: 'Usage Dashboard', icon: 'dashboard' },
@@ -509,7 +509,7 @@ export default function App() {
       setQuizData(mockTestData);
       setQuizLoading(false);
       
-      // Increment Daily Quiz count for free users
+      // Increment Play & Win count for free users
       setDailyQuizCount(prev => prev + 1);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to generate mock test');
@@ -1038,7 +1038,7 @@ export default function App() {
                 <MaterialIcons name="help-outline" size={48} color={colors.primary} />
                 <Text style={styles.askQuestionTitle}>Ask Any Question</Text>
                 <Text style={styles.askQuestionSubtitle}>
-                  Get instant AI-powered answers with step-by-step explanations
+                  Get the predictions of concepts with explanations and questions on those concepts
                 </Text>
               </View>
 
@@ -1345,7 +1345,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
     marginBottom: spacing.xs,
-    transition: 'background-color 200ms ease' as any,
   },
   navItemActive: {
     backgroundColor: '#EEF2FF',

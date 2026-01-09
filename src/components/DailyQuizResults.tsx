@@ -83,7 +83,9 @@ export const DailyQuizResults: React.FC<Props> = ({ userId, quizId, onClose, ini
                   ) : (
                     <MaterialIcons name="radio-button-unchecked" size={16} color="#9CA3AF" />
                   )}
-                  <Text style={[styles.optionText, isCorrect && styles.optionTextCorrect, isUser && styles.optionTextUser]}>{opt}</Text>
+                  <Text style={[styles.optionText, isCorrect && styles.optionTextCorrect, isUser && styles.optionTextUser]}>
+                    {typeof opt === 'object' ? (opt.text || opt.label || opt.value || JSON.stringify(opt)) : opt}
+                  </Text>
                 </View>
               );
             }) : (

@@ -191,17 +191,6 @@ const AnimatedLoader: React.FC<AnimatedLoaderProps> = ({
         ]}
       />
 
-      {text && (
-        <Animated.Text
-          style={[
-            styles.loadingText,
-            { color, marginTop: size === 'small' ? 8 : 16 },
-            { opacity: pulse },
-          ]}
-        >
-          {text}
-        </Animated.Text>
-      )}
     </Animated.View>
   );
 

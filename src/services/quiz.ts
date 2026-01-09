@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8003/api';
+const API_BASE_URL = 'https://ed-tech-backend-tzn8.onrender.com/api';
 
 // Timeout configuration for long-running operations
 const axiosInstance = axios.create({
