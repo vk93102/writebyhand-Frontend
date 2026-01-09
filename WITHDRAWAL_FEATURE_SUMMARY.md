@@ -117,7 +117,7 @@ POST /api/razorpay/withdraw/
 
 ### 1. Test UPI Withdrawal
 ```bash
-curl -X POST http://localhost:8000/api/razorpay/withdraw/ \
+curl -X POST http://ed-tech-backend-tzn8.onrender.com/api/razorpay/withdraw/ \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test_user_123",
@@ -142,7 +142,7 @@ curl -X POST http://localhost:8000/api/razorpay/withdraw/ \
 
 ### 2. Test Bank Transfer
 ```bash
-curl -X POST http://localhost:8000/api/razorpay/withdraw/ \
+curl -X POST http://ed-tech-backend-tzn8.onrender.com/api/razorpay/withdraw/ \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test_user_456",
@@ -154,7 +154,7 @@ curl -X POST http://localhost:8000/api/razorpay/withdraw/ \
 
 ### 3. Test Insufficient Balance
 ```bash
-curl -X POST http://localhost:8000/api/razorpay/withdraw/ \
+curl -X POST http://ed-tech-backend-tzn8.onrender.com/api/razorpay/withdraw/ \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test_user_789",

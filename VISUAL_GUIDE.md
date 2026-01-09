@@ -326,7 +326,7 @@ Check related withdrawals:
 ### Problem: Approval not working
 **Solution**: 
 - Check internet connection
-- Ensure backend is running (localhost:8000)
+- Ensure backend is running (ed-tech-backend-tzn8.onrender.com)
 - Try refreshing page
 
 ### Problem: Records not updating after action

@@ -88,7 +88,7 @@ class PaymentService {
   private apiBaseUrl: string;
 
   constructor() {
-    this.apiBaseUrl = process.env.REACT_APP_API_URL || 'https://ed-tech-backend-tzn8.onrender.com';
+    this.apiBaseUrl = process.env.REACT_APP_API_URL || 'https://ed-tech-backend-tzn8.onrender.com/api';
   }
 
   /**

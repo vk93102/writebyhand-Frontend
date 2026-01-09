@@ -391,7 +391,7 @@ This implementation demonstrates:
 
 ### For Issues:
 1. Check error messages in alerts
-2. Verify backend API is running (localhost:8000)
+2. Verify backend API is running (ed-tech-backend-tzn8.onrender.com)
 3. Check browser console for technical errors
 4. Verify admin permissions
 

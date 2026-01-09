@@ -337,7 +337,7 @@ See `WITHDRAWAL_TESTING_GUIDE.md` for:
 ### Configuration
 ```typescript
 // src/services/api.ts
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://ed-tech-backend-tzn8.onrender.com/api';
 
 // Withdrawal endpoint
 const WITHDRAWAL_ENDPOINT = '/razorpay/withdraw/';

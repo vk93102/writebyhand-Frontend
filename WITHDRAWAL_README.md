@@ -110,12 +110,12 @@ const response = await requestCoinWithdrawal(
 ### API Testing
 ```bash
 # UPI Withdrawal
-curl -X POST http://localhost:8000/api/razorpay/withdraw/ \
+curl -X POST http://ed-tech-backend-tzn8.onrender.com/api/razorpay/withdraw/ \
   -H "Content-Type: application/json" \
   -d '{"user_id":"user_123","amount":50,"upi_id":"user@ybl"}'
 
 # Bank Transfer
-curl -X POST http://localhost:8000/api/razorpay/withdraw/ \
+curl -X POST http://ed-tech-backend-tzn8.onrender.com/api/razorpay/withdraw/ \
   -H "Content-Type: application/json" \
   -d '{
     "user_id":"user_456",

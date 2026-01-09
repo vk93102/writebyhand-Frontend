@@ -160,7 +160,7 @@ DELETE /admin/withdrawals/{id}/         → Delete a withdrawal
 | UPI ID not showing | Refresh page or pull-to-refresh |
 | Records not updating | Pull-to-refresh or navigate away/back |
 | Delete button not working | Ensure internet connection |
-| Approve failing | Check backend is running on localhost:8000 |
+| Approve failing | Check backend is running on ed-tech-backend-tzn8.onrender.com |
 | No records showing | Try "All" filter instead of status filter |
 
 ---
