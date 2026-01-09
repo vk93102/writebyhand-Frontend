@@ -11,58 +11,18 @@ import {
   Alert,
   Image,
 } from 'react-native';
-    <View style={{ flex: 1 }}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Subscription Plans</Text>
-      </View>
+import { MaterialIcons } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
+import { paymentService } from '../services/paymentService';
+import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 
-      <View style={styles.carouselWrap}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carousel}
-        >
-          {plans.map((plan) => (
-            <Animated.View
-              key={plan.id}
-              style={[
-                styles.planCard,
-                selectedPlan === plan.id && styles.planCardSelected,
-                { transform: [{ scale: scaleMap.current[plan.id] || new Animated.Value(1) }] },
-              ]}
-            >
-              <Text style={[styles.planName, selectedPlan === plan.id && styles.planNameSelected]}>{plan.name}</Text>
-              <Text style={[styles.planPrice, selectedPlan === plan.id && styles.planPriceSelected]}>₹{plan.amount} / {plan.period}</Text>
-
-              <View style={styles.featuresList}>
-                {plan.features.map((f, idx) => (
-                  <View key={idx} style={styles.featureRow}>
-                    <MaterialIcons name="check-circle" size={16} color={selectedPlan === plan.id ? '#fff' : theme.colors.primary} />
-                    <Text style={[styles.featureText, selectedPlan === plan.id && { color: '#fff' }]}>{f}</Text>
-                  </View>
-                ))}
-              </View>
-
-              <TouchableOpacity
-                style={[styles.selectButton, selectedPlan === plan.id && styles.selectButtonSelected]}
-                onPress={() => handleSelectPlan(plan.id)}
-                activeOpacity={0.9}
-              >
-                <Text style={[styles.selectButtonText, selectedPlan === plan.id && styles.selectButtonTextSelected]}>
-                  {selectedPlan === plan.id ? 'Selected' : 'Choose Plan'}
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.paymentFooter}>
-        <TouchableOpacity style={styles.payNowButton} onPress={handlePayment} disabled={processingPayment}>
-          {processingPayment ? <ActivityIndicator color="#fff" /> : <Text style={styles.payNowText}>Pay ₹{plans.find(p => p.id === selectedPlan)?.amount || 0}</Text>}
-        </TouchableOpacity>
-      </View>
-    </View>
+// Mock theme if not available
+const theme = {
+  colors,
+  spacing,
+  borderRadius,
+  shadows,
+};
 
 // Types
 
@@ -95,7 +55,7 @@ const PaymentScreen: React.FC = () => {
     {
       id: 'premium',
       name: 'Premium Monthly',
-      amount: 199,
+      amount: 1,
       period: 'month',
       features: [
         'Unlimited questions',
@@ -107,7 +67,7 @@ const PaymentScreen: React.FC = () => {
     {
       id: 'premium_annual',
       name: 'Premium Annual',
-      amount: 1990,
+      amount: 10,
       period: 'year',
       features: [
         'Unlimited questions',
@@ -381,6 +341,7 @@ const PaymentScreen: React.FC = () => {
                   </Animated.View>
                 );
               }}
+            />
             <View style={styles.dotsContainer}>
               {plans.map((p) => (
                 <View key={p.id} style={[styles.dot, selectedPlan === p.id && styles.dotActive]} />

@@ -106,7 +106,7 @@ export const Pricing: React.FC<PricingProps> = ({ userId }) => {
     {
       id: 'genius',
       name: 'Genius',
-      price: '₹199',
+      price: '₹1',
       period: ' first month',
       description: 'For power users & teams',
       highlighted: false,
@@ -207,7 +207,7 @@ export const Pricing: React.FC<PricingProps> = ({ userId }) => {
 
     const pricingInfo = planId === 'scholar' 
       ? '₹1 for first month, then ₹99/month'
-      : '₹199 for first month, then ₹499/month';
+      : '₹1 for first month, then ₹499/month';
 
     Alert.alert(
       `Subscribe to ${plan.name}`,

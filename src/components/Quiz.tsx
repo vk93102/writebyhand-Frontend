@@ -477,7 +477,7 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.quizHeader}>
         <View style={styles.headerTop}>
           <View>
@@ -695,7 +695,6 @@ const styles = StyleSheet.create({
   questionContainer: {
     backgroundColor: colors.white,
     padding: spacing.xl,
-    marginTop: spacing.md,
     borderRadius: borderRadius.md,
     ...shadows.sm,
   },
@@ -704,8 +703,9 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   optionsContainer: {
-    padding: spacing.md,
-    gap: spacing.md,
+    paddingHorizontal: 0,
+    paddingVertical: spacing.sm,
+    gap: spacing.sm,
   },
   optionButton: {
     backgroundColor: colors.white,
@@ -766,7 +766,8 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   optionsContainerSmall: {
-    padding: spacing.sm,
+    paddingHorizontal: 0,
+    paddingVertical: spacing.xs,
     gap: spacing.sm,
   },
   optionTextActive: {

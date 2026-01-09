@@ -5,12 +5,12 @@ import { Platform } from 'react-native';
 
 const getAuthApiUrl = () => {
   if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:8003/api';
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   }
   if (Platform.OS === 'ios') {
-    return 'http://localhost:8003/api';
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   }
-  return 'http://localhost:8003/api';
+  return 'https://ed-tech-backend-tzn8.onrender.com';
 };
 
 const API_BASE_URL = getAuthApiUrl();

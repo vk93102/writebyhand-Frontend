@@ -7,14 +7,15 @@ import { ImageUpload } from './ImageUpload';
 import AnimatedLoader from './AnimatedLoader';
 import LoadingWebm from './LoadingWebm';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 const isMobile = width < 768;
+const isLargeScreen = width > 1024;
 
 interface FlashcardItem {
   id: number;
-  front: string;
-  back: string;
+  question: string;
+  answer: string;
   category: string;
 }
 
@@ -42,7 +43,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
 
   if (loading) {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={styles.loaderContainer}>
         <LoadingWebm visible={true} />
       </View>
     );
@@ -50,27 +51,29 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
 
   if (!flashcardData) {
     return (
-      <View style={styles.emptyContainer}>
-        <View style={styles.inputCardFlash}>
-            <View style={styles.cardTabsFlash}>
+      <ScrollView style={styles.emptyContainer} showsVerticalScrollIndicator={false}>
+        <View style={styles.emptyContent}>
+          {/* Full-width input at the top */}
+          <View style={styles.topInputContainer}>
+            <View style={styles.inputTabsRow}>
               <TouchableOpacity
-                style={[styles.cardTabFlash, styles.cardTabLeftFlash, activeMethod === 'text' && styles.cardTabActiveFlash]}
+                style={[styles.inputTab, activeMethod === 'text' && styles.inputTabActive]}
                 onPress={() => setActiveMethod('text')}
               >
                 <MaterialIcons name="text-fields" size={20} color={activeMethod === 'text' ? colors.white : colors.textMuted} />
-                <Text style={[styles.cardTabTextFlash, activeMethod === 'text' && styles.cardTabTextActiveFlash]}>Text Input</Text>
+                <Text style={[styles.inputTabText, activeMethod === 'text' && styles.inputTabTextActive]}>Text Input</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.cardTabFlash, styles.cardTabRightFlash, activeMethod === 'image' && styles.cardTabActiveFlash]}
+                style={[styles.inputTab, activeMethod === 'image' && styles.inputTabActive]}
                 onPress={() => setActiveMethod('image')}
               >
                 <MaterialIcons name="image" size={18} color={activeMethod === 'image' ? colors.white : colors.textMuted} />
-                <Text style={[styles.cardTabTextFlash, activeMethod === 'image' && styles.cardTabTextActiveFlash]}>Image Upload</Text>
+                <Text style={[styles.inputTabText, activeMethod === 'image' && styles.inputTabTextActive]}>Image Upload</Text>
               </TouchableOpacity>
             </View>
 
-            <View style={styles.cardContentFlash}>
+            <View style={styles.inputArea}>
               {activeMethod === 'text' ? (
                 <TextInputComponent
                   onSubmit={(text) => onTextSubmit?.(text)}
@@ -84,7 +87,12 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
               )}
             </View>
           </View>
-      </View>
+
+          <Text style={styles.emptySubtitle}>
+            Generate interactive study cards from any topic or document
+          </Text>
+        </View>
+      </ScrollView>
     );
   }
 
@@ -152,108 +160,145 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
   });
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      {/* Professional Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>{flashcardData.title}</Text>
-        <View style={styles.categoryBadge}>
-          <MaterialIcons name="label" size={14} color={colors.primary} />
-          <Text style={styles.categoryText}>{card.category}</Text>
+        <View style={styles.headerContent}>
+          <View style={styles.headerTitleSection}>
+            <Text style={styles.title}>{flashcardData.title}</Text>
+            <View style={styles.categoryBadge}>
+              <MaterialIcons name="label" size={13} color={colors.primary} />
+              <Text style={styles.categoryText}>{card.category}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Progress Bar */}
+        <View style={styles.progressSection}>
+          <View style={styles.progressLabelRow}>
+            <Text style={styles.progressLabel}>Progress</Text>
+            <Text style={styles.progressPercentage}>
+              {Math.round(((currentCard + 1) / flashcardData.cards.length) * 100)}%
+            </Text>
+          </View>
+          <View style={styles.progressBar}>
+            <View 
+              style={[
+                styles.progressFill, 
+                { width: `${((currentCard + 1) / flashcardData.cards.length) * 100}%` }
+              ]} 
+            />
+          </View>
+          <Text style={styles.progressText}>
+            Card {currentCard + 1} of {flashcardData.cards.length}
+          </Text>
         </View>
       </View>
 
-      <View style={styles.progressContainer}>
-        <Text style={styles.progressText}>
-          Card {currentCard + 1} of {flashcardData.cards.length}
-        </Text>
-        <View style={styles.progressBar}>
-          <View 
-            style={[
-              styles.progressFill, 
-              { width: `${((currentCard + 1) / flashcardData.cards.length) * 100}%` }
-            ]} 
-          />
-        </View>
-      </View>
-
+      {/* Stats Row */}
       <View style={styles.statsRow}>
-        <View style={styles.statBox}>
-          <MaterialIcons name="check-circle" size={20} color={colors.success} />
-          <Text style={styles.statText}>Known: {knownCards.length}</Text>
+        <View style={[styles.statBox, styles.statBoxKnown]}>
+          <MaterialIcons name="check-circle" size={18} color={colors.success} />
+          <View style={styles.statTextContainer}>
+            <Text style={styles.statLabel}>Known</Text>
+            <Text style={styles.statValue}>{knownCards.length}</Text>
+          </View>
         </View>
-        <View style={styles.statBox}>
-          <MaterialIcons name="help" size={20} color={colors.warning} />
-          <Text style={styles.statText}>Learning: {unknownCards.length}</Text>
+        <View style={[styles.statBox, styles.statBoxLearning]}>
+          <MaterialIcons name="school" size={18} color={colors.warning} />
+          <View style={styles.statTextContainer}>
+            <Text style={styles.statLabel}>Learning</Text>
+            <Text style={styles.statValue}>{unknownCards.length}</Text>
+          </View>
+        </View>
+        <View style={[styles.statBox, styles.statBoxRemaining]}>
+          <MaterialIcons name="pending-actions" size={18} color={colors.primary} />
+          <View style={styles.statTextContainer}>
+            <Text style={styles.statLabel}>Remaining</Text>
+            <Text style={styles.statValue}>{flashcardData.cards.length - knownCards.length - unknownCards.length}</Text>
+          </View>
         </View>
       </View>
 
-      <TouchableOpacity 
-        style={styles.cardContainer} 
-        onPress={handleFlip}
-        activeOpacity={0.9}
-      >
-        <Animated.View
-          style={[
-            styles.card,
-            styles.cardFront,
-            {
-              transform: [{ rotateY: frontRotation }],
-              opacity: frontOpacity,
-            },
-          ]}
+      {/* Card Viewer Section */}
+      <View style={styles.cardViewerContainer}>
+        <TouchableOpacity 
+          style={styles.cardContainer} 
+          onPress={handleFlip}
+          activeOpacity={0.95}
         >
-          <View style={styles.cardHeader}>
-            <MaterialIcons name="contact-page" size={24} color={colors.primary} />
-            <Text style={styles.cardLabel}>Question</Text>
-          </View>
-          <Text style={styles.cardText}>{card.front}</Text>
-          <View style={styles.tapHint}>
-            <MaterialIcons name="touch-app" size={20} color={colors.textMuted} />
-            <Text style={styles.tapHintText}>Tap to reveal answer</Text>
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          style={[
-            styles.card,
-            styles.cardBack,
-            {
-              transform: [{ rotateY: backRotation }],
-              opacity: backOpacity,
-            },
-          ]}
-        >
-          <View style={styles.cardHeader}>
-            <MaterialIcons name="lightbulb" size={24} color={colors.success} />
-            <Text style={styles.cardLabel}>Answer</Text>
-          </View>
-          <Text style={styles.cardText}>{card.back}</Text>
-          <View style={styles.tapHint}>
-            <MaterialIcons name="touch-app" size={20} color={colors.textMuted} />
-            <Text style={styles.tapHintText}>Tap to see question</Text>
-          </View>
-        </Animated.View>
-      </TouchableOpacity>
-
-      {isFlipped && (
-        <View style={styles.knowledgeButtons}>
-          <TouchableOpacity 
-            style={[styles.knowledgeButton, styles.unknownButton]} 
-            onPress={handleUnknown}
+          {/* Front Side */}
+          <Animated.View
+            style={[
+              styles.card,
+              styles.cardFront,
+              {
+                transform: [{ rotateY: frontRotation }],
+                opacity: frontOpacity,
+              },
+            ]}
           >
-            <MaterialIcons name="close" size={24} color={colors.white} />
-            <Text style={styles.knowledgeButtonText}>Still Learning</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.knowledgeButton, styles.knownButton]} 
-            onPress={handleKnown}
-          >
-            <MaterialIcons name="check" size={24} color={colors.white} />
-            <Text style={styles.knowledgeButtonText}>I Know This</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            <View style={styles.cardIconSection}>
+              <View style={styles.cardIconContainer}>
+                <MaterialIcons name="contact-page" size={32} color={colors.primary} />
+              </View>
+              <Text style={styles.cardSideLabel}>Question</Text>
+            </View>
+            <Text style={styles.cardContent}>{card.question}</Text>
+            <View style={styles.cardFooter}>
+              <MaterialIcons name="touch-app" size={16} color={colors.textMuted} />
+              <Text style={styles.tapHintText}>Tap to reveal answer</Text>
+            </View>
+          </Animated.View>
 
-      <View style={styles.navigationContainer}>
+          {/* Back Side */}
+          <Animated.View
+            style={[
+              styles.card,
+              styles.cardBack,
+              {
+                transform: [{ rotateY: backRotation }],
+                opacity: backOpacity,
+              },
+            ]}
+          >
+            <View style={styles.cardIconSection}>
+              <View style={[styles.cardIconContainer, styles.cardIconContainerAnswer]}>
+                <MaterialIcons name="lightbulb" size={32} color={colors.success} />
+              </View>
+              <Text style={styles.cardSideLabel}>Answer</Text>
+            </View>
+            <Text style={styles.cardContent}>{card.answer}</Text>
+            <View style={styles.cardFooter}>
+              <MaterialIcons name="touch-app" size={16} color={colors.textMuted} />
+              <Text style={styles.tapHintText}>Tap to see question</Text>
+            </View>
+          </Animated.View>
+        </TouchableOpacity>
+
+        {/* Knowledge Assessment Buttons */}
+        {isFlipped && (
+          <View style={styles.knowledgeButtons}>
+            <TouchableOpacity 
+              style={[styles.knowledgeButton, styles.unknownButton]} 
+              onPress={handleUnknown}
+            >
+              <MaterialIcons name="close" size={20} color={colors.white} />
+              <Text style={styles.knowledgeButtonText}>Still Learning</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.knowledgeButton, styles.knownButton]} 
+              onPress={handleKnown}
+            >
+              <MaterialIcons name="check" size={20} color={colors.white} />
+              <Text style={styles.knowledgeButtonText}>I Know This</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      {/* Navigation Footer */}
+      <View style={styles.navigationFooter}>
         <TouchableOpacity
           style={[styles.navButton, currentCard === 0 && styles.navButtonDisabled]}
           onPress={handlePrevious}
@@ -268,6 +313,10 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
             Previous
           </Text>
         </TouchableOpacity>
+
+        <View style={styles.cardCounter}>
+          <Text style={styles.counterText}>{currentCard + 1}/{flashcardData.cards.length}</Text>
+        </View>
 
         <TouchableOpacity
           style={[
@@ -293,24 +342,18 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
         </TouchableOpacity>
       </View>
 
+      {/* Summary on Last Card */}
       {currentCard === flashcardData.cards.length - 1 && (
-        <View style={styles.summaryContainer}>
-          <MaterialIcons name="summarize" size={32} color={colors.primary} />
-          <Text style={styles.summaryTitle}>Study Summary</Text>
-          <Text style={styles.summaryText}>
-            You've reviewed all {flashcardData.cards.length} cards!
-          </Text>
-          <View style={styles.summaryStats}>
-            <Text style={styles.summaryStatText}>
-              Known: {knownCards.length} ({Math.round((knownCards.length / flashcardData.cards.length) * 100)}%)
-            </Text>
-            <Text style={styles.summaryStatText}>
-              Learning: {unknownCards.length} ({Math.round((unknownCards.length / flashcardData.cards.length) * 100)}%)
+        <View style={styles.summaryBanner}>
+          <View style={styles.summaryContent}>
+            <MaterialIcons name="check-circle" size={24} color={colors.success} />
+            <Text style={styles.summaryText}>
+              Review complete! {knownCards.length} known, {unknownCards.length} learning
             </Text>
           </View>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -319,40 +362,69 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  loadingContainer: {
+  loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.xl,
-    backgroundColor: 'transparent',
-    minHeight: 400,
+    backgroundColor: colors.background,
   },
-  loadingText: {
-    ...typography.body,
-    color: colors.textMuted,
-    marginTop: spacing.md,
-  },
+  
+  /* Empty State */
   emptyContainer: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  emptyContent: {
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    minHeight: height,
+  },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.blue50,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.xl,
+    marginBottom: spacing.lg,
   },
-  emptyText: {
-    ...typography.h4,
-    color: colors.textMuted,
-    marginTop: spacing.md,
+  emptyTitle: {
+    ...typography.h2,
+    color: colors.text,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
+  emptySubtitle: {
+    ...typography.body,
+    color: colors.textMuted,
+    marginBottom: spacing.xl,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+
+  /* Header */
   header: {
     backgroundColor: colors.white,
-    padding: spacing.lg,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: '#F3F4F6',
+    ...shadows.sm,
+  },
+  headerContent: {
+    marginBottom: spacing.md,
+  },
+  headerTitleSection: {
+    gap: spacing.sm,
   },
   title: {
     ...typography.h2,
-    marginBottom: spacing.sm,
+    color: colors.text,
+    fontWeight: '700',
   },
   categoryBadge: {
     flexDirection: 'row',
@@ -369,62 +441,110 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '600',
   },
-  progressContainer: {
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+
+  /* Progress Section */
+  progressSection: {
+    gap: spacing.sm,
   },
-  progressText: {
-    ...typography.body,
+  progressLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  progressLabel: {
+    ...typography.small,
     color: colors.textMuted,
-    marginBottom: spacing.sm,
+    fontWeight: '600',
+  },
+  progressPercentage: {
+    ...typography.h4,
+    fontWeight: '700',
+    color: colors.primary,
   },
   progressBar: {
-    height: 8,
-    backgroundColor: colors.border,
+    height: 6,
+    backgroundColor: '#E5E7EB',
     borderRadius: borderRadius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
   },
+  progressText: {
+    ...typography.small,
+    color: colors.textMuted,
+    fontWeight: '500',
+  },
+
+  /* Stats Row */
   statsRow: {
     flexDirection: 'row',
     gap: spacing.md,
-    padding: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
   statBox: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.white,
-    padding: spacing.md,
+    backgroundColor: '#F9FAFB',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
-    ...shadows.sm,
+    borderLeftWidth: 3,
   },
-  statText: {
-    ...typography.body,
+  statBoxKnown: {
+    borderLeftColor: colors.success,
+  },
+  statBoxLearning: {
+    borderLeftColor: colors.warning,
+  },
+  statBoxRemaining: {
+    borderLeftColor: colors.primary,
+  },
+  statTextContainer: {
+    gap: spacing.xs,
+  },
+  statLabel: {
+    ...typography.small,
+    color: colors.textMuted,
     fontWeight: '600',
   },
+  statValue: {
+    ...typography.h4,
+    fontWeight: '700',
+    color: colors.text,
+  },
+
+  /* Card Viewer */
+  cardViewerContainer: {
+    flex: 1,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: isLargeScreen ? spacing.xl : spacing.lg,
+    justifyContent: 'center',
+  },
   cardContainer: {
-    height: isWeb && !isMobile ? 450 : isMobile ? 350 : 400,
-    margin: spacing.lg,
-    marginHorizontal: isWeb && !isMobile ? spacing.xl * 3 : spacing.lg,
-    position: 'relative',
+    height: isLargeScreen ? 500 : isMobile ? 350 : 420,
+    marginBottom: spacing.lg,
   },
   card: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.xl,
     padding: spacing.xl,
     justifyContent: 'space-between',
     ...shadows.lg,
     backfaceVisibility: 'hidden',
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
   },
   cardFront: {
     zIndex: 2,
@@ -432,40 +552,58 @@ const styles = StyleSheet.create({
   cardBack: {
     zIndex: 1,
   },
-  cardHeader: {
-    flexDirection: 'row',
+  cardIconSection: {
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.lg,
+    paddingBottom: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
-  cardLabel: {
+  cardIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.blue50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardIconContainerAnswer: {
+    backgroundColor: '#F0FDF4',
+  },
+  cardSideLabel: {
     ...typography.h4,
     color: colors.primary,
+    fontWeight: '700',
   },
-  cardText: {
-    fontSize: isWeb && !isMobile ? 24 : isMobile ? 18 : 22,
+  cardContent: {
+    ...typography.body,
+    fontSize: isMobile ? 18 : 20,
     fontWeight: '600',
-    flex: 1,
     textAlign: 'center',
-    textAlignVertical: 'center',
-    lineHeight: isWeb && !isMobile ? 36 : isMobile ? 26 : 32,
     color: colors.text,
+    lineHeight: isMobile ? 28 : 32,
+    flex: 1,
+    justifyContent: 'center',
   },
-  tapHint: {
+  cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.md,
+    gap: spacing.sm,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
   },
   tapHintText: {
     ...typography.small,
     color: colors.textMuted,
+    fontWeight: '500',
   },
+
+  /* Knowledge Buttons */
   knowledgeButtons: {
     flexDirection: 'row',
     gap: spacing.md,
-    paddingHorizontal: isWeb && !isMobile ? spacing.xl * 3 : spacing.lg,
     marginBottom: spacing.md,
   },
   knowledgeButton: {
@@ -475,7 +613,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.lg,
     ...shadows.md,
   },
   unknownButton: {
@@ -485,249 +623,129 @@ const styles = StyleSheet.create({
     backgroundColor: colors.success,
   },
   knowledgeButtonText: {
-    ...typography.h4,
+    ...typography.body,
     color: colors.white,
+    fontWeight: '700',
   },
-  navigationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: isWeb && !isMobile ? spacing.xl * 3 : spacing.lg,
-    paddingVertical: spacing.md,
-    gap: spacing.md,
-  },
-  navButton: {
+
+  /* Navigation Footer */
+  navigationFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderRadius: borderRadius.md,
+    backgroundColor: colors.white,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    ...shadows.sm,
+  },
+  navButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.lg,
     borderWidth: 2,
     borderColor: colors.primary,
     backgroundColor: colors.white,
   },
   navButtonDisabled: {
-    borderColor: colors.border,
-    backgroundColor: colors.background,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F3F4F6',
+    opacity: 0.5,
   },
   navButtonText: {
     ...typography.h4,
     color: colors.primary,
+    fontWeight: '700',
   },
   navButtonTextDisabled: {
     color: colors.textMuted,
   },
   nextButton: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   nextButtonText: {
     color: colors.white,
   },
-  summaryContainer: {
-    backgroundColor: colors.white,
-    margin: spacing.lg,
-    padding: spacing.xl,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-    ...shadows.md,
+  cardCounter: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    backgroundColor: '#F3F4F6',
+    borderRadius: borderRadius.md,
   },
-  summaryTitle: {
-    ...typography.h2,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
+  counterText: {
+    ...typography.small,
+    color: colors.textMuted,
+    fontWeight: '700',
+  },
+
+  /* Summary Banner */
+  summaryBanner: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: '#F0FDF4',
+    borderTopWidth: 1,
+    borderTopColor: colors.success,
+  },
+  summaryContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
   },
   summaryText: {
     ...typography.body,
-    color: colors.textMuted,
-    textAlign: 'center',
-    marginBottom: spacing.md,
-  },
-  summaryStats: {
-    gap: spacing.xs,
-    marginTop: spacing.md,
-  },
-  summaryStatText: {
-    ...typography.body,
+    color: colors.success,
     fontWeight: '600',
-    textAlign: 'center',
+    flex: 1,
   },
 
-  // Empty state with tabs
-  emptyContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  screenHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  headerIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#E8F2FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTextContainer: {
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  onlineBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    backgroundColor: '#DCFCE7',
-    borderRadius: borderRadius.full,
-  },
-  onlineText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#10B981',
-  },
-  scrollContent: {
-    paddingVertical: spacing.xl,
-  },
-  questionSection: {
-    alignItems: 'center',
-    paddingHorizontal: spacing.xl,
+  /* Top Input Container */
+  topInputContainer: {
+    width: '100%',
     marginBottom: spacing.xl,
-  },
-  questionIcon: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#E8F2FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.lg,
-  },
-  questionTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  questionSubtitle: {
-    fontSize: 15,
-    color: colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  tabContainer: {
-    flexDirection: 'row',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
     padding: spacing.lg,
+    ...shadows.md,
+  },
+  inputTabsRow: {
+    flexDirection: 'row',
+    marginBottom: spacing.lg,
     gap: spacing.md,
   },
-  tab: {
+  inputTab: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
     paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: '#F9FAFB',
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.white,
     borderWidth: 2,
+    borderColor: '#E5E7EB',
+  },
+  inputTabActive: {
+    backgroundColor: colors.primary,
     borderColor: colors.primary,
     ...shadows.sm,
   },
-  activeTab: {
-    backgroundColor: colors.primary,
-  },
-  tabText: {
-    ...typography.h4,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  activeTabText: {
-    color: colors.white,
-  },
-  inputSection: {
-    flex: 1,
-  },
-  // Horizontal layout for desktop
-  horizontalWrapper: {
-    flexDirection: 'row',
-    gap: spacing.lg,
-    paddingHorizontal: spacing.lg,
-  },
-  leftColumnFlash: {
-    flex: 1.2,
-  },
-  rightColumnFlash: {
-    flex: 1,
-  },
-  // Card styles for Flashcard input area
-  inputCardFlash: {
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.lg,
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    ...shadows.sm,
-  },
-  cardTabsFlash: {
-    flexDirection: 'row',
-    padding: spacing.sm,
-    gap: spacing.sm,
-  },
-  cardTabFlash: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    paddingVertical: spacing.lg * 1.1,
-    paddingHorizontal: spacing.lg,
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.xl,
-  },
-  cardTabLeftFlash: {
-    flex: 1,
-    borderTopLeftRadius: borderRadius.xl,
-    borderBottomLeftRadius: 0,
-  },
-  cardTabRightFlash: {
-    flex: 1,
-    borderTopRightRadius: borderRadius.xl,
-    borderBottomRightRadius: 0,
-  },
-  cardTabActiveFlash: {
-    backgroundColor: colors.primary,
-    ...shadows.lg,
-    transform: [{ translateY: -2 }],
-  },
-  cardTabTextFlash: {
-    ...typography.h4,
+  inputTabText: {
+    ...typography.body,
     color: colors.textMuted,
     fontWeight: '700',
   },
-  cardTabTextActiveFlash: {
+  inputTabTextActive: {
     color: colors.white,
   },
-  cardContentFlash: {
-    padding: spacing.lg,
+  inputArea: {
+    width: '100%',
   },
 });

@@ -624,6 +624,100 @@ const styles = StyleSheet.create({
     color: colors.white + 'DD',
   },
 
+  /* Daily Quiz Badge */
+  dailyBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+    borderRadius: borderRadius.full,
+    marginTop: spacing.xs,
+    alignSelf: 'flex-start',
+  },
+  dailyBadgeAvailable: {
+    backgroundColor: colors.white,
+  },
+  dailyBadgeDone: {
+    backgroundColor: colors.white + '40',
+  },
+  dailyBadgeText: {
+    ...typography.small,
+    fontWeight: '700',
+  },
+  dailyBadgeTextAvailable: {
+    color: colors.primary,
+  },
+  dailyBadgeTextDone: {
+    color: colors.textMuted,
+  },
+
+  /* Tips Section */
+  tipsSection: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  tipCard: {
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    alignItems: 'center',
+    gap: spacing.md,
+    ...shadows.sm,
+  },
+  tipIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.blue50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tipContent: {
+    flex: 1,
+  },
+  tipTitle: {
+    ...typography.body,
+    fontWeight: '700',
+    marginBottom: spacing.xs,
+  },
+  tipDescription: {
+    ...typography.small,
+    color: colors.textMuted,
+    lineHeight: 18,
+  },
+
+  /* CTA Section */
+  ctaSection: {
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.md,
+    padding: spacing.lg,
+    alignItems: 'center',
+  },
+  ctaTitle: {
+    ...typography.body,
+    fontWeight: '700',
+    color: colors.white,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  ctaButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+  },
+  ctaButtonText: {
+    ...typography.body,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+
   /* Subscription Banner */
   subscriptionBanner: {
     marginHorizontal: spacing.lg,
@@ -858,134 +952,5 @@ const styles = StyleSheet.create({
     ...typography.body,
     fontWeight: '700',
     color: colors.white,
-  },
-
-  dailyQuizBanner: {
-    backgroundColor: colors.primary,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    marginTop: spacing.lg,
-    marginHorizontal: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dailyQuizContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.lg,
-  },
-  dailyQuizIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: '#FFF7ED',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dailyQuizText: {
-    flex: 1,
-  },
-  dailyQuizTitle: {
-    ...typography.h4,
-    color: colors.white,
-    fontWeight: '700',
-  },
-  dailyQuizSubtitle: {
-    ...typography.small,
-    color: colors.white,
-    marginTop: spacing.xs,
-  },
-  dailyBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    borderRadius: borderRadius.full,
-    marginTop: spacing.xs,
-    alignSelf: 'flex-start',
-  },
-  dailyBadgeAvailable: {
-    backgroundColor: colors.white,
-  },
-  dailyBadgeDone: {
-    backgroundColor: colors.white + '40',
-  },
-  dailyBadgeText: {
-    ...typography.small,
-    fontWeight: '700',
-  },
-  dailyBadgeTextAvailable: {
-    color: colors.primary,
-  },
-  dailyBadgeTextDone: {
-    color: colors.textMuted,
-  },
-
-  /* Tips Section */
-  tipsSection: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-  },
-  tipCard: {
-    flexDirection: 'row',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    alignItems: 'center',
-    gap: spacing.md,
-    ...shadows.sm,
-  },
-  tipIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.blue50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tipContent: {
-    flex: 1,
-  },
-  tipTitle: {
-    ...typography.body,
-    fontWeight: '700',
-    marginBottom: spacing.xs,
-  },
-  tipDescription: {
-    ...typography.small,
-    color: colors.textMuted,
-    lineHeight: 18,
-  },
-
-  /* CTA Section */
-  ctaSection: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.xl,
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.md,
-    padding: spacing.lg,
-    alignItems: 'center',
-  },
-  ctaTitle: {
-    ...typography.body,
-    fontWeight: '700',
-    color: colors.white,
-    textAlign: 'center',
-    marginBottom: spacing.md,
-  },
-  ctaButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.md,
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  ctaButtonText: {
-    ...typography.body,
-    fontWeight: '700',
-    color: colors.primary,
   },
 });

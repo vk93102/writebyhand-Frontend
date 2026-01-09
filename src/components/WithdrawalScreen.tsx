@@ -11,6 +11,8 @@ import {
   Image,
   Platform,
   Linking,
+  Animated,
+  Easing,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
@@ -19,7 +21,12 @@ import { getUserCoins, requestCoinWithdrawal } from '../services/api';
 interface WithdrawalScreenProps {
   userId: string;
   onClose: () => void;
-  onWithdrawalSuccess: () => void;
+  onWithdrawalSuccess: (data: {
+    withdrawalId: string;
+    amount: string;
+    coinsDeducted: number;
+    remainingCoins: number;
+  }) => void;
 }
 
 export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
@@ -40,6 +47,30 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
   const [upiId, setUpiId] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [ifscCode, setIfscCode] = useState('');
+
+  // Animation values
+  const [loadingOverlayAnim] = useState(new Animated.Value(0));
+  const [loadingScaleAnim] = useState(new Animated.Value(0.8));
+  const [loadingRotateAnim] = useState(new Animated.Value(0));
+
+  // Helper function to stop loading animations
+  const stopLoadingAnimations = () => {
+    Animated.parallel([
+      Animated.timing(loadingOverlayAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(loadingScaleAnim, {
+        toValue: 0.8,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      loadingRotateAnim.stopAnimation();
+      loadingRotateAnim.setValue(0);
+    });
+  };
 
   useEffect(() => {
     if (userId) {
@@ -107,7 +138,8 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
         Alert.alert('Insufficient Balance', `You only have ${userCoins} coins available. Please enter a lower amount.`);
         return;
       }
-      // Validate payout details
+
+      // Validate account holder name
       if (!accountHolderName.trim()) {
         const msg = 'Account holder name is required';
         setErrorMessage(msg);
@@ -115,24 +147,72 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
         return;
       }
 
+      // Validate payout method specific fields
       if (payoutMethod === 'upi') {
-        if (!upiId.trim()) {
+        const upiTrimmed = upiId.trim();
+        if (!upiTrimmed) {
           const msg = 'UPI ID is required for UPI payout';
           setErrorMessage(msg);
           Alert.alert('Required Field', msg);
           return;
         }
+        
+        // Validate UPI format (e.g., user@ybl, user@okhdfcbank)
+        const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z]{3,}$/;
+        if (!upiRegex.test(upiTrimmed)) {
+          const msg = 'Invalid UPI ID format. Example: yourname@ybl';
+          setErrorMessage(msg);
+          Alert.alert('Invalid Format', msg);
+          return;
+        }
       } else if (payoutMethod === 'bank') {
-        if (!accountNumber.trim() || !ifscCode.trim()) {
+        const accountTrimmed = accountNumber.trim();
+        const ifscTrimmed = ifscCode.trim();
+
+        if (!accountTrimmed || !ifscTrimmed) {
           const msg = 'Account number and IFSC code are required for bank transfer';
           setErrorMessage(msg);
           Alert.alert('Required Field', msg);
           return;
         }
+
+        // Validate account number (9-18 digits)
+        if (!/^\d{9,18}$/.test(accountTrimmed)) {
+          const msg = 'Invalid account number. Must be 9-18 digits';
+          setErrorMessage(msg);
+          Alert.alert('Invalid Format', msg);
+          return;
+        }
+
+        // Validate IFSC code format (e.g., SBIN0001234)
+        const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+        if (!ifscRegex.test(ifscTrimmed)) {
+          const msg = 'Invalid IFSC code format. Example: SBIN0001234';
+          setErrorMessage(msg);
+          Alert.alert('Invalid Format', msg);
+          return;
+        }
       }
 
-      // Submit withdrawal request to backend (server will process payout)
+      // Submit withdrawal request to backend
       setLoading(true);
+      setErrorMessage('');
+
+      // Start loading animations
+      Animated.parallel([
+        Animated.timing(loadingOverlayAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.spring(loadingScaleAnim, {
+          toValue: 1,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
       const response = await requestCoinWithdrawal(
         userId,
         coins,
@@ -144,30 +224,33 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
       );
 
       if (!response?.success) {
-        throw new Error(response?.error || 'Failed to submit withdrawal request');
+        throw new Error(response?.message || 'Failed to submit withdrawal request');
       }
 
-      Alert.alert(
-        '✅ Withdrawal Auto-Approved!',
-        `Your withdrawal has been automatically approved and is now processing!\n\n💰 Amount: ₹${(coins / 10).toFixed(2)}\n🪙 Coins Deducted: ${coins}\n📊 New Balance: ${response.remaining_balance} coins\n\n⚡ Status: Processing\n⏱️ Expected: 1-3 business days\n\n✨ No manual approval needed - your payout is on its way!`,
-        [
-          {
-            text: 'Great!',
-            onPress: () => {
-              setCoinsAmount('');
-              setUserEmail('');
-              setAccountHolderName('');
-              setUpiId('');
-              setAccountNumber('');
-              setIfscCode('');
-              loadUserCoins();
-              onWithdrawalSuccess();
-            },
-          },
-        ]
-      );
+      // Success response with withdrawal details
+      const withdrawalAmount = response.data?.rupees_amount || (coins / 10).toFixed(2);
+      const withdrawalId = response.data?.withdrawal_id || 'N/A';
+      const remainingCoins = response.data?.remaining_coins || (userCoins - coins);
+
+      // Reset form
+      setCoinsAmount('');
+      setUserEmail('');
+      setAccountHolderName('');
+      setUpiId('');
+      setAccountNumber('');
+      setIfscCode('');
+      setErrorMessage('');
+
+      // Notify parent component with withdrawal data
+      onWithdrawalSuccess({
+        withdrawalId,
+        amount: withdrawalAmount,
+        coinsDeducted: coins,
+        remainingCoins,
+      });
+
+      stopLoadingAnimations();
       setLoading(false);
-      
     } catch (error: any) {
       let errMsg = 'Failed to process withdrawal';
       if (error.message) {
@@ -175,11 +258,12 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
       }
       setErrorMessage(errMsg);
       Alert.alert('Error', errMsg);
+      stopLoadingAnimations();
       setLoading(false);
     }
   };
-  // Removed Razorpay checkout flow. Payouts are created and processed by backend.
 
+  // Helper function to calculate rupees from coins
   const calculateRupees = () => {
     const coins = parseInt(coinsAmount);
     if (isNaN(coins)) return '0.00';
@@ -187,13 +271,14 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <MaterialIcons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
+    <View style={styles.container}>
+      <ScrollView style={{ flex: 1 }}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <MaterialIcons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <View style={styles.headerContent}>
           <Image source={require('../../assets/coins.png')} style={styles.headerImage} />
           <Text style={styles.headerTitle}>Withdraw Coins</Text>
         </View>
@@ -360,6 +445,41 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
         </Text>
       </View>
     </ScrollView>
+
+      {/* Loading Overlay */}
+      <Animated.View
+        style={[
+          styles.loadingOverlay,
+          {
+            opacity: loadingOverlayAnim,
+            transform: [{ scale: loadingScaleAnim }],
+          },
+        ]}
+        pointerEvents={loading ? 'auto' : 'none'}
+      >
+        <View style={styles.loadingContent}>
+          <Animated.View
+            style={[
+              styles.loadingSpinner,
+              {
+                transform: [
+                  {
+                    rotate: loadingRotateAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg'],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <MaterialIcons name="sync" size={60} color={colors.white} />
+          </Animated.View>
+          <Text style={styles.loadingText}>Processing your withdrawal...</Text>
+          <Text style={styles.loadingSubtext}>Sending request to admin for approval</Text>
+        </View>
+      </Animated.View>
+    </View>
   );
 };
 
@@ -578,5 +698,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#047857',
     lineHeight: 16,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingContent: {
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    padding: spacing.xl,
+    borderRadius: borderRadius.xl,
+    ...shadows.lg,
+    minWidth: 280,
+  },
+  loadingSpinner: {
+    marginBottom: spacing.lg,
+  },
+  loadingText: {
+    ...typography.h3,
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  loadingSubtext: {
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
 });

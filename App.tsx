@@ -31,8 +31,6 @@ import { SubscriptionPricing } from './src/components/SubscriptionPricing';
 import { UsageDashboard } from './src/components/UsageDashboard';
 import { AuthScreen } from './src/components/AuthScreen';
 import { AuthScreenNew } from './src/components/AuthScreenNew';
-import { LandingPageDashboard } from './src/components/LandingPageDashboard';
-import { LandingPage } from './src/components/LandingPage';
 import { MainDashboard } from './src/components/MainDashboard';
 import { TrendAnalysis } from './src/components/TrendAnalysis';
 import { PreviousYearPapers } from './src/components/PreviousYearPapers';
@@ -40,12 +38,13 @@ import { getUserCoins, getSubscriptionStatus } from './src/services/api';
 import { DailyQuizScreen } from './src/components/DailyQuizScreen';
 import { PairQuizContainer } from './src/components/pair-quiz';
 import { WithdrawalScreen } from './src/components/WithdrawalScreen';
+import { WithdrawalSuccessScreen } from './src/components/WithdrawalSuccessScreen';
 import { solveQuestionByText, solveQuestionByImage, checkHealth, generateQuiz, generateFlashcards, generateStudyMaterial, summarizeYouTubeVideo, generatePredictedQuestions } from './src/services/api';
 import { generateMockTest } from './src/services/mockTestService';
 import { colors, spacing, borderRadius, typography, shadows } from './src/styles/theme';
 
 type TabType = 'text' | 'image';
-type PageType = 'dashboard' | 'mock-test' | 'quiz' | 'flashcards' | 'ask' | 'predicted-questions' | 'youtube-summarizer' | 'pricing' | 'usage' | 'profile' | 'trends' | 'daily-quiz' | 'pair-quiz' | 'previous-papers' | 'withdrawal';
+type PageType = 'dashboard' | 'mock-test' | 'quiz' | 'flashcards' | 'ask' | 'predicted-questions' | 'youtube-summarizer' | 'pricing' | 'usage' | 'profile' | 'trends' | 'daily-quiz' | 'pair-quiz' | 'previous-papers' | 'withdrawal' | 'withdrawal-success';
 type DashboardSection = 'overview' | 'quiz' | 'flashcards' | 'study-material';
 type AppScreenType = 'auth' | 'landing' | 'main';
 
@@ -106,6 +105,12 @@ export default function App() {
   const [youtubeSummaryLoading, setYoutubeSummaryLoading] = useState(false);
   const [dailyQuizCount, setDailyQuizCount] = useState(0);
   const [subscriptionData, setSubscriptionData] = useState<any>(null);
+  const [withdrawalSuccessData, setWithdrawalSuccessData] = useState<{
+    withdrawalId: string;
+    amount: string;
+    coinsDeducted: number;
+    remainingCoins: number;
+  } | null>(null);
 
   // Authentication Handlers
   const handleAuthSuccess = (userInfo: User) => {
@@ -1163,10 +1168,28 @@ export default function App() {
           <WithdrawalScreen
             userId={user?.id || 'guest'}
             onClose={() => setCurrentPage('ask')}
-            onWithdrawalSuccess={() => {
+            onWithdrawalSuccess={(data) => {
+              setWithdrawalSuccessData(data);
+              setCurrentPage('withdrawal-success');
               loadUserCoins();
             }}
           />
+        </View>
+      ) : currentPage === 'withdrawal-success' ? (
+        <View style={{ flex: 1 }}>
+          {withdrawalSuccessData && (
+            <WithdrawalSuccessScreen
+              withdrawalData={withdrawalSuccessData}
+              onClose={() => {
+                setCurrentPage('ask');
+                setWithdrawalSuccessData(null);
+              }}
+              onGoToDashboard={() => {
+                setCurrentPage('dashboard');
+                setWithdrawalSuccessData(null);
+              }}
+            />
+          )}
         </View>
       ) : currentPage === 'trends' ? (
         <View style={{ flex: 1, padding: spacing.lg }}>

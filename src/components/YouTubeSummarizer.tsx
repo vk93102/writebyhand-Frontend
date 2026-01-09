@@ -56,7 +56,7 @@ export const YouTubeSummarizer: React.FC<YouTubeSummarizerProps> = ({
 
   const loadSubscriptionStatus = async () => {
     try {
-      const response = await fetch(`https://ed-tech-backend-tzn8.onrender.com/api/subscription/status/?user_id=${userId}`);
+      const response = await fetch(`https://localhost:8000/api/subscription/status/?user_id=${userId}`);
       const data = await response.json();
       if (data.success) {
         setSubscriptionStatus(data);
@@ -92,10 +92,8 @@ export const YouTubeSummarizer: React.FC<YouTubeSummarizerProps> = ({
   if (loading) {
     return (
       <View style={styles.container}>
-        <View style={styles.contentWrapper}>
-          <View style={styles.pageCard}>
-            <LoadingWebm visible={true} overlay={false} />
-          </View>
+        <View style={styles.loadingContainer}>
+          <LoadingWebm visible={true} overlay={false} />
         </View>
       </View>
     );
@@ -230,7 +228,14 @@ export const YouTubeSummarizer: React.FC<YouTubeSummarizerProps> = ({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xl, backgroundColor: 'transparent', minHeight: 400 },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: spacing.xl, 
+    backgroundColor: colors.background, 
+    minHeight: 600 
+  },
   loadingText: { ...typography.h3, color: colors.text, marginTop: spacing.md },
   contentWrapper: { 
     flex: 1, 

@@ -755,6 +755,7 @@ const styles = StyleSheet.create({
   },
   configItem: {
     marginBottom: spacing.md,
+    marginTop: 0,
   },
   configRow: {
     flexDirection: 'row',
@@ -964,6 +965,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.sm,
+    marginTop: 0,
   },
   questionsValue: {
     fontSize: 18,
@@ -979,9 +981,10 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    minWidth: 50,
+    paddingVertical: 8,
+    width: '100%',
     textAlign: 'center',
+    marginTop: 0,
   },
   sliderContainer: {
     flexDirection: 'row',

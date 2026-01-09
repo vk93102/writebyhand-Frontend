@@ -12,9 +12,10 @@ import { colors, spacing, borderRadius } from '../../styles/theme';
 import { UserManagement } from './UserManagement';
 import { QuizManagement } from './QuizManagement';
 import { MockTestManagement } from './MockTestManagement';
+import { WithdrawalManagement } from './WithdrawalManagement';
 import { AnalyticsDashboard } from '../AnalyticsDashboard';
 
-type AdminTab = 'users' | 'quiz' | 'mocktest' | 'analytics';
+type AdminTab = 'users' | 'quiz' | 'mocktest' | 'withdrawals' | 'analytics';
 
 interface AdminPanelProps {
   userRole?: 'admin' | 'moderator';
@@ -28,6 +29,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ userRole = 'admin', onLo
     { id: 'users', label: 'Users', icon: 'people', component: UserManagement },
     { id: 'quiz', label: 'Quiz', icon: 'quiz', component: QuizManagement },
     { id: 'mocktest', label: 'Mock Tests', icon: 'assignment', component: MockTestManagement },
+    { id: 'withdrawals', label: 'Withdrawals', icon: 'account-balance-wallet', component: WithdrawalManagement },
     { id: 'analytics', label: 'Analytics', icon: 'analytics', component: AnalyticsDashboard },
   ];
 
@@ -84,7 +86,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ userRole = 'admin', onLo
 
       {/* Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {ActiveComponent && <ActiveComponent userRole={userRole} />}
+        {ActiveComponent && (
+          <ActiveComponent 
+            userRole={userRole}
+            onClose={activeTab === 'analytics' ? () => setActiveTab('users') : () => {}}
+          />
+        )}
       </ScrollView>
     </View>
   );

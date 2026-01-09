@@ -88,7 +88,7 @@ class PaymentService {
   private apiBaseUrl: string;
 
   constructor() {
-    this.apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8003/api';
+    this.apiBaseUrl = process.env.REACT_APP_API_URL || 'https://ed-tech-backend-tzn8.onrender.com';
   }
 
   /**
@@ -416,7 +416,7 @@ class PaymentService {
   getPricingInfo(): Record<string, any> {
     return {
       premium: {
-        amount: 199,
+        amount: 1,
         currency: 'INR',
         period: 'Monthly',
         features: [
@@ -427,7 +427,7 @@ class PaymentService {
         ],
       },
       premium_annual: {
-        amount: 1990,
+        amount: 10,
         currency: 'INR',
         period: 'Annual',
         features: [

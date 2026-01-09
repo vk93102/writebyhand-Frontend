@@ -6,13 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const getApiUrl = () => {
   if (Platform.OS === 'android') {
     // Android uses the production backend
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   } else if (Platform.OS === 'ios') {
     // iOS uses the production backend
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   } else {
-    // Web or other platforms
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
+    // Web or other platforms - use production backend
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   }
 };
 

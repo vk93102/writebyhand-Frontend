@@ -6,13 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const getApiUrl = () => {
   if (Platform.OS === 'android') {
     // Android uses the production backend
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   } else if (Platform.OS === 'ios') {
     // iOS uses the production backend
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   } else {
-    // Web or other platforms
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
+    // Web or other platforms - use production backend
+    return 'https://ed-tech-backend-tzn8.onrender.com';
   }
 };
 
@@ -602,28 +602,45 @@ export const requestCoinWithdrawal = async (
   ifscCode?: string
 ) => {
   try {
+    // Convert coins to rupees (e.g., 1000 coins = 100 rupees)
+    const amount = coinsAmount / 10;
+
     const payload: any = {
       user_id: userId,
-      coins_amount: coinsAmount,
-      payout_method: payoutMethod,
-      account_holder_name: accountHolderName,
+      amount: amount, // Send amount in rupees as expected by backend
     };
 
-    if (payoutMethod === 'upi' && upiId) {
+    // Add payment method specific fields
+    if (payoutMethod === 'upi') {
+      if (!upiId) {
+        throw new Error('UPI ID is required for UPI transfer');
+      }
       payload.upi_id = upiId;
     } else if (payoutMethod === 'bank') {
-      if (accountNumber && ifscCode) {
-        payload.account_number = accountNumber;
-        payload.ifsc_code = ifscCode;
-      } else {
+      if (!accountNumber || !ifscCode) {
         throw new Error('Account number and IFSC code are required for bank transfer');
       }
+      payload.account_number = accountNumber;
+      payload.ifsc_code = ifscCode;
     }
 
     const response = await api.post('/razorpay/withdraw/', payload);
-    return response.data;
+    
+    if (!response.data?.success) {
+      throw new Error(response.data?.message || 'Withdrawal request failed');
+    }
+
+    return {
+      success: true,
+      ...response.data,
+      // Include coins for consistency with component expectations
+      coins_deducted: coinsAmount,
+      remaining_balance: response.data?.remaining_coins,
+    };
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to request withdrawal');
+    console.error('Withdrawal error:', error);
+    const errorMessage = error.response?.data?.message || error.message || 'Failed to request withdrawal';
+    throw new Error(errorMessage);
   }
 };
 
@@ -665,6 +682,67 @@ export const cancelWithdrawal = async (withdrawalId: string) => {
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.error || error.message || 'Failed to cancel withdrawal');
+  }
+};
+
+// ============================================
+// ADMIN WITHDRAWAL MANAGEMENT APIs
+// ============================================
+
+/**
+ * Get all withdrawals (admin only)
+ * @param status - Filter by status: 'pending', 'completed', 'failed', 'cancelled'
+ */
+export const getAdminWithdrawals = async (status?: string) => {
+  try {
+    const response = await api.get('/admin/withdrawals/', {
+      params: { status }
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || error.message || 'Failed to get withdrawals');
+  }
+};
+
+/**
+ * Approve withdrawal (admin only)
+ * @param withdrawalId - Withdrawal ID to approve
+ */
+export const approveWithdrawal = async (withdrawalId: string) => {
+  try {
+    const response = await api.post(`/admin/withdrawals/${withdrawalId}/approve/`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || error.message || 'Failed to approve withdrawal');
+  }
+};
+
+/**
+ * Reject withdrawal and refund coins (admin only)
+ * @param withdrawalId - Withdrawal ID to reject
+ */
+export const rejectWithdrawal = async (withdrawalId: string) => {
+  try {
+    const response = await api.post(`/admin/withdrawals/${withdrawalId}/reject/`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || error.message || 'Failed to reject withdrawal');
+  }
+};
+
+/**
+ * Delete withdrawal record (admin only)
+ * @param withdrawalId - Withdrawal ID to delete
+ * @param userId - User ID associated with withdrawal
+ */
+export const deleteWithdrawal = async (withdrawalId: string, userId?: string) => {
+  try {
+    const response = await api.delete(`/admin/withdrawals/${withdrawalId}/`, {
+      params: { user_id: userId }
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || error.message || 'Failed to delete withdrawal');
   }
 };
 

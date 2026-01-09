@@ -32,6 +32,15 @@ const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 const isMobile = width < 768;
 
+interface QuestionResult {
+  question: string;
+  selectedAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  explanation: string;
+  options: string[];
+}
+
 interface DailyQuizScreenProps {
   userId: string;
   onComplete: (totalCoins?: number) => void;
@@ -301,7 +310,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       // Fallback: Calculate results locally
       const timeTaken = Math.floor((Date.now() - startTime) / 1000);
       let correctAnswers = 0;
-      const questionResults = [];
+      const questionResults: QuestionResult[] = [];
       
       quizData.questions.forEach((question: any, index: number) => {
         // Answers are stored with string keys ("1", "2", etc.)
@@ -312,7 +321,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
         
         questionResults.push({
           question: question.question,
-          selectedAnswer: userAnswer,
+          selectedAnswer: String(userAnswer),
           correctAnswer: question.correctAnswer,
           isCorrect,
           explanation: question.explanation || 'No explanation available',

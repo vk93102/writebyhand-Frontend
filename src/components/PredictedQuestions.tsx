@@ -72,7 +72,7 @@ export const PredictedQuestions: React.FC<PredictedQuestionsProps> = ({ predicte
   if (loading) {
     // Use full-screen overlay loader for consistent behavior across screens
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
         <LoadingWebm visible={true} />
       </View>
     );
