@@ -24,6 +24,7 @@ import {
   UsageStatus,
   DashboardData,
 } from '../services/subscriptionService';
+import { getUsageDashboard } from '../services/api';
 
 interface UsageFeature {
   name: string;
@@ -68,6 +69,33 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({
   const loadData = async () => {
     try {
       setLoading(true);
+      // Try to fetch from new usage API first
+      try {
+        const usageResponse = await getUsageDashboard();
+        console.log('[UsageDashboard] Usage API response:', usageResponse);
+        
+        if (usageResponse.success && usageResponse.dashboard) {
+          // Format the usage data for display
+          const formattedData = {
+            plan: usageResponse.dashboard.plan || 'free',
+            features: usageResponse.dashboard.features || {},
+            billing: {
+              subscription_status: 'active',
+              is_trial: false,
+              trial_end_date: null,
+              next_billing_date: null,
+            },
+          };
+          
+          console.log('[UsageDashboard] Formatted dashboard data:', formattedData);
+          setDashboardData(formattedData as any);
+          return;
+        }
+      } catch (usageError) {
+        console.log('[UsageDashboard] Usage API not available, falling back to subscription service:', usageError);
+      }
+      
+      // Fallback to subscription service if usage API fails
       const dashboard = await subscriptionService.getDashboard();
       setDashboardData(dashboard);
     } catch (error: any) {

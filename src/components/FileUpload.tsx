@@ -38,10 +38,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       });
 
       if (result.canceled === false && result.assets && result.assets.length > 0) {
-        // For web, expo-document-picker returns file property
         const processedAssets = result.assets.map(asset => {
           if (Platform.OS === 'web' && asset.file) {
-            // Web returns a File object in the file property
             return {
               ...asset,
               file: asset.file,

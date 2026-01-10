@@ -39,8 +39,9 @@ import { DailyQuizScreen } from './src/components/DailyQuizScreen';
 import { PairQuizContainer } from './src/components/pair-quiz';
 import { WithdrawalScreen } from './src/components/WithdrawalScreen';
 import { WithdrawalSuccessScreen } from './src/components/WithdrawalSuccessScreen';
-import { solveQuestionByText, solveQuestionByImage, checkHealth, generateQuiz, generateFlashcards, generateStudyMaterial, summarizeYouTubeVideo, generatePredictedQuestions, setUserId } from './src/services/api';
+import { solveQuestionByText, solveQuestionByImage, checkHealth, generateFlashcards, generateStudyMaterial, summarizeYouTubeVideo, generatePredictedQuestions, setUserId, checkFeatureUsage, recordFeatureUsage, getUsageDashboard } from './src/services/api';
 import { generateMockTest } from './src/services/mockTestService';
+import { generateQuiz, createQuiz, getQuizQuestions, submitQuiz, getQuizResults } from './src/services/quiz';
 import { colors, spacing, borderRadius, typography, shadows } from './src/styles/theme';
 
 type TabType = 'text' | 'image';
@@ -93,12 +94,16 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dashboardSection, setDashboardSection] = useState<DashboardSection>('overview');
   const [quizData, setQuizData] = useState<any>(null);
+  const [mockTestData, setMockTestData] = useState<any>(null);
+  const [quizResults, setQuizResults] = useState<any>(null);
+  const [mockTestResults, setMockTestResults] = useState<any>(null);
   const [userCoins, setUserCoins] = useState<number>(0);
   const [flashcardData, setFlashcardData] = useState<any>(null);
   const [studyMaterialData, setStudyMaterialData] = useState<any>(null);
   const [predictedQuestionsData, setPredictedQuestionsData] = useState<any>(null);
   const [youtubeSummaryData, setYoutubeSummaryData] = useState<any>(null);
   const [quizLoading, setQuizLoading] = useState(false);
+  const [mockTestLoading, setMockTestLoading] = useState(false);
   const [flashcardLoading, setFlashcardLoading] = useState(false);
   const [studyMaterialLoading, setStudyMaterialLoading] = useState(false);
   const [predictedQuestionsLoading, setPredictedQuestionsLoading] = useState(false);
@@ -138,6 +143,9 @@ export default function App() {
     setShowLanding(true);
     setResults(null);
     setQuizData(null);
+    setMockTestData(null);
+    setQuizResults(null);
+    setMockTestResults(null);
     setFlashcardData(null);
     setStudyMaterialData(null);
     setPredictedQuestionsData(null);
@@ -252,10 +260,52 @@ export default function App() {
     setQuizData(null);
 
     try {
-      const response = await generateQuiz(topic, numQuestions, difficulty);
-      setQuizData(response);
+      // Check feature usage before generating
+      console.log('[Quiz] Checking feature usage...');
+      const usageCheck = await checkFeatureUsage('quiz');
+      
+      if (!usageCheck.success || !usageCheck.allowed) {
+        const message = usageCheck.error || 'You have reached your monthly limit for quizzes. Please upgrade to continue.';
+        Alert.alert('Feature Limit Reached', message);
+        setQuizLoading(false);
+        return;
+      }
+
+      console.log(`[Quiz] Feature usage allowed, generating quiz from topic: "${topic}" with ${numQuestions} questions, difficulty: ${difficulty}`);
+      
+      // Call the new quiz service
+      const response = await generateQuiz(topic, numQuestions, difficulty as 'easy' | 'medium' | 'hard');
+      
+      console.log('[Quiz] API Response:', response);
+      
+      if (!response.success) {
+        Alert.alert('Error', response.error || 'Failed to generate quiz');
+        setQuizLoading(false);
+        return;
+      }
+
+      // Extract quiz data from response
+      const quizDataToSet = {
+        title: `Quiz: ${topic}`,
+        topic: topic,
+        difficulty: difficulty,
+        questions: response.data?.questions || response.questions || [],
+        quiz_id: response.data?.quiz_id,
+      };
+
+      console.log('[Quiz] Setting quiz data:', quizDataToSet);
+      
+      // Record feature usage after successful generation
+      console.log('[Quiz] Recording feature usage...');
+      await recordFeatureUsage('quiz', topic.length, 'text', {
+        num_questions: numQuestions,
+        difficulty: difficulty,
+      });
+
+      setQuizData(quizDataToSet);
       setQuizLoading(false);
     } catch (error: any) {
+      console.error('[Quiz] Error generating quiz:', error);
       const status = error.response?.status;
       const details = error.response?.data?.details || error.response?.data?.error;
       if (status === 429) {
@@ -269,6 +319,61 @@ export default function App() {
     }
   };
 
+  // Helper function to extract text content from file
+  const extractFileContent = async (file: any): Promise<string> => {
+    try {
+      if (file.file && typeof file.file === 'object' && file.file.constructor.name === 'File') {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const content = e.target?.result as string;
+            resolve(content || '');
+          };
+          reader.onerror = () => reject(new Error('Failed to read file'));
+          reader.readAsText(file.file);
+        });
+      }
+
+      // For native platforms - try to read from URI
+      if (file.uri) {
+        try {
+          const fileResponse = await fetch(file.uri);
+          const blob = await fileResponse.blob();
+          const fileExtension = (file.name || '').split('.').pop()?.toLowerCase();
+          
+          // For images, we'll create a descriptive text
+          if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(fileExtension || '')) {
+            return `[Image Content]\nFilename: ${file.name}\nFile Type: ${file.mimeType || 'image'}\n\nNote: Image files should contain readable text or diagrams for best results. The AI will attempt to extract and interpret visual content.`;
+          }
+
+          // For PDF files
+          if (fileExtension === 'pdf') {
+            return `[PDF Document]\nFilename: ${file.name}\nSize: ${file.size} bytes\n\nNote: For better PDF support, please convert to text or use images. The system will attempt to process the PDF content.`;
+          }
+
+          // For text files
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const content = e.target?.result as string;
+              resolve(content || '');
+            };
+            reader.onerror = () => reject(new Error('Failed to read file content'));
+            reader.readAsText(blob);
+          });
+        } catch (fetchError) {
+          console.error('[Quiz] Error fetching file from URI:', fetchError);
+          throw new Error('Failed to read file from device');
+        }
+      }
+
+      return '';
+    } catch (error) {
+      console.error('[Quiz] Error extracting file content:', error);
+      throw error;
+    }
+  };
+
   const handleGenerateQuizFromFile = async (files: any[], numQuestions: number = 5, difficulty: string = 'medium') => {
     if (!files || files.length === 0) {
       Alert.alert('Error', 'Please select a file');
@@ -279,11 +384,51 @@ export default function App() {
     setQuizData(null);
 
     try {
-      // Use first file for now (backend supports single file)
-      const response = await generateQuiz('', numQuestions, difficulty, files[0]);
-      setQuizData(response);
+      const file = files[0];
+      console.log('[Quiz] Starting file upload process:', { name: file.name, size: file.size, type: file.mimeType });
+
+      // Extract content from file
+      const fileContent = await extractFileContent(file);
+      
+      if (!fileContent || fileContent.trim().length === 0) {
+        Alert.alert('Error', 'File content is empty or could not be read');
+        setQuizLoading(false);
+        return;
+      }
+
+      console.log(`[Quiz] Generating quiz from file: "${file.name}" (${fileContent.length} characters) with ${numQuestions} questions`);
+      
+      // Use createQuiz to save the quiz from file content
+      const response = await createQuiz(
+        fileContent,
+        `Quiz from ${file.name || 'document'}`,
+        numQuestions,
+        difficulty as 'easy' | 'medium' | 'hard',
+        'text',
+        `file_${Date.now()}`
+      );
+
+      console.log('[Quiz] File upload response:', response);
+
+      if (!response.success) {
+        Alert.alert('Error', response.error || 'Failed to generate quiz from file');
+        setQuizLoading(false);
+        return;
+      }
+
+      const quizDataToSet = {
+        title: response.data?.title || `Quiz from ${file.name}`,
+        topic: file.name || 'Document',
+        difficulty: difficulty,
+        questions: response.data?.questions || [],
+        quiz_id: response.data?.quiz_id,
+      };
+
+      console.log('[Quiz] Setting quiz data from file:', quizDataToSet);
+      setQuizData(quizDataToSet);
       setQuizLoading(false);
     } catch (error: any) {
+      console.error('[Quiz] Error generating quiz from file:', error);
       Alert.alert('Error', error.message || 'Failed to generate quiz from file');
       setQuizLoading(false);
     }
@@ -299,8 +444,30 @@ export default function App() {
     setFlashcardData(null);
 
     try {
+      // Check feature usage before generating
+      console.log('[Flashcards] Checking feature usage...');
+      const usageCheck = await checkFeatureUsage('flashcards');
+      
+      if (!usageCheck.success || !usageCheck.allowed) {
+        const message = usageCheck.error || 'You have reached your monthly limit for flashcards. Please upgrade to continue.';
+        Alert.alert('Feature Limit Reached', message);
+        setFlashcardLoading(false);
+        return;
+      }
+
+      console.log('[Flashcards] Feature usage allowed, generating flashcards...');
+
       // Use default language (english) and difficulty (medium) from API
       const response = await generateFlashcards(topic, numCards, 'english', 'medium');
+      
+      // Record feature usage after successful generation
+      console.log('[Flashcards] Recording feature usage...');
+      await recordFeatureUsage('flashcards', topic.length, 'text', {
+        num_cards: numCards,
+        language: 'english',
+        difficulty: 'medium',
+      });
+
       setFlashcardData(response);
       setFlashcardLoading(false);
     } catch (error: any) {
@@ -496,11 +663,11 @@ export default function App() {
 
   const handleStartQuiz = (config: any) => {
     try {
-      setQuizLoading(true);
-      setQuizData(null);
+      setMockTestLoading(true);
+      setMockTestData(null);
 
       // Generate mock test from local JSON files with random question selection
-      const mockTestData = generateMockTest({
+      const mockTest = generateMockTest({
         subject: config.subject,
         topics: config.topics || [],
         difficulty: config.difficulty || 'medium',
@@ -509,8 +676,8 @@ export default function App() {
         numQuestions: config.numQuestions || 20,
       });
 
-      setQuizData(mockTestData);
-      setQuizLoading(false);
+      setMockTestData(mockTest);
+      setMockTestLoading(false);
       
       // Increment Play & Win count for free users
       setDailyQuizCount(prev => prev + 1);
@@ -805,7 +972,7 @@ export default function App() {
         <View style={{ flex: 1 }}>
           <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
             <View style={styles.sectionContainer}>
-              {!quizData && !quizLoading && (
+              {!mockTestData && !mockTestLoading && (
                 <QuizSelector 
                   onStartQuiz={handleStartQuiz} 
                   onClose={() => setCurrentPage('ask')} 
@@ -815,13 +982,13 @@ export default function App() {
                   quizType="mock-test"
                 />
               )}
-              {(quizData || quizLoading) && (
-                <Quiz quizData={quizData} loading={quizLoading} />
+              {(mockTestData || mockTestLoading) && (
+                <Quiz quizData={mockTestData} loading={mockTestLoading} />
               )}
-              {quizData && (
+              {mockTestData && (
                 <TouchableOpacity 
                   style={styles.newContentButton}
-                  onPress={() => setQuizData(null)}
+                  onPress={() => setMockTestData(null)}
                 >
                   <MaterialIcons name="add" size={20} color={colors.white} />
                   <Text style={styles.newContentButtonText}>Generate New Quiz</Text>

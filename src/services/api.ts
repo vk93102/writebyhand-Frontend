@@ -354,6 +354,13 @@ export const generateFlashcards = async (
       throw new Error('No response received from server');
     }
 
+    // Handle wrapped response format: { success: true, data: { title, cards, ... } }
+    // If data is wrapped in a 'data' field, return the data portion
+    // Otherwise return the entire response
+    if (response.data.data && response.data.success) {
+      return response.data.data;
+    }
+
     return response.data;
   } catch (error: any) {
     // Production-level error handling
@@ -1260,4 +1267,124 @@ export const getUserPromoHistory = async (userId: string) => {
   }
 };
 
+// ==================== FEATURE USAGE RESTRICTION SYSTEM ====================
+
+/**
+ * Check if user can access a feature
+ * POST /api/usage/check/
+ * @param feature - Feature name (quiz, flashcards, study-material, etc.)
+ * @returns { success: boolean, allowed: boolean, error?: string, usage?: {...} }
+ */
+export const checkFeatureUsage = async (feature: string) => {
+  try {
+    console.log(`[Usage] Checking feature access: ${feature}`);
+    const response = await api.post('/usage/check/', {
+      feature: feature.toLowerCase(),
+    });
+    console.log(`[Usage] Check response:`, response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(`[Usage] Check error:`, error.response?.data || error.message);
+    // If 403, it means access is forbidden/limit exceeded
+    if (error.response?.status === 403) {
+      return {
+        success: false,
+        allowed: false,
+        error: error.response?.data?.error || 'Monthly limit reached for this feature',
+        usage: error.response?.data?.usage,
+      };
+    }
+    throw error;
+  }
+};
+
+/**
+ * Record feature usage after successful execution
+ * POST /api/usage/record/
+ * @param feature - Feature name
+ * @param inputSize - Size of input/content in bytes
+ * @param usageType - Type: text | image | video | audio
+ * @param metadata - Optional metadata
+ * @returns { success: boolean, message: string, usage: {...} }
+ */
+export const recordFeatureUsage = async (
+  feature: string,
+  inputSize: number = 0,
+  usageType: string = 'text',
+  metadata: Record<string, any> = {}
+) => {
+  try {
+    console.log(`[Usage] Recording feature usage: ${feature}`, { inputSize, usageType });
+    const response = await api.post('/usage/record/', {
+      feature: feature.toLowerCase(),
+      input_size: inputSize,
+      usage_type: usageType.toLowerCase(),
+      metadata: metadata,
+    });
+    console.log(`[Usage] Record response:`, response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(`[Usage] Record error:`, error.response?.data || error.message);
+    // Don't throw - recording failure shouldn't break the feature
+    return {
+      success: false,
+      message: 'Failed to record usage',
+      error: error.message,
+    };
+  }
+};
+
+/**
+ * Get user's usage dashboard with all feature limits
+ * GET /api/usage/dashboard/
+ * @returns { success: boolean, dashboard: {...} }
+ */
+export const getUsageDashboard = async () => {
+  try {
+    console.log(`[Usage] Fetching usage dashboard`);
+    const response = await api.get('/usage/dashboard/');
+    console.log(`[Usage] Dashboard response:`, response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(`[Usage] Dashboard error:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+/**
+ * Get specific feature status
+ * GET /api/usage/feature/{feature}/
+ * @param feature - Feature name
+ * @returns { success: boolean, feature: string, status: {...} }
+ */
+export const getFeatureStatus = async (feature: string) => {
+  try {
+    console.log(`[Usage] Fetching feature status: ${feature}`);
+    const response = await api.get(`/usage/feature/${feature.toLowerCase()}/`);
+    console.log(`[Usage] Feature status response:`, response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(`[Usage] Feature status error:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+/**
+ * Get usage statistics
+ * GET /api/usage/stats/
+ * @returns { success: boolean, stats: {...} }
+ */
+export const getUsageStats = async () => {
+  try {
+    console.log(`[Usage] Fetching usage statistics`);
+    const response = await api.get('/usage/stats/');
+    console.log(`[Usage] Stats response:`, response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(`[Usage] Stats error:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export { api };
 export default api;

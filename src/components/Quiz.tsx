@@ -96,16 +96,24 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
     );
   }
 
-  if (!quizData.questions || quizData.questions.length === 0) {
+  // Validate quiz data structure - handle both direct and wrapped response formats
+  let validData = quizData;
+  
+  // If the response is wrapped in a 'data' field, unwrap it
+  if (quizData && (quizData as any).data && !quizData.questions) {
+    validData = (quizData as any).data;
+  }
+
+  if (!validData || !validData.questions || !Array.isArray(validData.questions) || validData.questions.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <MaterialIcons name="error-outline" size={64} color={colors.error} />
-        <Text style={styles.emptyText}>No questions available</Text>
+        <Text style={styles.emptyText}>No questions available for this quiz</Text>
       </View>
     );
   }
 
-  const question = quizData.questions[currentQuestion];
+  const question = validData.questions[currentQuestion];
   const selectedAnswer = userAnswers.get(currentQuestion);
 
   const handleAnswerSelect = (optionIndex: number) => {
@@ -115,7 +123,7 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
   };
 
   const handleNext = () => {
-    if (currentQuestion < quizData.questions.length - 1) {
+    if (currentQuestion < validData.questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     }
   };
@@ -138,7 +146,7 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
     let conceptualCorrect = 0, conceptualTotal = 0;
     let numericalCorrect = 0, numericalTotal = 0;
 
-    quizData.questions.forEach((q, index) => {
+    validData.questions.forEach((q, index) => {
       const userAnswer = userAnswers.get(index);
       const isCorrect = userAnswer === q.correctAnswer;
       
@@ -170,8 +178,8 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
 
     return {
       correct,
-      total: quizData.questions.length,
-      percentage: Math.round((correct / quizData.questions.length) * 100),
+      total: validData.questions.length,
+      percentage: Math.round((correct / validData.questions.length) * 100),
       easyCorrect,
       easyTotal,
       easyPercentage: easyTotal > 0 ? Math.round((easyCorrect / easyTotal) * 100) : 0,
@@ -230,7 +238,7 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
     setCurrentQuestion(0);
     setUserAnswers(new Map());
     setQuizCompleted(false);
-    const timeLimit = quizData.timeLimit || 30;
+    const timeLimit = validData.timeLimit || 30;
     setTimeRemaining(timeLimit * 60);
     setTimerStarted(true);
   };
@@ -507,13 +515,13 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
 
       <View style={styles.progressContainer}>
         <Text style={styles.progressText}>
-          Question {currentQuestion + 1} of {quizData.questions.length}
+          Question {currentQuestion + 1} of {validData.questions.length}
         </Text>
         <View style={styles.progressBar}>
           <View 
             style={[
               styles.progressFill, 
-              { width: `${((currentQuestion + 1) / quizData.questions.length) * 100}%` }
+              { width: `${((currentQuestion + 1) / validData.questions.length) * 100}%` }
             ]} 
           />
         </View>
@@ -565,7 +573,7 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
                   styles.optionText,
                   isSelected && styles.optionTextSelected
                 ]}>
-                  {option}
+                  {typeof option === 'string' ? option : option.text}
                 </Text>
                 {isSelected && (
                   <MaterialIcons name="check" size={24} color={colors.primary} />
@@ -588,7 +596,7 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
           </Text>
         </TouchableOpacity>
 
-        {currentQuestion === quizData.questions.length - 1 ? (
+        {currentQuestion === validData.questions.length - 1 ? (
           <TouchableOpacity
             style={[styles.navButton, styles.submitButton, isSmallDevice && styles.navButtonSmall]}
             onPress={handleSubmitQuiz}
@@ -613,7 +621,7 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
 
       <View style={styles.scorePreview}>
         <Text style={styles.scorePreviewText}>
-          Answered: {userAnswers.size} / {quizData.questions.length}
+          Answered: {userAnswers.size} / {validData.questions.length}
         </Text>
       </View>
     </ScrollView>

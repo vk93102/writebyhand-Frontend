@@ -17,11 +17,15 @@ interface FlashcardItem {
   question: string;
   answer: string;
   category: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  importance?: 'low' | 'medium' | 'high';
 }
 
 interface FlashcardData {
   title: string;
   topic: string;
+  language?: string;
+  total_cards?: number;
   cards: FlashcardItem[];
 }
 
@@ -40,6 +44,23 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
   const [flipAnimation] = useState(new Animated.Value(0));
   const [knownCards, setKnownCards] = useState<number[]>([]);
   const [unknownCards, setUnknownCards] = useState<number[]>([]);
+
+  // Reset state when flashcardData changes
+  React.useEffect(() => {
+    // Handle both direct and wrapped response formats
+    let dataToCheck = flashcardData;
+    if (flashcardData && (flashcardData as any).data && !flashcardData.cards) {
+      dataToCheck = (flashcardData as any).data;
+    }
+    
+    if (dataToCheck && dataToCheck.cards && dataToCheck.cards.length > 0) {
+      setCurrentCard(0);
+      setIsFlipped(false);
+      setKnownCards([]);
+      setUnknownCards([]);
+      flipAnimation.setValue(0);
+    }
+  }, [flashcardData, flipAnimation]);
 
   if (loading) {
     return (
@@ -96,7 +117,36 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
     );
   }
 
-  const card = flashcardData.cards[currentCard];
+  // Validate flashcard data structure - handle both direct and nested response formats
+  let validData = flashcardData;
+  
+  // If the response is wrapped in a 'data' field, unwrap it
+  if (flashcardData && (flashcardData as any).data && !flashcardData.cards) {
+    validData = (flashcardData as any).data;
+  }
+  
+  if (!validData || !validData.cards || !Array.isArray(validData.cards) || validData.cards.length === 0) {
+    return (
+      <View style={styles.errorContainer}>
+        <MaterialIcons name="error-outline" size={48} color={colors.error} />
+        <Text style={styles.errorTitle}>No Flashcards Available</Text>
+        <Text style={styles.errorMessage}>
+          Unable to load flashcards. The data may be corrupted or empty.
+        </Text>
+        <TouchableOpacity style={styles.retryButton} onPress={() => {
+          // Reset to input state
+          setCurrentCard(0);
+          setIsFlipped(false);
+          setKnownCards([]);
+          setUnknownCards([]);
+        }}>
+          <Text style={styles.retryButtonText}>Try Again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const card = validData.cards[currentCard];
 
   const handleFlip = () => {
     Animated.timing(flipAnimation, {
@@ -108,7 +158,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
   };
 
   const handleNext = () => {
-    if (currentCard < flashcardData.cards.length - 1) {
+    if (currentCard < validData.cards.length - 1) {
       setCurrentCard(currentCard + 1);
       setIsFlipped(false);
       flipAnimation.setValue(0);
@@ -178,19 +228,19 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
           <View style={styles.progressLabelRow}>
             <Text style={styles.progressLabel}>Progress</Text>
             <Text style={styles.progressPercentage}>
-              {Math.round(((currentCard + 1) / flashcardData.cards.length) * 100)}%
+              {Math.round(((currentCard + 1) / validData.cards.length) * 100)}%
             </Text>
           </View>
           <View style={styles.progressBar}>
             <View 
               style={[
                 styles.progressFill, 
-                { width: `${((currentCard + 1) / flashcardData.cards.length) * 100}%` }
+                { width: `${((currentCard + 1) / validData.cards.length) * 100}%` }
               ]} 
             />
           </View>
           <Text style={styles.progressText}>
-            Card {currentCard + 1} of {flashcardData.cards.length}
+            Card {currentCard + 1} of {validData.cards.length}
           </Text>
         </View>
       </View>
@@ -215,7 +265,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
           <MaterialIcons name="pending-actions" size={18} color={colors.primary} />
           <View style={styles.statTextContainer}>
             <Text style={styles.statLabel}>Remaining</Text>
-            <Text style={styles.statValue}>{flashcardData.cards.length - knownCards.length - unknownCards.length}</Text>
+            <Text style={styles.statValue}>{validData.cards.length - knownCards.length - unknownCards.length}</Text>
           </View>
         </View>
       </View>
@@ -315,35 +365,35 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
         </TouchableOpacity>
 
         <View style={styles.cardCounter}>
-          <Text style={styles.counterText}>{currentCard + 1}/{flashcardData.cards.length}</Text>
+          <Text style={styles.counterText}>{currentCard + 1}/{validData.cards.length}</Text>
         </View>
 
         <TouchableOpacity
           style={[
             styles.navButton, 
             styles.nextButton,
-            currentCard === flashcardData.cards.length - 1 && styles.navButtonDisabled
+            currentCard === validData.cards.length - 1 && styles.navButtonDisabled
           ]}
           onPress={handleNext}
-          disabled={currentCard === flashcardData.cards.length - 1}
+          disabled={currentCard === validData.cards.length - 1}
         >
           <Text style={[
             styles.navButtonText, 
             styles.nextButtonText,
-            currentCard === flashcardData.cards.length - 1 && styles.navButtonTextDisabled
+            currentCard === validData.cards.length - 1 && styles.navButtonTextDisabled
           ]}>
             Next
           </Text>
           <MaterialIcons 
             name="arrow-forward" 
             size={20} 
-            color={currentCard === flashcardData.cards.length - 1 ? colors.textMuted : colors.white} 
+            color={currentCard === validData.cards.length - 1 ? colors.textMuted : colors.white} 
           />
         </TouchableOpacity>
       </View>
 
       {/* Summary on Last Card */}
-      {currentCard === flashcardData.cards.length - 1 && (
+      {currentCard === validData.cards.length - 1 && (
         <View style={styles.summaryBanner}>
           <View style={styles.summaryContent}>
             <MaterialIcons name="check-circle" size={24} color={colors.success} />
@@ -747,5 +797,40 @@ const styles = StyleSheet.create({
   },
   inputArea: {
     width: '100%',
+  },
+
+  /* Error State */
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+    backgroundColor: colors.background,
+  },
+  errorTitle: {
+    ...typography.h2,
+    color: colors.error,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  errorMessage: {
+    ...typography.body,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
+    lineHeight: 22,
+  },
+  retryButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: borderRadius.md,
+    ...shadows.sm,
+  },
+  retryButtonText: {
+    ...typography.h4,
+    color: colors.white,
+    fontWeight: '600',
   },
 });
