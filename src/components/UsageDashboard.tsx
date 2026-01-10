@@ -1,3 +1,9 @@
+/**
+ * Usage Dashboard
+ * Complete implementation of subscription and feature usage dashboard
+ * Shows user subscription status, feature limits, and usage statistics
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,59 +14,49 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius } from '../styles/theme';
-import { getSubscriptionStatus } from '../services/api';
+import {
+  subscriptionService,
+  SubscriptionStatus,
+  UsageStatus,
+  DashboardData,
+} from '../services/subscriptionService';
 
 interface UsageFeature {
   name: string;
-  key: keyof Usage;
+  key: string;
   icon: string;
   color: string;
-}
-
-interface Usage {
-  mock_tests: number;
-  quizzes: number;
-  flash_cards: number;
-  pyqs: number;
-  ask_questions: number;
-  predicted_questions: number;
-  youtube_summarizer: number;
-}
-
-interface FeatureLimit {
-  limit: number;
-  used: number;
-}
-
-interface SubscriptionStatus {
-  user_id: string;
-  plan: string;
-  subscription_status: string;
-  current_period_end: string | null;
-  usage: Usage;
-  feature_limits: Record<string, FeatureLimit>;
+  category?: string;
 }
 
 interface UsageDashboardProps {
   userId: string;
   onBack: () => void;
   onUpgrade: () => void;
+  onManageSubscription?: () => void;
 }
 
-export const UsageDashboard: React.FC<UsageDashboardProps> = ({ userId, onBack, onUpgrade }) => {
+export const UsageDashboard: React.FC<UsageDashboardProps> = ({
+  userId,
+  onBack,
+  onUpgrade,
+  onManageSubscription,
+}) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [status, setStatus] = useState<SubscriptionStatus | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'features'>('overview');
 
   const features: UsageFeature[] = [
-    { name: 'Mock Tests', key: 'mock_tests', icon: 'assignment', color: '#4CAF50' },
-    { name: 'Quizzes', key: 'quizzes', icon: 'quiz', color: '#2196F3' },
-    { name: 'Flashcards', key: 'flash_cards', icon: 'style', color: '#9C27B0' },
+    { name: 'Mock Tests', key: 'mock_test', icon: 'assignment', color: '#4CAF50' },
+    { name: 'Quizzes', key: 'quiz', icon: 'school', color: '#2196F3' },
+    { name: 'Flashcards', key: 'flashcards', icon: 'style', color: '#9C27B0' },
     { name: 'PYQs', key: 'pyqs', icon: 'history-edu', color: '#FF9800' },
-    { name: 'Ask Questions', key: 'ask_questions', icon: 'help-outline', color: '#F44336' },
+    { name: 'Ask Questions', key: 'ask_question', icon: 'help-outline', color: '#F44336' },
     { name: 'Predicted Questions', key: 'predicted_questions', icon: 'lightbulb', color: '#FFC107' },
     { name: 'YouTube Summarizer', key: 'youtube_summarizer', icon: 'video-library', color: '#E91E63' },
   ];
@@ -72,8 +68,8 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({ userId, onBack, 
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await getSubscriptionStatus(userId);
-      setStatus(data);
+      const dashboard = await subscriptionService.getDashboard();
+      setDashboardData(dashboard);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to load usage data');
     } finally {
@@ -87,8 +83,7 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({ userId, onBack, 
     setRefreshing(false);
   };
 
-  const getUsagePercentage = (used: number, limit: number | null): number => {
-    if (limit === null) return 0; // Unlimited
+  const getUsagePercentage = (used: number, limit: number): number => {
     if (limit === 0) return 0;
     return Math.min((used / limit) * 100, 100);
   };
@@ -99,63 +94,173 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({ userId, onBack, 
     return colors.error;
   };
 
-  const renderFeatureCard = (feature: UsageFeature) => {
-    if (!status) return null;
+  const renderSubscriptionHeader = () => {
+    if (!dashboardData) return null;
 
-    const used = status.usage[feature.key];
-    const featureLimit = status.feature_limits[feature.key];
-    const limit = featureLimit?.limit ?? null;
-    const percentage = getUsagePercentage(used, limit);
-    const isUnlimited = limit === null;
-    const isLimitReached = !isUnlimited && used >= limit;
+    const billing = dashboardData.billing;
+    const isActive = billing.subscription_status === 'active';
+    const isTrial = billing.is_trial;
+
+    return (
+      <View style={[styles.planCard, !isActive && styles.planCardInactive]}>
+        <View style={styles.planCardHeader}>
+          <View>
+            <Text style={styles.planName}>{dashboardData.plan.toUpperCase()}</Text>
+            <View style={[styles.statusBadge, { borderColor: isActive ? colors.success : colors.error }]}>
+              <MaterialIcons
+                name={isActive ? 'check-circle' : 'cancel'}
+                size={14}
+                color={isActive ? colors.success : colors.error}
+              />
+              <Text style={[styles.statusBadgeText, { color: isActive ? colors.success : colors.error }]}>
+                {isActive ? 'ACTIVE' : 'INACTIVE'}
+              </Text>
+            </View>
+          </View>
+          <MaterialIcons
+            name={isTrial ? 'schedule' : 'workspace-premium'}
+            size={48}
+            color={isTrial ? colors.warning : colors.primary}
+          />
+        </View>
+
+        {/* Subscription Details */}
+        {isTrial && billing.trial_end_date && (
+          <View style={styles.detailRow}>
+            <MaterialIcons
+              name="schedule"
+              size={18}
+              color={colors.primary}
+            />
+            <View style={styles.detailText}>
+              <Text style={styles.detailLabel}>Trial Ends</Text>
+              <Text style={styles.detailValue}>
+                {new Date(billing.trial_end_date).toLocaleDateString()}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {billing.next_billing_date && !isTrial && (
+          <View style={styles.detailRow}>
+            <MaterialIcons
+              name="event-note"
+              size={18}
+              color={colors.success}
+            />
+            <View style={styles.detailText}>
+              <Text style={styles.detailLabel}>Next Billing</Text>
+              <Text style={styles.detailValue}>
+                {new Date(billing.next_billing_date!).toLocaleDateString()}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Access Status */}
+        {Object.values(dashboardData.features).some(f => f.unlimited) ? (
+          <View style={[styles.accessStatus, styles.unlimitedStatus]}>
+            <MaterialIcons
+              name="all-inclusive"
+              size={20}
+              color={colors.success}
+            />
+            <Text style={[styles.accessStatusText, { color: colors.success }]}>
+              Unlimited Access
+            </Text>
+          </View>
+        ) : (
+          <View style={[styles.accessStatus, styles.limitedStatus]}>
+            <MaterialIcons
+              name="info-outline"
+              size={20}
+              color={colors.warning}
+            />
+            <Text style={[styles.accessStatusText, { color: colors.warning }]}>
+              3 Uses Per Feature Monthly
+            </Text>
+          </View>
+        )}
+
+        {/* Action Buttons */}
+        {!Object.values(dashboardData.features).some(f => f.unlimited) && (
+          <TouchableOpacity style={styles.upgradeBtn} onPress={onUpgrade}>
+            <MaterialIcons name="upgrade" size={18} color="#fff" />
+            <Text style={styles.upgradeBtnText}>Upgrade to Premium</Text>
+          </TouchableOpacity>
+        )}
+
+        {isActive && onManageSubscription && (
+          <TouchableOpacity style={styles.manageBtn} onPress={onManageSubscription}>
+            <Text style={styles.manageBtnText}>Manage Subscription</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
+  const renderFeatureCard = (feature: UsageFeature) => {
+    if (!dashboardData || !dashboardData.features[feature.key]) {
+      return null;
+    }
+
+    const featureData = dashboardData.features[feature.key];
 
     return (
       <View key={feature.key} style={styles.featureCard}>
-        <View style={[styles.iconContainer, { backgroundColor: feature.color + '15' }]}>
-          <MaterialIcons name={feature.icon as any} size={28} color={feature.color} />
-        </View>
-        
-        <Text style={styles.featureName}>{feature.name}</Text>
-        
-        <View style={styles.usageNumbers}>
-          {isUnlimited ? (
-            <View style={styles.unlimitedBadge}>
-              <MaterialIcons name="all-inclusive" size={20} color={colors.success} />
-              <Text style={styles.unlimitedText}>Unlimited</Text>
-            </View>
-          ) : (
-            <>
-              <Text style={[styles.usedCount, isLimitReached && styles.limitReachedCount]}>
-                {used}
-              </Text>
-              <Text style={styles.limitCount}> / {limit}</Text>
-            </>
-          )}
+        <View
+          style={[styles.featureIcon, { backgroundColor: feature.color + '20' }]}
+        >
+          <MaterialIcons
+            name={feature.icon as any}
+            size={24}
+            color={feature.color}
+          />
         </View>
 
-        {!isUnlimited && (
+        <Text style={styles.featureName}>{feature.name}</Text>
+
+        {featureData.unlimited ? (
+          <View style={styles.unlimitedBadge}>
+            <MaterialIcons
+              name="all-inclusive"
+              size={16}
+              color={colors.success}
+            />
+            <Text style={styles.unlimitedText}>Unlimited</Text>
+          </View>
+        ) : (
           <>
-            <View style={styles.progressBarBackground}>
+            <Text style={styles.usageCount}>
+              {featureData.used}/{featureData.limit}
+            </Text>
+
+            <View style={styles.progressBar}>
               <View
                 style={[
-                  styles.progressBarFill,
+                  styles.progressFill,
                   {
-                    width: `${percentage}%`,
-                    backgroundColor: getUsageColor(percentage),
+                    width: `${featureData.percentage_used}%`,
+                    backgroundColor: featureData.percentage_used < 50 
+                      ? colors.success 
+                      : featureData.percentage_used < 80 
+                        ? colors.warning 
+                        : colors.error,
                   },
                 ]}
               />
             </View>
-            <Text style={[styles.percentageText, { color: getUsageColor(percentage) }]}>
-              {percentage.toFixed(0)}% Used
+
+            <Text style={styles.remainingText}>
+              {featureData.remaining} remaining
             </Text>
           </>
         )}
 
-        {isLimitReached && (
-          <View style={styles.limitBadge}>
-            <MaterialIcons name="warning" size={14} color="#fff" />
-            <Text style={styles.limitBadgeText}>Limit Reached</Text>
+        {featureData.remaining !== null && featureData.remaining === 0 && !featureData.unlimited && (
+          <View style={styles.limitReachedBadge}>
+            <MaterialIcons name="block" size={12} color="#fff" />
+            <Text style={styles.limitReachedText}>Limit Reached</Text>
           </View>
         )}
       </View>
@@ -166,10 +271,11 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({ userId, onBack, 
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <TouchableOpacity onPress={onBack}>
             <MaterialIcons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.title}>Usage Dashboard</Text>
+          <Text style={styles.headerTitle}>Usage Dashboard</Text>
+          <View style={{ width: 24 }} />
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -179,88 +285,131 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({ userId, onBack, 
     );
   }
 
-  const isPremium = status?.plan === 'premium';
-  const isActive = status?.subscription_status === 'active';
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+        <TouchableOpacity onPress={onBack}>
           <MaterialIcons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Usage Dashboard</Text>
-        <TouchableOpacity onPress={handleRefresh} style={styles.refreshButton}>
+        <Text style={styles.headerTitle}>Usage Dashboard</Text>
+        <TouchableOpacity onPress={handleRefresh}>
           <MaterialIcons name="refresh" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
+        style={styles.content}
+        contentContainerStyle={styles.contentPadding}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
+        showsVerticalScrollIndicator={false}
       >
-        {/* Plan Status Card */}
-        <View style={[styles.planCard, isPremium && styles.premiumCard]}>
-          <View style={styles.planHeader}>
-            <MaterialIcons
-              name={isPremium ? 'workspace-premium' : 'info'}
-              size={32}
-              color={isPremium ? colors.warning : colors.primary}
-            />
-            <View style={styles.planInfo}>
-              <Text style={styles.planName}>
-                {isPremium ? 'Premium Plan' : 'Free Plan'}
-              </Text>
-              {isPremium && status?.current_period_end && (
-                <Text style={styles.planSubtitle}>
-                  Renews on {new Date(status.current_period_end).toLocaleDateString()}
+        {/* Subscription Header */}
+        {renderSubscriptionHeader()}
+
+        {/* Tab Navigation */}
+        <View style={styles.tabBar}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
+            onPress={() => setActiveTab('overview')}
+          >
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === 'overview' && styles.activeTabLabel,
+              ]}
+            >
+              Overview
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'features' && styles.activeTab]}
+            onPress={() => setActiveTab('features')}
+          >
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === 'features' && styles.activeTabLabel,
+              ]}
+            >
+              Features
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <>
+            {/* Summary Card */}
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryLabel}>Plan Type</Text>
+                <Text style={styles.summaryValue}>
+                  {dashboardData?.plan.toUpperCase()}
                 </Text>
-              )}
-              {!isPremium && (
-                <Text style={styles.planSubtitle}>
-                  Upgrade for unlimited access
+              </View>
+              <View style={styles.summaryDivider} />
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryLabel}>Status</Text>
+                <Text style={styles.summaryValue}>
+                  {dashboardData?.billing.subscription_status.toUpperCase()}
                 </Text>
-              )}
+              </View>
+              <View style={styles.summaryDivider} />
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryLabel}>Access</Text>
+                <Text style={styles.summaryValue}>
+                  {Object.values(dashboardData?.features || {}).some(f => f.unlimited) ? 'Unlimited' : 'Limited'}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          {!isPremium && (
-            <TouchableOpacity style={styles.upgradeButton} onPress={onUpgrade}>
-              <MaterialIcons name="upgrade" size={20} color="#fff" />
-              <Text style={styles.upgradeButtonText}>Upgrade to Premium</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+            {/* Quick Stats */}
+            <View style={styles.statsGrid}>
+              {features.slice(0, 3).map((feature) => renderFeatureCard(feature))}
+            </View>
 
-        {/* Usage Statistics - Grid Layout */}
-        <Text style={styles.sectionTitle}>Feature Usage</Text>
-        <View style={styles.featuresGrid}>
-          {features.map((feature) => renderFeatureCard(feature))}
-        </View>
+            {/* Tips Section */}
+            <View style={styles.tipsSection}>
+              <Text style={styles.sectionTitle}>💡 Tips</Text>
+              <View style={styles.tipCard}>
+                <MaterialIcons
+                  name={Object.values(dashboardData?.features || {}).some(f => f.unlimited) ? 'celebration' : 'lightbulb'}
+                  size={20}
+                  color={colors.warning}
+                />
+                <Text style={styles.tipText}>
+                  {Object.values(dashboardData?.features || {}).some(f => f.unlimited)
+                    ? 'You have unlimited access! Start learning without limits.'
+                    : 'Upgrade to Premium for just ₹1 and get unlimited access to all features.'}
+                </Text>
+              </View>
+            </View>
+          </>
+        )}
 
-        {/* Tips Section */}
-        <View style={styles.tipsSection}>
-          <Text style={styles.sectionTitle}>Tips</Text>
-          <View style={styles.tipCard}>
-            <MaterialIcons name="lightbulb-outline" size={20} color={colors.warning} />
-            <Text style={styles.tipText}>
-              {isPremium
-                ? 'You have unlimited access to all features. Enjoy learning!'
-                : 'Upgrade to Premium for unlimited access to all features. Only ₹1 for first month!'}
-            </Text>
-          </View>
-        </View>
+        {/* Features Tab */}
+        {activeTab === 'features' && (
+          <>
+            <Text style={styles.sectionTitle}>All Features</Text>
+            <View style={styles.statsGrid}>
+              {features.map((feature) => renderFeatureCard(feature))}
+            </View>
 
-        {/* Monthly Reset Info */}
-        {!isPremium && (
-          <View style={styles.resetInfo}>
-            <MaterialIcons name="schedule" size={20} color={colors.textSecondary} />
-            <Text style={styles.resetText}>
-              Usage limits reset on the 1st of each month
-            </Text>
-          </View>
+            {!Object.values(dashboardData?.features || {}).some(f => f.unlimited) && (
+              <View style={styles.resetInfoCard}>
+                <MaterialIcons
+                  name="schedule"
+                  size={20}
+                  color={colors.textSecondary}
+                />
+                <Text style={styles.resetInfoText}>
+                  Usage limits reset on the 1st of each month
+                </Text>
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </View>
@@ -270,33 +419,22 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({ userId, onBack, 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f7fa',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing.md,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e8eaed',
   },
-  backButton: {
-    marginRight: spacing.md,
-  },
-  title: {
+  headerTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-    flex: 1,
-  },
-  refreshButton: {
-    padding: spacing.xs,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    padding: spacing.lg,
   },
   loadingContainer: {
     flex: 1,
@@ -306,86 +444,189 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: spacing.md,
     color: colors.textSecondary,
+    fontSize: 14,
+  },
+  content: {
+    flex: 1,
+  },
+  contentPadding: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   planCard: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: borderRadius.lg,
     padding: spacing.lg,
     marginBottom: spacing.lg,
     borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  planCardInactive: {
     borderColor: '#e8eaed',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    opacity: 0.8,
   },
-  premiumCard: {
-    borderColor: colors.warning,
-    backgroundColor: '#fffbf0',
-  },
-  planHeader: {
+  planCardHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: spacing.md,
-  },
-  planInfo: {
-    marginLeft: spacing.md,
-    flex: 1,
   },
   planName: {
     fontSize: 22,
     fontWeight: '700',
     color: colors.text,
+    marginBottom: spacing.sm,
   },
-  planSubtitle: {
-    fontSize: 13,
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignSelf: 'flex-start',
+  },
+  statusBadgeText: {
+    marginLeft: spacing.xs,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  detailText: {
+    marginLeft: spacing.md,
+    flex: 1,
+  },
+  detailLabel: {
+    fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 4,
+    fontWeight: '500',
   },
-  upgradeButton: {
+  detailValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: 2,
+  },
+  accessStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.sm,
+    marginBottom: spacing.md,
+  },
+  unlimitedStatus: {
+    backgroundColor: '#ecfdf5',
+  },
+  limitedStatus: {
+    backgroundColor: '#fffbf0',
+  },
+  accessStatusText: {
+    marginLeft: spacing.sm,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  upgradeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
-    padding: spacing.md,
-    borderRadius: 12,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.sm,
   },
-  upgradeButtonText: {
-    marginLeft: spacing.xs,
+  upgradeBtnText: {
+    marginLeft: spacing.sm,
     fontSize: 15,
     fontWeight: '700',
     color: '#fff',
   },
-  sectionTitle: {
-    fontSize: 18,
+  manageBtn: {
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  manageBtnText: {
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    marginBottom: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e8eaed',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 3,
+    borderBottomColor: colors.primary,
+  },
+  tabLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  activeTabLabel: {
+    color: colors.primary,
+  },
+  summaryCard: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  summaryDivider: {
+    width: 1,
+    backgroundColor: '#e8eaed',
+    marginHorizontal: spacing.sm,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    marginBottom: spacing.xs,
+  },
+  summaryValue: {
+    fontSize: 16,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: spacing.md,
   },
-  featuresGrid: {
+  statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    marginBottom: spacing.lg,
   },
   featureCard: {
+    width: '48%',
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
-    width: '48%', // Two columns
-    borderWidth: 1,
-    borderColor: '#e8eaed',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    position: 'relative',
+    alignItems: 'center',
   },
-  iconContainer: {
-    width: 56,
-    height: 56,
+  featureIcon: {
+    width: 48,
+    height: 48,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -396,54 +637,47 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     marginBottom: spacing.xs,
+    textAlign: 'center',
   },
-  usageNumbers: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: spacing.sm,
-  },
-  usedCount: {
-    fontSize: 24,
+  usageCount: {
+    fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-  },
-  limitReachedCount: {
-    color: colors.error,
-  },
-  limitCount: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    marginBottom: spacing.sm,
   },
   unlimitedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.successLight,
+    backgroundColor: '#ecfdf5',
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,
     borderRadius: 12,
+    marginBottom: spacing.sm,
   },
   unlimitedText: {
     marginLeft: 4,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: colors.success,
   },
-  progressBarBackground: {
-    height: 6,
+  progressBar: {
+    width: '100%',
+    height: 4,
     backgroundColor: '#e8eaed',
-    borderRadius: 3,
+    borderRadius: 2,
     overflow: 'hidden',
     marginBottom: spacing.xs,
   },
-  progressBarFill: {
+  progressFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 2,
   },
-  percentageText: {
+  remainingText: {
     fontSize: 11,
-    fontWeight: '600',
+    color: colors.textSecondary,
+    fontWeight: '500',
   },
-  limitBadge: {
+  limitReachedBadge: {
     position: 'absolute',
     top: 8,
     right: 8,
@@ -454,48 +688,50 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 10,
   },
-  limitBadgeText: {
+  limitReachedText: {
     marginLeft: 2,
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '700',
     color: '#fff',
   },
-  tipsSection: {
-    marginTop: spacing.lg,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
     marginBottom: spacing.md,
+  },
+  tipsSection: {
+    marginBottom: spacing.lg,
   },
   tipCard: {
     flexDirection: 'row',
     backgroundColor: '#fff',
     padding: spacing.md,
-    borderRadius: 12,
+    borderRadius: borderRadius.md,
     borderLeftWidth: 4,
     borderLeftColor: colors.warning,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   tipText: {
-    marginLeft: spacing.sm,
+    marginLeft: spacing.md,
     flex: 1,
     fontSize: 13,
     color: colors.text,
     lineHeight: 20,
+    fontWeight: '500',
   },
-  resetInfo: {
+  resetInfoCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.md,
-    marginTop: spacing.md,
     backgroundColor: '#fff',
-    borderRadius: 12,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginTop: spacing.lg,
   },
-  resetText: {
-    marginLeft: spacing.xs,
+  resetInfoText: {
+    marginLeft: spacing.sm,
     fontSize: 12,
     color: colors.textSecondary,
+    fontWeight: '500',
   },
 });

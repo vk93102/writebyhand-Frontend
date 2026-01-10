@@ -143,10 +143,12 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Only check health once on app start, not continuously
     checkApiHealth();
-    const interval = setInterval(checkApiHealth, 15000);
     loadUserCoins();
-    return () => clearInterval(interval);
+    // Remove the interval to reduce backend load
+    // const interval = setInterval(checkApiHealth, 15000);
+    // return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -224,7 +226,8 @@ export default function App() {
     setResults(null);
 
     try {
-      const response = await solveQuestionByImage(imageUri, 5);
+      // solveQuestionByImage now takes only imageUri parameter (no maxResults)
+      const response = await solveQuestionByImage(imageUri);
       setResults(response);
       setLoading(false);
     } catch (error: any) {
@@ -284,7 +287,7 @@ export default function App() {
     }
   };
 
-  const handleGenerateFlashcards = async (topic: string, numCards: number = 10) => {
+  const handleGenerateFlashcards = async (topic: string, numCards: number = 5) => {
     if (!topic.trim()) {
       Alert.alert('Error', 'Please enter a topic');
       return;
@@ -294,7 +297,8 @@ export default function App() {
     setFlashcardData(null);
 
     try {
-      const response = await generateFlashcards(topic, numCards);
+      // Use default language (english) and difficulty (medium) from API
+      const response = await generateFlashcards(topic, numCards, 'english', 'medium');
       setFlashcardData(response);
       setFlashcardLoading(false);
     } catch (error: any) {
@@ -316,14 +320,10 @@ export default function App() {
     setFlashcardData(null);
 
     try {
-      const document = {
-        uri: imageUri,
-        mimeType: 'image/jpeg',
-        name: 'image_upload.jpg',
-      } as any;
-
-      const response = await generateFlashcards('', 10, document);
-      setFlashcardData(response);
+      // Note: Backend currently uses POST /flashcards/generate/ with topic parameter
+      // Image processing would require document upload endpoint if supported
+      // For now, generate flashcards from a descriptive topic instead
+      Alert.alert('Info', 'Please use text input to generate flashcards. Document upload feature coming soon.');
       setFlashcardLoading(false);
     } catch (error: any) {
       const status = error.response?.status;
@@ -339,7 +339,7 @@ export default function App() {
     }
   };
 
-  const handleGenerateFlashcardsFromFile = async (files: any[], numCards: number = 10) => {
+  const handleGenerateFlashcardsFromFile = async (files: any[], numCards: number = 5) => {
     if (!files || files.length === 0) {
       Alert.alert('Error', 'Please select a file');
       return;
@@ -349,9 +349,9 @@ export default function App() {
     setFlashcardData(null);
 
     try {
-      // Use first file for now (backend supports single file)
-      const response = await generateFlashcards('', numCards, files[0]);
-      setFlashcardData(response);
+      // Note: Backend currently uses POST /flashcards/generate/ with topic parameter
+      // Document/File upload feature would require separate endpoint if supported
+      Alert.alert('Info', 'Please use text input to generate flashcards. Document upload feature coming soon.');
       setFlashcardLoading(false);
     } catch (error: any) {
       const status = error.response?.status;
@@ -413,17 +413,21 @@ export default function App() {
     }
   };
 
-  const handleGeneratePredictedQuestions = async (topic: string, examType: string = 'General') => {
+  const handleGeneratePredictedQuestions = async (topic: string, examType: string = 'medium') => {
     if (!topic.trim()) {
       Alert.alert('Error', 'Please enter a topic or subject');
       return;
     }
 
+    // Get userId from user state
+    const userId = user?.id || 'guest_user';
+
     setPredictedQuestionsLoading(true);
     setPredictedQuestionsData(null);
 
     try {
-      const response = await generatePredictedQuestions(topic, examType, 5);
+      // Updated API: generatePredictedQuestions(topic, userId, difficulty, numQuestions)
+      const response = await generatePredictedQuestions(topic, userId, examType, 3);
       setPredictedQuestionsData(response);
       setPredictedQuestionsLoading(false);
     } catch (error: any) {
@@ -436,19 +440,12 @@ export default function App() {
   };
 
   const handleGeneratePredictedQuestionsFromImage = async (imageUri: string) => {
-    // Send image as document to the backend which will use OCR to extract text
+    // Backend API requires topic parameter - prompt user or use default
     setPredictedQuestionsLoading(true);
     setPredictedQuestionsData(null);
 
     try {
-      const document = {
-        uri: imageUri,
-        mimeType: 'image/jpeg',
-        name: 'image_upload.jpg',
-      } as any;
-
-      const response = await generatePredictedQuestions(undefined, 'General', 5, document);
-      setPredictedQuestionsData(response);
+      Alert.alert('Info', 'Please use text input to generate predicted questions. Document/image processing coming soon.');
       setPredictedQuestionsLoading(false);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to generate predicted questions from image');
@@ -456,7 +453,7 @@ export default function App() {
     }
   };
 
-  const handleGeneratePredictedQuestionsFromFile = async (files: any[], examType: string = 'General') => {
+  const handleGeneratePredictedQuestionsFromFile = async (files: any[], examType: string = 'medium') => {
     if (!files || files.length === 0) {
       Alert.alert('Error', 'Please select a file');
       return;
@@ -466,8 +463,7 @@ export default function App() {
     setPredictedQuestionsData(null);
 
     try {
-      const response = await generatePredictedQuestions(undefined, examType, 5, files[0]);
-      setPredictedQuestionsData(response);
+      Alert.alert('Info', 'Please use text input to generate predicted questions. Document/file processing coming soon.');
       setPredictedQuestionsLoading(false);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to generate predicted questions from file');
@@ -1213,18 +1209,10 @@ export default function App() {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-        {showLanding ? (
-          <LandingPage 
-            onGetStarted={() => setShowLanding(false)}
-            onLogin={() => setShowLanding(false)}
-            onGuestLogin={handleGuestLogin}
-          />
-        ) : (
           <AuthScreenNew 
             onAuthSuccess={handleAuthSuccess}
             onGuestLogin={handleGuestLogin}
           />
-        )}
       </SafeAreaView>
     );
   }

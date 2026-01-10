@@ -2,32 +2,22 @@ import axios from 'axios';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Dynamic API URL based on platform
-const getApiUrl = () => {
-  if (Platform.OS === 'android') {
-    // Android uses the production backend
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
-  } else if (Platform.OS === 'ios') {
-    // iOS uses the production backend
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
-  } else {
-    // Web or other platforms - use production backend
-    return 'https://ed-tech-backend-tzn8.onrender.com/api';
-  }
-};
+// ==================== API CONFIGURATION ====================
 
-const API_URL = getApiUrl();
+const PRODUCTION_API_URL = 'https://ed-tech-backend-tzn8.onrender.com/api';
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: PRODUCTION_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 60000, // 30 second timeout
+  timeout: 60000,
 });
 
-// Auth token management (persist in AsyncStorage)
+// ==================== AUTH TOKEN MANAGEMENT ====================
+
 const AUTH_TOKEN_KEY = 'AUTH_TOKEN';
+const USER_ID_KEY = 'USER_ID';
 
 export const setAuthToken = async (token: string | null) => {
   try {
@@ -39,7 +29,6 @@ export const setAuthToken = async (token: string | null) => {
       delete api.defaults.headers.common['Authorization'];
     }
   } catch (e) {
-    // ignore storage errors for now
     console.warn('Failed to persist auth token', e);
   }
 };
@@ -52,54 +41,149 @@ export const getAuthToken = async (): Promise<string | null> => {
   }
 };
 
-// Initialize token from storage
+// Store and retrieve user ID for API calls
+export const setUserId = async (userId: string | null) => {
+  try {
+    if (userId) {
+      await AsyncStorage.setItem(USER_ID_KEY, userId);
+      api.defaults.headers.common['X-User-ID'] = userId;
+    } else {
+      await AsyncStorage.removeItem(USER_ID_KEY);
+      delete api.defaults.headers.common['X-User-ID'];
+    }
+  } catch (e) {
+    console.warn('Failed to persist user ID', e);
+  }
+};
+
+export const getUserId = async (): Promise<string | null> => {
+  try {
+    return await AsyncStorage.getItem(USER_ID_KEY);
+  } catch (e) {
+    return null;
+  }
+};
+
+// Initialize tokens and user ID from storage
 (async () => {
-  const t = await getAuthToken();
-  if (t) api.defaults.headers.common['Authorization'] = `Bearer ${t}`;
+  const token = await getAuthToken();
+  const userId = await getUserId();
+  
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  if (userId) {
+    api.defaults.headers.common['X-User-ID'] = userId;
+  }
 })();
 
-// Response interceptor to handle 401 globally (optional)
+// ==================== REQUEST INTERCEPTOR ====================
+
+// Add user ID header to every request if available
+api.interceptors.request.use(
+  async (config) => {
+    try {
+      const userId = await getUserId();
+      if (userId && !config.headers['X-User-ID']) {
+        config.headers['X-User-ID'] = userId;
+      }
+    } catch (e) {
+      console.warn('Failed to add user ID to request', e);
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ==================== RESPONSE INTERCEPTOR ====================
+
+// Handle authentication errors and server responses
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err?.response?.status === 401) {
-      // token invalid or expired - clear stored token
+      // Token expired or invalid - clear credentials
       setAuthToken(null);
+      setUserId(null);
+    }
+    // Log API errors for debugging (remove in production if verbose)
+    if (err?.response?.status >= 500) {
+      console.error('Server error:', err?.response?.data || err.message);
     }
     return Promise.reject(err);
   }
 );
 
+// ==================== QUESTION SOLVING APIs ====================
+
 /**
  * Solve question using text input
- * @param text - The question text
- * @param maxResults - Number of search results (default: 5)
+ * Production-ready with proper error handling
+ * 
+ * API: POST /solve/
+ * Headers: X-User-ID: {userId}, Content-Type: application/json
+ * Body: { text: "question text" }
+ * 
+ * @param text - The question text to solve
+ * @returns API response with solution
  */
-export const solveQuestionByText = async (text: string, maxResults: number = 5) => {
+export const solveQuestionByText = async (text: string): Promise<any> => {
   try {
+    if (!text || text.trim().length === 0) {
+      throw new Error('Question text cannot be empty');
+    }
+
+    // Production-level request with exact API format
     const response = await api.post('/solve/', {
-      text: text,
-      max_results: maxResults,
+      text: text.trim(),
     });
+
+    if (!response.data) {
+      throw new Error('No response received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to solve question');
+    // Production-level error handling
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to solve question';
+    
+    console.error('solveQuestionByText error:', {
+      status: error.response?.status,
+      message: errorMessage,
+      data: error.response?.data,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
 /**
  * Solve question using image upload
+ * Production-ready with platform-specific handling
+ * 
+ * API: POST /solve/ with multipart/form-data
+ * Headers: X-User-ID: {userId}, Content-Type: multipart/form-data
+ * Body: FormData with image file
+ * 
  * @param imageUri - The local URI of the image
- * @param maxResults - Number of search results (default: 5)
+ * @returns API response with solution from image
  */
-export const solveQuestionByImage = async (imageUri: string, maxResults: number = 5) => {
+export const solveQuestionByImage = async (imageUri: string): Promise<any> => {
   try {
+    if (!imageUri || imageUri.trim().length === 0) {
+      throw new Error('Image URI cannot be empty');
+    }
+
     const formData = new FormData();
-    
     let imageFile: any;
-    
+
+    // Platform-specific image handling
     if (Platform.OS === 'web') {
-      // For web, handle data URLs
+      // Web: Handle data URLs and blob URLs
       if (imageUri.startsWith('data:')) {
         // Convert data URL to blob
         const arr = imageUri.split(',');
@@ -114,32 +198,50 @@ export const solveQuestionByImage = async (imageUri: string, maxResults: number 
         const blob = new Blob([u8arr], { type: mime });
         imageFile = new File([blob], 'question.jpg', { type: mime });
       } else {
-        // For blob URLs, fetch the blob
+        // Handle blob/regular URLs
         const response = await fetch(imageUri);
         const blob = await response.blob();
         imageFile = new File([blob], 'question.jpg', { type: 'image/jpeg' });
       }
     } else {
-      // For mobile, use the uri directly
+      // Mobile: Use URI directly (React Native handles it)
       imageFile = {
         uri: imageUri,
         type: 'image/jpeg',
         name: 'question.jpg',
       } as any;
     }
-    
+
+    // Append image to form data with exact API format
     formData.append('image', imageFile);
-    formData.append('max_results', maxResults.toString());
-    
+
+    // Production-level multipart request
     const response = await api.post('/solve/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    
+
+    if (!response.data) {
+      throw new Error('No response received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to process image');
+    // Production-level error handling
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to process image';
+
+    console.error('solveQuestionByImage error:', {
+      status: error.response?.status,
+      message: errorMessage,
+      data: error.response?.data,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
@@ -200,52 +302,74 @@ export const generateQuiz = async (
 };
 
 /**
- * Generate flashcards from topic or document
- * @param topic - The topic or text content
- * @param numCards - Number of flashcards to generate (default: 10)
- * @param document - Optional document file
+ * Generate flashcards from topic with language and difficulty options
+ * Production-ready API endpoint matching backend specification
+ * 
+ * API: POST /flashcards/generate/
+ * Headers: X-User-ID (auto-injected), Content-Type: application/json
+ * Body: { topic, num_cards, language, difficulty }
+ * 
+ * @param topic - The topic or subject for flashcards (e.g., "World History", "Biology Cells")
+ * @param numCards - Number of flashcards to generate (default: 5, range: 1-20)
+ * @param language - Language for flashcards (default: "english", options: "english", "hindi")
+ * @param difficulty - Difficulty level (default: "medium", options: "easy", "medium", "hard")
+ * @returns API response with generated flashcards data
  */
 export const generateFlashcards = async (
   topic: string, 
-  numCards: number = 10,
-  document?: any
-) => {
+  numCards: number = 5,
+  language: string = 'english',
+  difficulty: string = 'medium'
+): Promise<any> => {
   try {
-    const formData = new FormData();
-    
-    if (document) {
-      // For web, document might already be a File object
-      if (Platform.OS === 'web' && document.file) {
-        formData.append('document', document.file);
-      } else if (Platform.OS === 'web' && document instanceof File) {
-        formData.append('document', document);
-      } else {
-        // For mobile platforms
-        const documentFile = {
-          uri: document.uri,
-          type: document.mimeType || document.type || 'application/octet-stream',
-          name: document.name || 'document',
-        } as any;
-        formData.append('document', documentFile);
-      }
+    if (!topic || topic.trim().length === 0) {
+      throw new Error('Topic cannot be empty');
     }
+
+    // Validate parameters
+    const validLanguages = ['english', 'hindi'];
+    const validDifficulties = ['easy', 'medium', 'hard'];
     
-    // Always append topic (can be empty string if document is provided)
-    if (topic) {
-      formData.append('topic', topic);
+    if (!validLanguages.includes(language)) {
+      language = 'english';
     }
-    
-    formData.append('num_cards', numCards.toString());
-    
-    const response = await api.post('/flashcards/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    
+    if (!validDifficulties.includes(difficulty)) {
+      difficulty = 'medium';
+    }
+
+    // Ensure numCards is within valid range
+    const validNumCards = Math.min(Math.max(numCards, 1), 20);
+
+    // Production-level request matching backend API format exactly
+    const payload = {
+      topic: topic.trim(),
+      num_cards: validNumCards,
+      language: language.toLowerCase(),
+      difficulty: difficulty.toLowerCase(),
+    };
+
+    const response = await api.post('/flashcards/generate/', payload);
+
+    if (!response.data) {
+      throw new Error('No response received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate flashcards');
+    // Production-level error handling
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to generate flashcards';
+
+    console.error('generateFlashcards error:', {
+      status: error.response?.status,
+      message: errorMessage,
+      data: error.response?.data,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
@@ -297,20 +421,58 @@ export const generateStudyMaterial = async (
 
 /**
  * Summarize YouTube video
- * @param videoUrl - YouTube video URL
+ * Production-ready API endpoint matching backend specification
+ * 
+ * API: POST /youtube/summarize/
+ * Headers: X-User-ID (auto-injected), Content-Type: application/json
+ * Body: { video_url }
+ * Response: { metadata: {...}, summary: string, sections: array }
+ * 
+ * @param videoUrl - YouTube video URL (must be valid YouTube URL)
  * @param useDemo - Use demo mode for testing UI (optional)
+ * @returns Video summary data with metadata and sections
  */
-export const summarizeYouTubeVideo = async (videoUrl: string, useDemo: boolean = false) => {
+export const summarizeYouTubeVideo = async (videoUrl: string, useDemo: boolean = false): Promise<any> => {
   try {
+    if (!videoUrl || videoUrl.trim().length === 0) {
+      throw new Error('Video URL cannot be empty');
+    }
+
+    // Validate YouTube URL format
+    const youtubeUrlPattern = /^(https?:\/\/)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)\//i;
+    if (!youtubeUrlPattern.test(videoUrl)) {
+      throw new Error('Invalid YouTube URL format');
+    }
+
+    // Production-level request matching backend API format
+    const payload = {
+      video_url: videoUrl.trim(),
+    };
+
     const url = useDemo ? '/youtube/summarize/?demo=true' : '/youtube/summarize/';
-    const response = await api.post(url, {
-      video_url: videoUrl,
-    }, {
-      timeout: 60000, // 60 seconds for real video processing
+    const response = await api.post(url, payload, {
+      timeout: 60000, // 60 seconds for video processing
     });
+
+    if (!response.data) {
+      throw new Error('No response received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to summarize video');
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to summarize video';
+
+    console.error('summarizeYouTubeVideo error:', {
+      status: error.response?.status,
+      message: errorMessage,
+      data: error.response?.data,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
@@ -333,49 +495,77 @@ export const checkYouTubeHealth = async () => {
  * @param numQuestions - Number of questions (default: 5)
  * @param document - Optional document file
  */
+/**
+ * Generate predicted exam questions using AI
+ * Production-ready API endpoint matching backend specification
+ * 
+ * API: POST /predicted-questions/generate/
+ * Headers: X-User-ID (auto-injected), Content-Type: application/json
+ * Body: { topic, user_id, difficulty, num_questions }
+ * Response: { data: { questions: [], confidence_score: float } }
+ * 
+ * @param topic - Subject/topic for question generation (e.g., "Science", "Math")
+ * @param userId - User identifier for tracking
+ * @param difficulty - Question difficulty level (default: "medium", options: "easy", "medium", "hard")
+ * @param numQuestions - Number of questions to generate (default: 3, range: 1-10)
+ * @returns API response with predicted questions and confidence score
+ */
 export const generatePredictedQuestions = async (
-  topic?: string,
-  examType: string = 'General',
-  numQuestions: number = 5,
-  document?: any
-) => {
+  topic: string,
+  userId: string,
+  difficulty: string = 'medium',
+  numQuestions: number = 3
+): Promise<any> => {
   try {
-    const formData = new FormData();
-    
-    if (document) {
-      // For web, document might already be a File object
-      if (Platform.OS === 'web' && document.file) {
-        formData.append('document', document.file);
-      } else if (Platform.OS === 'web' && document instanceof File) {
-        formData.append('document', document);
-      } else {
-        // For mobile platforms
-        const documentFile = {
-          uri: document.uri,
-          type: document.mimeType || document.type || 'application/octet-stream',
-          name: document.name || 'document',
-        } as any;
-        formData.append('document', documentFile);
-      }
-    } else if (topic) {
-      formData.append('topic', topic);
-    } else {
-      throw new Error('Please provide either a topic or document');
+    if (!topic || topic.trim().length === 0) {
+      throw new Error('Topic cannot be empty');
     }
-    
-    formData.append('exam_type', examType);
-    formData.append('num_questions', numQuestions.toString());
-    
-    const response = await api.post('/predicted-questions/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 60000, // 60 seconds for AI generation
+
+    if (!userId || userId.trim().length === 0) {
+      throw new Error('User ID cannot be empty');
+    }
+
+    // Validate difficulty
+    const validDifficulties = ['easy', 'medium', 'hard'];
+    if (!validDifficulties.includes(difficulty)) {
+      difficulty = 'medium';
+    }
+
+    // Ensure numQuestions is within valid range
+    const validNumQuestions = Math.min(Math.max(numQuestions, 1), 10);
+
+    // Production-level request matching backend API format exactly
+    const payload = {
+      topic: topic.trim(),
+      user_id: userId.trim(),
+      difficulty: difficulty.toLowerCase(),
+      num_questions: validNumQuestions,
+    };
+
+    const response = await api.post('/predicted-questions/generate/', payload, {
+      timeout: 45000, // 45 seconds for AI generation
     });
-    
+
+    if (!response.data) {
+      throw new Error('No response received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate predicted questions');
+    // Production-level error handling
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to generate predicted questions';
+
+    console.error('generatePredictedQuestions error:', {
+      status: error.response?.status,
+      message: errorMessage,
+      data: error.response?.data,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
@@ -388,17 +578,54 @@ export const generatePredictedQuestions = async (
  */
 
 /**
- * Get today's Play & Win
- * @param userId - User identifier
+ * Daily Quiz APIs - Play & Win Feature
  */
-export const getDailyQuiz = async (userId: string) => {
+
+/**
+ * Get today's daily quiz
+ * Production-ready API endpoint matching backend specification
+ * 
+ * API: GET /daily-quiz/?language={language}&user_id={user_id}
+ * Headers: X-User-ID (auto-injected)
+ * Query Params: language, user_id
+ * Response: { quiz_id, questions: [], ... }
+ * 
+ * @param language - Quiz language (default: "english", options: "english", "hindi")
+ * @param userId - User identifier
+ * @returns Quiz data with questions
+ */
+export const getDailyQuiz = async (language: string = 'english', userId?: string): Promise<any> => {
   try {
+    const validLanguages = ['english', 'hindi'];
+    if (!validLanguages.includes(language)) {
+      language = 'english';
+    }
+
     const response = await api.get('/daily-quiz/', {
-      params: { user_id: userId }
+      params: { 
+        language: language.toLowerCase(),
+        ...(userId && { user_id: userId })
+      }
     });
+
+    if (!response.data) {
+      throw new Error('No quiz data received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to get Play & Win');
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to get daily quiz';
+
+    console.error('getDailyQuiz error:', {
+      status: error.response?.status,
+      message: errorMessage,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
@@ -492,62 +719,165 @@ export const startDailyQuiz = async (userId: string, quizId: string) => {
 };
 
 /**
- * Submit Play & Win answers
+ * Submit daily quiz answers
+ * Production-ready API endpoint matching backend specification
+ * 
+ * API: POST /daily-quiz/submit/
+ * Headers: X-User-ID (auto-injected), Content-Type: application/json
+ * Body: { user_id, quiz_id, answers, time_taken_seconds }
+ * Response: { result: { coins_earned, score_percentage }, total_coins }
+ * 
  * @param userId - User identifier
- * @param quizId - Quiz ID
- * @param answers - User's answers {question_id: option_index} e.g. {"1": 0, "2": 2}
- * @param timeTaken - Time taken in seconds
+ * @param quizId - Quiz ID from getDailyQuiz
+ * @param answers - User's answers in format {question_id: option_index} e.g. {"1": 0, "2": 2}
+ * @param timeTakenSeconds - Time taken to complete quiz in seconds
+ * @returns Result data with coins earned and score
  */
 export const submitDailyQuiz = async (
   userId: string,
   quizId: string,
   answers: Record<string, number>,
-  timeTaken: number
-) => {
+  timeTakenSeconds: number
+): Promise<any> => {
   try {
-    console.log('Submitting quiz:', { userId, quizId, answers, timeTaken });
-    const response = await api.post('/daily-quiz/submit/', {
-      user_id: userId,
-      quiz_id: quizId,
+    if (!userId || userId.trim().length === 0) {
+      throw new Error('User ID cannot be empty');
+    }
+
+    if (!quizId || quizId.trim().length === 0) {
+      throw new Error('Quiz ID cannot be empty');
+    }
+
+    if (!answers || Object.keys(answers).length === 0) {
+      throw new Error('Answers cannot be empty');
+    }
+
+    if (!Number.isInteger(timeTakenSeconds) || timeTakenSeconds < 0) {
+      throw new Error('Time taken must be a positive integer');
+    }
+
+    // Production-level request matching backend API format exactly
+    const payload = {
+      user_id: userId.trim(),
+      quiz_id: quizId.trim(),
       answers: answers,
-      time_taken_seconds: timeTaken,
-    });
-    console.log('Submit response:', response.data);
+      time_taken_seconds: timeTakenSeconds,
+    };
+
+    const response = await api.post('/daily-quiz/submit/', payload);
+
+    if (!response.data) {
+      throw new Error('No response received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    console.error('Submit error:', error.response?.data || error.message);
-    throw new Error(error.response?.data?.error || error.message || 'Failed to submit quiz');
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to submit quiz';
+
+    console.error('submitDailyQuiz error:', {
+      status: error.response?.status,
+      message: errorMessage,
+      data: error.response?.data,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
 /**
- * Get user's coin balance and stats
+ * Get user's coin balance and transaction history
+ * Production-ready API endpoint matching backend specification
+ * 
+ * API: GET /daily-quiz/coins/?user_id={user_id}
+ * Headers: X-User-ID (auto-injected)
+ * Query Params: user_id
+ * Response: { total_coins, recent_transactions: [...] }
+ * 
  * @param userId - User identifier
+ * @returns User's coin balance and recent transactions
  */
-export const getUserCoins = async (userId: string) => {
+export const getUserCoins = async (userId: string): Promise<any> => {
   try {
+    if (!userId || userId.trim().length === 0) {
+      throw new Error('User ID cannot be empty');
+    }
+
     const response = await api.get('/daily-quiz/coins/', {
-      params: { user_id: userId }
+      params: { user_id: userId.trim() }
     });
+
+    if (!response.data) {
+      throw new Error('No coin data received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to get coins');
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to get coins';
+
+    console.error('getUserCoins error:', {
+      status: error.response?.status,
+      message: errorMessage,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
 /**
- * Get user's quiz history
+ * Get user's quiz history with attempt statistics
+ * Production-ready API endpoint matching backend specification
+ * 
+ * API: GET /daily-quiz/history/?user_id={user_id}&limit={limit}
+ * Headers: X-User-ID (auto-injected)
+ * Query Params: user_id, limit
+ * Response: { history: [...], stats: { total_attempts, average_score, total_coins_earned } }
+ * 
  * @param userId - User identifier
- * @param limit - Number of records to fetch
+ * @param limit - Maximum number of records to fetch (default: 5)
+ * @returns Quiz history with statistics
  */
-export const getQuizHistory = async (userId: string, limit: number = 30) => {
+export const getQuizHistory = async (userId: string, limit: number = 5): Promise<any> => {
   try {
+    if (!userId || userId.trim().length === 0) {
+      throw new Error('User ID cannot be empty');
+    }
+
+    // Ensure limit is within valid range
+    const validLimit = Math.min(Math.max(limit, 1), 100);
+
     const response = await api.get('/daily-quiz/history/', {
-      params: { user_id: userId, limit: limit }
+      params: { 
+        user_id: userId.trim(), 
+        limit: validLimit 
+      }
     });
+
+    if (!response.data) {
+      throw new Error('No history data received from server');
+    }
+
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to get quiz history');
+    const errorMessage = 
+      error.response?.data?.error || 
+      error.response?.data?.message ||
+      error.message || 
+      'Failed to get quiz history';
+
+    console.error('getQuizHistory error:', {
+      status: error.response?.status,
+      message: errorMessage,
+    });
+
+    throw new Error(errorMessage);
   }
 };
 
