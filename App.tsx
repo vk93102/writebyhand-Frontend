@@ -39,7 +39,7 @@ import { DailyQuizScreen } from './src/components/DailyQuizScreen';
 import { PairQuizContainer } from './src/components/pair-quiz';
 import { WithdrawalScreen } from './src/components/WithdrawalScreen';
 import { WithdrawalSuccessScreen } from './src/components/WithdrawalSuccessScreen';
-import { solveQuestionByText, solveQuestionByImage, checkHealth, generateQuiz, generateFlashcards, generateStudyMaterial, summarizeYouTubeVideo, generatePredictedQuestions } from './src/services/api';
+import { solveQuestionByText, solveQuestionByImage, checkHealth, generateQuiz, generateFlashcards, generateStudyMaterial, summarizeYouTubeVideo, generatePredictedQuestions, setUserId } from './src/services/api';
 import { generateMockTest } from './src/services/mockTestService';
 import { colors, spacing, borderRadius, typography, shadows } from './src/styles/theme';
 
@@ -113,8 +113,10 @@ export default function App() {
   } | null>(null);
 
   // Authentication Handlers
-  const handleAuthSuccess = (userInfo: User) => {
+  const handleAuthSuccess = async (userInfo: User) => {
     setUser(userInfo);
+    // Set user ID in API service to auto-inject X-User-ID header
+    await setUserId(userInfo.id);
     setAppScreen('main');
     setShowLanding(false);
     setCurrentPage('ask');

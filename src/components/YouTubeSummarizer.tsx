@@ -111,10 +111,6 @@ export const YouTubeSummarizer: React.FC<YouTubeSummarizerProps> = ({
             {/* Usage Indicator for Free Users */}
             {subscriptionStatus?.plan === 'free' && (
               <View style={styles.usageBanner}>
-                <View style={styles.usageHeader}>
-                  <MaterialIcons name="info-outline" size={20} color="#F59E0B" />
-                  <Text style={styles.usageTitle}>Free Plan Limits</Text>
-                </View>
                 <View style={styles.usageBar}>
                   <View style={styles.usageBarBackground}>
                     <View 
