@@ -20,9 +20,14 @@ const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
 /**
- * Google OAuth Authentication Service
+ * Email/Password Authentication Service - Production Ready
  */
 class AuthService {
+  private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+  private user: any = null;
+  private isInitialized: boolean = false;
+
   constructor() {
     this.accessToken = null;
     this.refreshToken = null;
@@ -33,7 +38,7 @@ class AuthService {
   /**
    * Initialize auth service - restore tokens from secure storage
    */
-  async initialize() {
+  async initialize(): Promise<boolean> {
     try {
       const accessToken = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
       const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
@@ -62,61 +67,35 @@ class AuthService {
   }
 
   /**
-   * Exchange Google authorization code for tokens
-   */
-  async googleSignIn(code) {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/auth/google/callback/`,
-        {
-          code: code,
-          provider: 'google',
-        }
-      );
-
-      if (response.data.success) {
-        await this.setTokens(response.data.tokens);
-        this.user = response.data.user;
-        return {
-          success: true,
-          user: response.data.user,
-          isNewUser: response.data.is_new_user,
-        };
-      }
-
-      return {
-        success: false,
-        error: response.data.error,
-      };
-    } catch (error) {
-      console.error('Google sign in error:', error);
-      return {
-        success: false,
-        error: error.response?.data?.error || 'Sign in failed',
-      };
-    }
-  }
-
-  /**
    * Email/Password signup
    */
-  async emailSignUp(name, email, password) {
+  async emailSignUp(name: string, email: string, password: string): Promise<any> {
     try {
+      console.log('[AuthService] POST /auth/signup/ - Signing up user:', { name, email });
       const response = await axios.post(
-        `${API_BASE_URL}/auth/signup/`,
+        `${API_BASE_URL}/auth/register/`,
         {
-          name: name,
-          email: email,
+          username: name.split(' ')[0],
+          email: email.toLowerCase().trim(),
           password: password,
+          full_name: name,
         }
       );
 
       if (response.data.success) {
-        await this.setTokens(response.data.tokens);
-        this.user = response.data.user;
+        const token = response.data.token || response.data.data?.token;
+        const userId = response.data.data?.user_id;
+        
+        await this.setTokens({ access_token: token, refresh_token: null });
+        this.user = response.data.user || response.data.data;
+        
+        if (userId) {
+          console.log('[AuthService] Signup successful, user ID:', userId);
+        }
+        
         return {
           success: true,
-          user: response.data.user,
+          user: this.user,
         };
       }
 
@@ -124,8 +103,12 @@ class AuthService {
         success: false,
         error: response.data.error,
       };
-    } catch (error) {
-      console.error('Email signup error:', error);
+    } catch (error: any) {
+      console.error('[AuthService] Signup error:', {
+        status: error.response?.status,
+        message: error.response?.data?.error,
+        endpoint: 'POST /auth/register/',
+      });
       return {
         success: false,
         error: error.response?.data?.error || 'Sign up failed',
@@ -136,22 +119,31 @@ class AuthService {
   /**
    * Email/Password login
    */
-  async emailLogin(email, password) {
+  async emailLogin(email: string, password: string): Promise<any> {
     try {
+      console.log('[AuthService] POST /auth/login/ - Logging in user:', { email });
       const response = await axios.post(
         `${API_BASE_URL}/auth/login/`,
         {
-          email: email,
+          email: email.toLowerCase().trim(),
           password: password,
         }
       );
 
       if (response.data.success) {
-        await this.setTokens(response.data.tokens);
-        this.user = response.data.user;
+        const token = response.data.token || response.data.data?.token;
+        const userId = response.data.data?.user_id;
+        
+        await this.setTokens({ access_token: token, refresh_token: null });
+        this.user = response.data.user || response.data.data;
+        
+        if (userId) {
+          console.log('[AuthService] Login successful, user ID:', userId);
+        }
+        
         return {
           success: true,
-          user: response.data.user,
+          user: this.user,
         };
       }
 
@@ -159,8 +151,12 @@ class AuthService {
         success: false,
         error: response.data.error,
       };
-    } catch (error) {
-      console.error('Email login error:', error);
+    } catch (error: any) {
+      console.error('[AuthService] Login error:', {
+        status: error.response?.status,
+        message: error.response?.data?.error,
+        endpoint: 'POST /auth/login/',
+      });
       return {
         success: false,
         error: error.response?.data?.error || 'Login failed',
@@ -171,7 +167,7 @@ class AuthService {
   /**
    * Store tokens in secure storage
    */
-  async setTokens(tokens) {
+  async setTokens(tokens: { access_token: string; refresh_token: string | null }): Promise<void> {
     try {
       this.accessToken = tokens.access_token;
       this.refreshToken = tokens.refresh_token;
@@ -188,7 +184,7 @@ class AuthService {
   /**
    * Refresh access token using refresh token
    */
-  async refreshAccessToken() {
+  async refreshAccessToken(): Promise<boolean> {
     try {
       if (!this.refreshToken) {
         return false;
@@ -218,7 +214,7 @@ class AuthService {
   /**
    * Load user profile from backend
    */
-  async loadUserProfile() {
+  async loadUserProfile(): Promise<boolean> {
     try {
       if (!this.accessToken) {
         return false;
@@ -248,9 +244,9 @@ class AuthService {
   /**
    * Check if JWT token is expired
    */
-  isTokenExpired(token) {
+  isTokenExpired(token: string): boolean {
     try {
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode<{ exp: number }>(token);
       const expirationTime = decoded.exp * 1000; // Convert to milliseconds
       return Date.now() >= expirationTime;
     } catch (error) {
@@ -262,7 +258,7 @@ class AuthService {
   /**
    * Logout user
    */
-  async logout() {
+  async logout(): Promise<boolean> {
     try {
       // Call logout endpoint if needed
       if (this.accessToken) {
@@ -300,21 +296,21 @@ class AuthService {
   /**
    * Get current user
    */
-  getCurrentUser() {
+  getCurrentUser(): any {
     return this.user;
   }
 
   /**
    * Check if user is authenticated
    */
-  isAuthenticated() {
+  isAuthenticated(): boolean {
     return this.accessToken !== null && this.user !== null;
   }
 
   /**
    * Get authorization header for API requests
    */
-  getAuthHeader() {
+  getAuthHeader(): { Authorization?: string } {
     if (this.accessToken) {
       return {
         'Authorization': `Bearer ${this.accessToken}`,
@@ -326,11 +322,11 @@ class AuthService {
   /**
    * Setup axios interceptor for automatic token refresh
    */
-  setupAxiosInterceptor() {
+  setupAxiosInterceptor(): void {
     axios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const originalRequest = error.config;
+        const originalRequest = error.config as any;
 
         // If 401 and not already retried, try to refresh token
         if (
@@ -360,27 +356,20 @@ class AuthService {
 export const authService = new AuthService();
 
 /**
- * API functions for authentication
+ * API functions for authentication - Production Ready
  */
 export const googleAuthAPI = {
   /**
-   * Sign in with Google
-   */
-  async signInWithGoogle(code) {
-    return authService.googleSignIn(code);
-  },
-
-  /**
    * Email signup
    */
-  async signUp(name, email, password) {
+  async signUp(name: string, email: string, password: string) {
     return authService.emailSignUp(name, email, password);
   },
 
   /**
    * Email login
    */
-  async login(email, password) {
+  async login(email: string, password: string) {
     return authService.emailLogin(email, password);
   },
 

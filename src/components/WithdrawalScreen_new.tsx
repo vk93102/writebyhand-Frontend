@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Image,
   Platform,
   Linking,
   Animated,
@@ -198,16 +199,19 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
         ),
       ]).start();
 
-      // Prepare withdrawal request parameters
-      const response = await requestCoinWithdrawal(
-        userId,
-        coins,
-        payoutMethod,
-        accountHolderName,
-        payoutMethod === 'upi' ? upiId : undefined,
-        payoutMethod === 'bank' ? accountNumber : undefined,
-        payoutMethod === 'bank' ? ifscCode : undefined
-      );
+      // Prepare withdrawal request
+      const withdrawalData = {
+        email: emailInput,
+        coins_to_withdraw: coins,
+        account_holder_name: accountHolderName,
+        payout_method: payoutMethod,
+        ...(payoutMethod === 'upi' ? { upi_id: upiId } : {
+          account_number: accountNumber,
+          ifsc_code: ifscCode,
+        }),
+      };
+
+      const response = await requestCoinWithdrawal(userId, withdrawalData);
 
       const {
         withdrawal_id: withdrawalId,
@@ -264,6 +268,17 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
     <View style={styles.container}>
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.mainContainer}>
+          {/* Left Side - Security Illustration */}
+          <View style={styles.leftSide}>
+            <View style={styles.imageContainer}>
+              <Image
+                source={require('../../assets/signin.png')}
+                style={styles.securityImage}
+                resizeMode="contain"
+              />
+            </View>
+          </View>
+
           {/* Right Side - Withdrawal Form */}
           <View style={styles.rightSide}>
             <View style={styles.formContainer}>
@@ -499,21 +514,37 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background,
   },
   scrollContainer: {
     flex: 1,
   },
   mainContainer: {
-    flexDirection: 'column',
+    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    flex: 1,
+    minHeight: Platform.OS === 'web' ? 'auto' : '100%',
+  },
+  leftSide: {
+    flex: Platform.OS === 'web' ? 1 : 0,
+    backgroundColor: '#F0F4FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: Platform.OS === 'web' ? 0 : spacing.xl,
+    display: Platform.OS === 'web' ? 'flex' : 'none',
+  },
+  imageContainer: {
     width: '100%',
+    height: Platform.OS === 'web' ? Dimensions.get('window').height * 0.8 : 250,
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+  },
+  securityImage: {
+    width: '100%',
+    height: '100%',
   },
   rightSide: {
-    width: '100%',
-    maxWidth: 600,
-    alignSelf: 'center',
+    flex: Platform.OS === 'web' ? 1 : 1,
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
@@ -541,7 +572,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   balanceCardForm: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#F0F4FF',
     padding: spacing.lg,
     borderRadius: borderRadius.lg,
     borderLeftWidth: 4,
@@ -614,7 +645,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.background,
   },
   methodButtonActive: {
     backgroundColor: colors.primary,
@@ -685,7 +716,7 @@ const styles = StyleSheet.create({
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEE2E2',
+    backgroundColor: colors.errorLight,
     padding: spacing.md,
     borderRadius: borderRadius.md,
     marginBottom: spacing.md,

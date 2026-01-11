@@ -56,7 +56,7 @@ export const YouTubeSummarizer: React.FC<YouTubeSummarizerProps> = ({
 
   const loadSubscriptionStatus = async () => {
     try {
-      const response = await fetch(`https://localhost:8000/api/subscription/status/?user_id=${userId}`);
+      const response = await fetch(`https://ed-tech-backend-tzn8.onrender.com/api/subscription/status/?user_id=${userId}`);
       const data = await response.json();
       if (data.success) {
         setSubscriptionStatus(data);

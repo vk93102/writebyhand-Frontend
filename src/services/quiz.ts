@@ -22,19 +22,23 @@ export const generateQuiz = async (
   difficulty: 'easy' | 'medium' | 'hard' = 'medium'
 ) => {
   try {
-    console.log('[Quiz Service] generateQuiz called with:', { topic, numQuestions, difficulty });
+    console.log('[Quiz Service] generateQuiz endpoint called with:', { topic, num_questions: numQuestions, difficulty: difficulty.toLowerCase() });
     
     // Create axios instance with extended timeout for this specific call
     const axiosInstance = api;
     axiosInstance.defaults.timeout = 120000; // 2 minutes for AI processing
     
-    const response = await axiosInstance.post('/quiz/generate/', {
+    const payload = {
       topic,
       num_questions: numQuestions,
       difficulty: difficulty.toLowerCase(),
-    });
+    };
+    
+    console.log('[Quiz Service] POST /api/quiz/generate/ - Payload:', payload);
+    const response = await axiosInstance.post('/api/quiz/generate/', payload);
 
-    console.log('[Quiz Service] generateQuiz response:', response.data);
+    console.log('[Quiz Service] generateQuiz response status:', response.status);
+    console.log('[Quiz Service] generateQuiz response data:', response.data);
 
     return {
       success: true,
@@ -42,12 +46,13 @@ export const generateQuiz = async (
       questions: response.data.questions,
     };
   } catch (error: any) {
-    console.error('[Quiz Service] generateQuiz error:', error.message, error.response?.data);
-    return {
-      success: false,
-      error: error.response?.data?.error || error.message,
-      details: error.response?.data?.details,
-    };
+    console.error('[Quiz Service] generateQuiz error:', {
+      endpoint: 'POST /api/quiz/generate/',
+      status: error.response?.status,
+      message: error.message,
+      responseData: error.response?.data,
+    });
+    throw error; // Throw to let handler catch it with full error details
   }
 };
 

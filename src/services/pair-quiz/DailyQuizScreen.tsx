@@ -716,11 +716,6 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
               </View>
               <View style={styles.rewardRow}>
                 <MaterialIcons name="check-circle" size={24} color={colors.success} />
-                <Text style={styles.rewardText}>
-                  {language === 'hindi'
-                    ? `प्रति सही उत्तर +${quizData.coins?.per_correct_answer || 5} सिक्के`
-                    : `+${quizData.coins?.per_correct_answer || 5} coins per correct answer`}
-                </Text>
               </View>
             </View>
 

@@ -11,7 +11,7 @@ echo ""
 echo "1️⃣  Testing API Endpoint"
 echo "Run this command to test UPI withdrawal:"
 echo ""
-echo 'curl -X POST http://localhost:8000/api/razorpay/withdraw/ \'
+echo 'curl -X POST http://https://ed-tech-backend-tzn8.onrender.com/api/razorpay/withdraw/ \'
 echo '  -H "Content-Type: application/json" \'
 echo '  -d '"'"'{"user_id": "test_user_123", "amount": 50, "upi_id": "user@ybl"}'"'"
 echo ""
@@ -150,7 +150,7 @@ echo ""
 echo "9️⃣  Environment Setup"
 echo ""
 echo "For localhost development:"
-echo "  API_BASE_URL=http://localhost:8000/api"
+echo "  API_BASE_URL=http://https://ed-tech-backend-tzn8.onrender.com/api"
 echo ""
 echo "For production:"
 echo "  API_BASE_URL=https://api.yourdomain.com/api"

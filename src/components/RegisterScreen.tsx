@@ -256,17 +256,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
           </View>
 
           <TouchableOpacity style={styles.loginPrompt} onPress={onSwitchToLogin}>
-            <Text style={styles.loginText}>
-              Already have an account?{' '}
-              <Text style={styles.loginLink}>Sign In</Text>
-            </Text>
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            By signing up, you agree to our Terms of Service and Privacy Policy
-          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

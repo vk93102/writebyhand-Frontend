@@ -5,7 +5,7 @@ echo "Testing Razorpay Withdrawal Endpoint"
 echo "====================================="
 echo ""
 
-BASE_URL="http://localhost:8000/api"
+BASE_URL="http://https://ed-tech-backend-tzn8.onrender.com/api"
 
 # Test 1: UPI Withdrawal
 echo "Test 1: UPI Withdrawal"

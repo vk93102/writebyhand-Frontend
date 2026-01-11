@@ -386,7 +386,7 @@ export const PreviousYearPapers: React.FC = () => {
           <MaterialIcons name="search" size={20} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by paper code, topic, or subject..."
+            placeholder="Search by paper code, subject..."
             placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}

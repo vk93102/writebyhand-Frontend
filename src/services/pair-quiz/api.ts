@@ -442,34 +442,54 @@ export const loginUser = async (usernameOrEmail: string, password: string) => {
 
 export const requestPasswordReset = async (email: string) => {
   try {
+    console.log('[Auth] POST /auth/request-password-reset/ - Requesting password reset for:', email);
     const response = await api.post('/auth/request-password-reset/', {
       email: email.toLowerCase().trim(),
     });
+    console.log('[Auth] Password reset requested:', response.data);
     return response.data;
   } catch (error: any) {
+    console.error('[Auth] Password reset request error:', {
+      status: error.response?.status,
+      message: error.response?.data?.error,
+      endpoint: 'POST /api/auth/request-password-reset/',
+    });
     throw new Error(error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to request password reset');
   }
 };
 
 export const validateResetToken = async (token: string) => {
   try {
+    console.log('[Auth] POST /auth/validate-reset-token/ - Validating reset token');
     const response = await api.post('/auth/validate-reset-token/', {
       token: token.trim(),
     });
+    console.log('[Auth] Reset token valid:', response.data);
     return response.data;
   } catch (error: any) {
+    console.error('[Auth] Reset token validation error:', {
+      status: error.response?.status,
+      endpoint: 'POST /api/auth/validate-reset-token/',
+    });
     throw new Error(error.response?.data?.error || error.response?.data?.message || error.message || 'Invalid or expired reset token');
   }
 };
 
 export const resetPassword = async (token: string, newPassword: string) => {
   try {
+    console.log('[Auth] POST /auth/reset-password/ - Resetting password');
     const response = await api.post('/auth/reset-password/', {
       token: token.trim(),
       new_password: newPassword,
     });
+    console.log('[Auth] Password reset successful:', response.data);
     return response.data;
   } catch (error: any) {
+    console.error('[Auth] Password reset error:', {
+      status: error.response?.status,
+      message: error.response?.data?.error,
+      endpoint: 'POST /api/auth/reset-password/',
+    });
     throw new Error(error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to reset password');
   }
 };

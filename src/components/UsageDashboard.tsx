@@ -91,14 +91,27 @@ export const UsageDashboard: React.FC<UsageDashboardProps> = ({
           setDashboardData(formattedData as any);
           return;
         }
-      } catch (usageError) {
-        console.log('[UsageDashboard] Usage API not available, falling back to subscription service:', usageError);
+      } catch (usageError: any) {
+        console.log('[UsageDashboard] Usage API error:', usageError?.response?.status, usageError?.message);
       }
       
       // Fallback to subscription service if usage API fails
-      const dashboard = await subscriptionService.getDashboard();
-      setDashboardData(dashboard);
+      try {
+        const dashboard = await subscriptionService.getDashboard();
+        setDashboardData(dashboard);
+      } catch (subError: any) {
+        console.log('[UsageDashboard] Subscription service error:', subError?.message);
+        // If both fail and user is not authenticated, show limited dashboard
+        if (subError?.message?.includes('Unauthorized') || subError?.message?.includes('401')) {
+          console.log('[UsageDashboard] User not authenticated, showing limited view');
+          setDashboardData(null);
+          Alert.alert('Please Login', 'Please log in to view your usage dashboard and subscription details.');
+        } else {
+          Alert.alert('Error', subError?.message || 'Failed to load usage data');
+        }
+      }
     } catch (error: any) {
+      console.error('[UsageDashboard] Unexpected error:', error);
       Alert.alert('Error', error.message || 'Failed to load usage data');
     } finally {
       setLoading(false);

@@ -72,7 +72,7 @@ export const PredictedQuestions: React.FC<PredictedQuestionsProps> = ({ predicte
   if (loading) {
     // Use full-screen overlay loader for consistent behavior across screens
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+      <View style={styles.loadingContainer}>
         <LoadingWebm visible={true} />
       </View>
     );
@@ -912,6 +912,16 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
     overflow: 'hidden',
+  },
+
+  // Loading state container - centered full screen
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+    backgroundColor: colors.background,
+    minHeight: 400,
   },
 
   // Empty state with vertical layout

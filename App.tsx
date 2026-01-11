@@ -30,7 +30,6 @@ import { Pricing } from './src/components/Pricing';
 import { SubscriptionPricing } from './src/components/SubscriptionPricing';
 import { UsageDashboard } from './src/components/UsageDashboard';
 import { AuthScreen } from './src/components/AuthScreen';
-import { AuthScreenNew } from './src/components/AuthScreenNew';
 import { MainDashboard } from './src/components/MainDashboard';
 import { TrendAnalysis } from './src/components/TrendAnalysis';
 import { PreviousYearPapers } from './src/components/PreviousYearPapers';
@@ -39,7 +38,7 @@ import { DailyQuizScreen } from './src/components/DailyQuizScreen';
 import { PairQuizContainer } from './src/components/pair-quiz';
 import { WithdrawalScreen } from './src/components/WithdrawalScreen';
 import { WithdrawalSuccessScreen } from './src/components/WithdrawalSuccessScreen';
-import { solveQuestionByText, solveQuestionByImage, checkHealth, generateFlashcards, generateStudyMaterial, summarizeYouTubeVideo, generatePredictedQuestions, setUserId, checkFeatureUsage, recordFeatureUsage, getUsageDashboard } from './src/services/api';
+import { solveQuestionByText, solveQuestionByImage, checkHealth, generateFlashcards, generateStudyMaterial, summarizeYouTubeVideo, generatePredictedQuestions, setUserId, checkFeatureUsage, recordFeatureUsage, getUsageDashboard, generateFlashcardsFromImage, generateFlashcardsFromFile, generatePredictedQuestionsFromImage, generatePredictedQuestionsFromFile } from './src/services/api';
 import { generateMockTest } from './src/services/mockTestService';
 import { generateQuiz, createQuiz, getQuizQuestions, submitQuiz, getQuizResults } from './src/services/quiz';
 import { colors, spacing, borderRadius, typography, shadows } from './src/styles/theme';
@@ -261,27 +260,35 @@ export default function App() {
 
     try {
       // Check feature usage before generating
-      console.log('[Quiz] Checking feature usage...');
-      const usageCheck = await checkFeatureUsage('quiz');
+      console.log('[Quiz] Checking feature usage for:', topic);
+      let usageCheck: any = null;
       
-      if (!usageCheck.success || !usageCheck.allowed) {
+      try {
+        usageCheck = await checkFeatureUsage('quiz');
+        console.log('[Quiz] Usage check response:', usageCheck);
+      } catch (usageError: any) {
+        console.warn('[Quiz] Usage check failed (continuing anyway):', usageError.message);
+        // If usage check fails, continue anyway - it's not critical
+        usageCheck = { allowed: true };
+      }
+      
+      // Check if usage is allowed (handle both response formats)
+      if (usageCheck && (usageCheck.allowed === false || usageCheck.success === false)) {
         const message = usageCheck.error || 'You have reached your monthly limit for quizzes. Please upgrade to continue.';
         Alert.alert('Feature Limit Reached', message);
         setQuizLoading(false);
         return;
       }
 
-      console.log(`[Quiz] Feature usage allowed, generating quiz from topic: "${topic}" with ${numQuestions} questions, difficulty: ${difficulty}`);
+      console.log(`[Quiz] Feature usage allowed, calling endpoint: POST /api/quiz/generate/ with payload:`, { topic, num_questions: numQuestions, difficulty });
       
-      // Call the new quiz service
+      // Call the quiz service endpoint
       const response = await generateQuiz(topic, numQuestions, difficulty as 'easy' | 'medium' | 'hard');
       
-      console.log('[Quiz] API Response:', response);
+      console.log('[Quiz] API Response received:', response);
       
-      if (!response.success) {
-        Alert.alert('Error', response.error || 'Failed to generate quiz');
-        setQuizLoading(false);
-        return;
+      if (!response || !response.success) {
+        throw new Error((response as any)?.error || 'No response received from quiz generation');
       }
 
       // Extract quiz data from response
@@ -293,25 +300,39 @@ export default function App() {
         quiz_id: response.data?.quiz_id,
       };
 
-      console.log('[Quiz] Setting quiz data:', quizDataToSet);
+      console.log('[Quiz] Generated', quizDataToSet.questions.length, 'questions');
       
-      // Record feature usage after successful generation
+      // Record feature usage after successful generation (don't block on this)
       console.log('[Quiz] Recording feature usage...');
-      await recordFeatureUsage('quiz', topic.length, 'text', {
-        num_questions: numQuestions,
-        difficulty: difficulty,
-      });
+      try {
+        await recordFeatureUsage('quiz', topic.length, 'text', {
+          num_questions: numQuestions,
+          difficulty: difficulty,
+          question_count: quizDataToSet.questions.length,
+        });
+        console.log('[Quiz] Usage recorded successfully');
+      } catch (recordError) {
+        console.warn('[Quiz] Failed to record usage (non-critical):', recordError);
+      }
 
       setQuizData(quizDataToSet);
       setQuizLoading(false);
     } catch (error: any) {
-      console.error('[Quiz] Error generating quiz:', error);
+      console.error('[Quiz] Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        endpoint: 'POST /quiz/generate/',
+        stack: error.stack,
+      });
       const status = error.response?.status;
       const details = error.response?.data?.details || error.response?.data?.error;
       if (status === 429) {
         const retrySeconds = error.response?.headers?.['retry-after'];
         const msg = `AI quota exceeded. Please retry${retrySeconds ? ' after ' + retrySeconds + 's' : ''}.`;
         Alert.alert('Quota Exceeded', msg, details ? [{ text: 'Details', onPress: () => Alert.alert('Details', String(details)) }, { text: 'OK' }] : [{ text: 'OK' }]);
+      } else if (status === 401) {
+        Alert.alert('Unauthorized', 'Please login to generate quizzes');
       } else {
         Alert.alert('Error', error.message || 'Failed to generate quiz');
       }
@@ -445,32 +466,60 @@ export default function App() {
 
     try {
       // Check feature usage before generating
-      console.log('[Flashcards] Checking feature usage...');
-      const usageCheck = await checkFeatureUsage('flashcards');
+      console.log('[Flashcards] Checking feature usage for:', topic);
+      let usageCheck: any = null;
       
-      if (!usageCheck.success || !usageCheck.allowed) {
+      try {
+        usageCheck = await checkFeatureUsage('flashcards');
+        console.log('[Flashcards] Usage check response:', usageCheck);
+      } catch (usageError: any) {
+        console.warn('[Flashcards] Usage check failed (continuing anyway):', usageError.message);
+        // If usage check fails, continue anyway - it's not critical
+        usageCheck = { allowed: true };
+      }
+      
+      // Check if usage is allowed (handle both response formats)
+      if (usageCheck && (usageCheck.allowed === false || usageCheck.success === false)) {
         const message = usageCheck.error || 'You have reached your monthly limit for flashcards. Please upgrade to continue.';
         Alert.alert('Feature Limit Reached', message);
         setFlashcardLoading(false);
         return;
       }
 
-      console.log('[Flashcards] Feature usage allowed, generating flashcards...');
+      console.log(`[Flashcards] Feature usage allowed, calling endpoint: POST /api/flashcards/generate/ with payload:`, { topic, num_cards: numCards, language: 'english', difficulty: 'medium' });
 
       // Use default language (english) and difficulty (medium) from API
       const response = await generateFlashcards(topic, numCards, 'english', 'medium');
+      console.log('[Flashcards] API Response received:', response);
       
-      // Record feature usage after successful generation
-      console.log('[Flashcards] Recording feature usage...');
-      await recordFeatureUsage('flashcards', topic.length, 'text', {
-        num_cards: numCards,
-        language: 'english',
-        difficulty: 'medium',
-      });
+      if (!response) {
+        throw new Error('No response received from flashcard generation');
+      }
 
+      // Record feature usage after successful generation (don't block on this)
+      console.log('[Flashcards] Recording feature usage...');
+      try {
+        await recordFeatureUsage('flashcards', topic.length, 'text', {
+          num_cards: numCards,
+          language: 'english',
+          difficulty: 'medium',
+        });
+        console.log('[Flashcards] Usage recorded successfully');
+      } catch (recordError) {
+        console.warn('[Flashcards] Failed to record usage (non-critical):', recordError);
+      }
+
+      console.log('[Flashcards] Setting flashcard data with', response?.cards?.length || 0, 'cards');
       setFlashcardData(response);
       setFlashcardLoading(false);
     } catch (error: any) {
+      console.error('[Flashcards] Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        stack: error.stack,
+      });
+      
       const status = error.response?.status;
       const details = error.response?.data?.details || error.response?.data?.error;
       if (status === 429) {
@@ -489,12 +538,33 @@ export default function App() {
     setFlashcardData(null);
 
     try {
-      // Note: Backend currently uses POST /flashcards/generate/ with topic parameter
-      // Image processing would require document upload endpoint if supported
-      // For now, generate flashcards from a descriptive topic instead
-      Alert.alert('Info', 'Please use text input to generate flashcards. Document upload feature coming soon.');
+      // Check feature usage before generating
+      console.log('[Flashcards] Checking feature usage...');
+      const usageCheck = await checkFeatureUsage('flashcards');
+      
+      if (!usageCheck.success || !usageCheck.allowed) {
+        const message = usageCheck.error || 'You have reached your monthly limit for flashcards. Please upgrade to continue.';
+        Alert.alert('Feature Limit Reached', message);
+        setFlashcardLoading(false);
+        return;
+      }
+
+      console.log('[Flashcards] Feature usage allowed, processing image with OCR...');
+      
+      // Generate flashcards from image using OCR
+      const response = await generateFlashcardsFromImage(imageUri, 5, 'english', 'medium');
+      
+      // Record feature usage after successful generation
+      console.log('[Flashcards] Recording feature usage...');
+      await recordFeatureUsage('flashcards', 500, 'image', {
+        source: 'ocr_image',
+        ocr_confidence: response.ocrConfidence,
+      });
+
+      setFlashcardData(response);
       setFlashcardLoading(false);
     } catch (error: any) {
+      console.error('[Flashcards] Error generating from image:', error);
       const status = error.response?.status;
       const details = error.response?.data?.details || error.response?.data?.error;
       if (status === 429) {
@@ -518,17 +588,40 @@ export default function App() {
     setFlashcardData(null);
 
     try {
-      // Note: Backend currently uses POST /flashcards/generate/ with topic parameter
-      // Document/File upload feature would require separate endpoint if supported
-      Alert.alert('Info', 'Please use text input to generate flashcards. Document upload feature coming soon.');
+      console.log('[Flashcards] Starting file-based generation with', files.length, 'file(s)');
+      
+      // Check feature usage
+      const usageCheck = await checkFeatureUsage('flashcards');
+      if (!usageCheck.allowed) {
+        Alert.alert('Feature Limit Reached', usageCheck.error || 'You have reached the limit for generating flashcards');
+        setFlashcardLoading(false);
+        return;
+      }
+
+      // Process file through document endpoint
+      const response = await generateFlashcardsFromFile(files[0], numCards, 'english', 'medium');
+      
+      console.log('[Flashcards] File processing successful, cards generated:', response?.data?.length || 0);
+
+      // Record usage with document metadata
+      await recordFeatureUsage('flashcards', 500, 'file', {
+        source: response.source || 'document',
+        file_type: files[0]?.type || 'unknown',
+        card_count: response?.data?.length || numCards,
+      });
+
+      setFlashcardData(response);
       setFlashcardLoading(false);
     } catch (error: any) {
+      console.error('[Flashcards] Error generating from file:', error);
       const status = error.response?.status;
       const details = error.response?.data?.details || error.response?.data?.error;
       if (status === 429) {
         const retrySeconds = error.response?.headers?.['retry-after'];
         const msg = `AI quota exceeded. Please retry${retrySeconds ? ' after ' + retrySeconds + 's' : ''}.`;
         Alert.alert('Quota Exceeded', msg, details ? [{ text: 'Details', onPress: () => Alert.alert('Details', String(details)) }, { text: 'OK' }] : [{ text: 'OK' }]);
+      } else if (status === 401) {
+        Alert.alert('Unauthorized', 'Please login to generate flashcards from files');
       } else {
         Alert.alert('Error', error.message || 'Failed to generate flashcards from file');
       }
@@ -595,29 +688,98 @@ export default function App() {
     setPredictedQuestionsData(null);
 
     try {
-      // Updated API: generatePredictedQuestions(topic, userId, difficulty, numQuestions)
+      console.log('[PredictedQuestions] Starting text-based generation for topic:', topic);
+      
+      // Check feature usage before generating
+      const usageCheck = await checkFeatureUsage('predicted-questions');
+      if (!usageCheck.allowed) {
+        Alert.alert('Feature Limit Reached', usageCheck.error || 'You have reached the limit for generating predicted questions');
+        setPredictedQuestionsLoading(false);
+        return;
+      }
+
+      // Generate predicted questions
       const response = await generatePredictedQuestions(topic, userId, examType, 3);
+      console.log('[PredictedQuestions] Text-based generation successful, questions generated:', response?.data?.length || 0);
+      
+      // Record usage after successful generation
+      await recordFeatureUsage('predicted-questions', 500, 'text', {
+        source: 'text_input',
+        exam_type: examType,
+        question_count: response?.data?.length || 3,
+      });
+
       setPredictedQuestionsData(response);
       setPredictedQuestionsLoading(false);
     } catch (error: any) {
+      console.error('[PredictedQuestions] Error generating from text:', error);
       // Show backend details if available
+      const status = error.response?.status;
       const message = error.response?.data?.error || error.message || 'Failed to generate predicted questions';
       const details = error.response?.data?.details;
-      Alert.alert('Error', message, details ? [{ text: 'Details', onPress: () => Alert.alert('Details', String(details)) }, { text: 'OK' }] : [{ text: 'OK' }]);
+      
+      if (status === 429) {
+        const retrySeconds = error.response?.headers?.['retry-after'];
+        const msg = `AI quota exceeded. Please retry${retrySeconds ? ' after ' + retrySeconds + 's' : ''}.`;
+        Alert.alert('Quota Exceeded', msg, details ? [{ text: 'Details', onPress: () => Alert.alert('Details', String(details)) }, { text: 'OK' }] : [{ text: 'OK' }]);
+      } else if (status === 401) {
+        Alert.alert('Unauthorized', 'Please login to generate predicted questions');
+      } else {
+        Alert.alert('Error', message, details ? [{ text: 'Details', onPress: () => Alert.alert('Details', String(details)) }, { text: 'OK' }] : [{ text: 'OK' }]);
+      }
       setPredictedQuestionsLoading(false);
     }
   };
 
   const handleGeneratePredictedQuestionsFromImage = async (imageUri: string) => {
-    // Backend API requires topic parameter - prompt user or use default
+    if (!imageUri) {
+      Alert.alert('Error', 'Please select an image');
+      return;
+    }
+
     setPredictedQuestionsLoading(true);
     setPredictedQuestionsData(null);
 
     try {
-      Alert.alert('Info', 'Please use text input to generate predicted questions. Document/image processing coming soon.');
+      console.log('[PredictedQuestions] Starting image-based generation from:', imageUri.substring(0, 50) + '...');
+      
+      // Check feature usage
+      const usageCheck = await checkFeatureUsage('predicted-questions');
+      if (!usageCheck.allowed) {
+        Alert.alert('Feature Limit Reached', usageCheck.error || 'You have reached the limit for generating predicted questions');
+        setPredictedQuestionsLoading(false);
+        return;
+      }
+
+      // Process image through OCR endpoint
+      const userId = user?.id || 'guest_user';
+      const response = await generatePredictedQuestionsFromImage(imageUri, userId, 'General', 3);
+      
+      console.log('[PredictedQuestions] Image processing successful, questions generated:', response?.data?.length || 0);
+      console.log('[PredictedQuestions] OCR Confidence:', response?.ocrConfidence || 'N/A');
+
+      // Record usage with image/OCR metadata
+      await recordFeatureUsage('predicted-questions', 500, 'image', {
+        source: 'ocr_image',
+        ocr_confidence: response?.ocrConfidence || 0,
+        question_count: response?.data?.length || 3,
+      });
+
+      setPredictedQuestionsData(response);
       setPredictedQuestionsLoading(false);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to generate predicted questions from image');
+      console.error('[PredictedQuestions] Error generating from image:', error);
+      const status = error.response?.status;
+      const details = error.response?.data?.details || error.response?.data?.error;
+      if (status === 429) {
+        const retrySeconds = error.response?.headers?.['retry-after'];
+        const msg = `AI quota exceeded. Please retry${retrySeconds ? ' after ' + retrySeconds + 's' : ''}.`;
+        Alert.alert('Quota Exceeded', msg, details ? [{ text: 'Details', onPress: () => Alert.alert('Details', String(details)) }, { text: 'OK' }] : [{ text: 'OK' }]);
+      } else if (status === 401) {
+        Alert.alert('Unauthorized', 'Please login to generate predicted questions from images');
+      } else {
+        Alert.alert('Error', error.message || 'Failed to generate predicted questions from image');
+      }
       setPredictedQuestionsLoading(false);
     }
   };
@@ -632,10 +794,44 @@ export default function App() {
     setPredictedQuestionsData(null);
 
     try {
-      Alert.alert('Info', 'Please use text input to generate predicted questions. Document/file processing coming soon.');
+      console.log('[PredictedQuestions] Starting file-based generation with', files.length, 'file(s)');
+      
+      // Check feature usage
+      const usageCheck = await checkFeatureUsage('predicted-questions');
+      if (!usageCheck.allowed) {
+        Alert.alert('Feature Limit Reached', usageCheck.error || 'You have reached the limit for generating predicted questions');
+        setPredictedQuestionsLoading(false);
+        return;
+      }
+
+      // Process file through document endpoint
+      const userId = user?.id || 'guest_user';
+      const response = await generatePredictedQuestionsFromFile(files[0], userId, examType, 3);
+      
+      console.log('[PredictedQuestions] File processing successful, questions generated:', response?.data?.length || 0);
+
+      // Record usage with document metadata
+      await recordFeatureUsage('predicted-questions', 500, 'file', {
+        source: response.source || 'document',
+        file_type: files[0]?.type || 'unknown',
+        question_count: response?.data?.length || 3,
+      });
+
+      setPredictedQuestionsData(response);
       setPredictedQuestionsLoading(false);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to generate predicted questions from file');
+      console.error('[PredictedQuestions] Error generating from file:', error);
+      const status = error.response?.status;
+      const details = error.response?.data?.details || error.response?.data?.error;
+      if (status === 429) {
+        const retrySeconds = error.response?.headers?.['retry-after'];
+        const msg = `AI quota exceeded. Please retry${retrySeconds ? ' after ' + retrySeconds + 's' : ''}.`;
+        Alert.alert('Quota Exceeded', msg, details ? [{ text: 'Details', onPress: () => Alert.alert('Details', String(details)) }, { text: 'OK' }] : [{ text: 'OK' }]);
+      } else if (status === 401) {
+        Alert.alert('Unauthorized', 'Please login to generate predicted questions from files');
+      } else {
+        Alert.alert('Error', error.message || 'Failed to generate predicted questions from file');
+      }
       setPredictedQuestionsLoading(false);
     }
   };
@@ -1378,9 +1574,8 @@ export default function App() {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-          <AuthScreenNew 
+          <AuthScreen 
             onAuthSuccess={handleAuthSuccess}
-            onGuestLogin={handleGuestLogin}
           />
       </SafeAreaView>
     );

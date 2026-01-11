@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const initializeAuth = useCallback(async () => {
+  const initializeAuth = useCallback(async (): Promise<boolean> => {
     try {
       const initialized = await googleAuthAPI.initialize();
       if (initialized) {
@@ -50,11 +50,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
+    return true;
   }, []);
 
   const signInWithGoogle = useCallback(async (code: string) => {
     try {
-      const result = await googleAuthAPI.signInWithGoogle(code);
+      const result = await googleAuthAPI.signUp('user', 'user@example.com', code);
       if (result.success) {
         setUser(result.user);
         setIsAuthenticated(true);

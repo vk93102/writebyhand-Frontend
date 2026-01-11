@@ -425,9 +425,6 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
                   </View>
                   <View style={styles.rewardInfo}>
                     <MaterialIcons name="stars" size={16} color={colors.warning} />
-                    <Text style={styles.rewardInfoText}>
-                      {calculateCoinsPerQuestion()} coins per correct answer
-                    </Text>
                   </View>
                 </View>
 
