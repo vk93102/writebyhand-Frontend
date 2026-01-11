@@ -14,6 +14,7 @@ import {
   Easing,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { getUserCoins, requestCoinWithdrawal } from '../services/api';
@@ -34,6 +35,7 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
   onClose,
   onWithdrawalSuccess,
 }) => {
+  const insets = useSafeAreaInsets();
   const [userCoins, setUserCoins] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -261,7 +263,7 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.mainContainer}>
           {/* Right Side - Withdrawal Form */}
@@ -492,7 +494,8 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
           <Text style={styles.loadingSubtext}>Sending request to admin for approval</Text>
         </View>
       </Animated.View>
-    </View>
+    </ScrollView>
+    </SafeAreaView>
   );
 };
 

@@ -9,11 +9,12 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { useAuth } from '../contexts/AuthContext';
-import AnimatedLoader from './AnimatedLoader';
 
 interface LoginScreenProps {
   onSwitchToRegister: () => void;
@@ -21,6 +22,7 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister, onLoginSuccess }) => {
+  const insets = useSafeAreaInsets();
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -67,103 +69,110 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister, on
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <MaterialIcons name="school" size={60} color={colors.primary} />
-          </View>
-          <Text style={styles.title}>Welcome Back!</Text>
-          <Text style={styles.subtitle}>Sign in to continue your learning journey</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Username or Email</Text>
-            <View style={[styles.inputContainer, errors.username && styles.inputError]}>
-              <MaterialIcons name="person" size={20} color={colors.textMuted} />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter username or email"
-                placeholderTextColor={colors.textMuted}
-                value={username}
-                onChangeText={(text) => {
-                  setUsername(text);
-                  if (errors.username) setErrors({ ...errors, username: undefined });
-                }}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <View style={styles.iconContainer}>
+              <MaterialIcons name="school" size={60} color={colors.primary} />
             </View>
-            {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
+            <Text style={styles.title}>Welcome Back!</Text>
+            <Text style={styles.subtitle}>Sign in to continue your learning journey</Text>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <View style={[styles.inputContainer, errors.password && styles.inputError]}>
-              <MaterialIcons name="lock" size={20} color={colors.textMuted} />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter password"
-                placeholderTextColor={colors.textMuted}
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  if (errors.password) setErrors({ ...errors, password: undefined });
-                }}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <MaterialIcons
-                  name={showPassword ? 'visibility' : 'visibility-off'}
-                  size={20}
-                  color={colors.textMuted}
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Username or Email</Text>
+              <View style={[styles.inputContainer, errors.username && styles.inputError]}>
+                <MaterialIcons name="person" size={20} color={colors.textMuted} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter username or email"
+                  placeholderTextColor={colors.textMuted}
+                  value={username}
+                  onChangeText={(text) => {
+                    setUsername(text);
+                    if (errors.username) setErrors({ ...errors, username: undefined });
+                  }}
+                  autoCapitalize="none"
+                  autoCorrect={false}
                 />
-              </TouchableOpacity>
+              </View>
+              {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
             </View>
-            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Password</Text>
+              <View style={[styles.inputContainer, errors.password && styles.inputError]}>
+                <MaterialIcons name="lock" size={20} color={colors.textMuted} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter password"
+                  placeholderTextColor={colors.textMuted}
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    if (errors.password) setErrors({ ...errors, password: undefined });
+                  }}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <MaterialIcons
+                    name={showPassword ? 'visibility' : 'visibility-off'}
+                    size={20}
+                    color={colors.textMuted}
+                  />
+                </TouchableOpacity>
+              </View>
+              {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+            </View>
+
+            <TouchableOpacity style={styles.forgotPassword} onPress={() => Alert.alert('Password Reset', 'Check your email for password reset link')}>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <>
+                  <MaterialIcons name="login" size={20} color={colors.white} />
+                  <Text style={styles.loginButtonText}>Log In</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity style={styles.registerPrompt} onPress={onSwitchToRegister}>
+              <Text style={styles.registerText}>
+                New here?{' '}
+                <Text style={styles.registerLink}>Sign Up</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
-            {loading ? (
-              <AnimatedLoader visible={true} size="small" color={colors.white} />
-            ) : (
-              <>
-                <MaterialIcons name="login" size={20} color={colors.white} />
-                <Text style={styles.loginButtonText}>Login</Text>
-              </>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
+          <View style={styles.footer}>
+            <MaterialIcons name="security" size={16} color={colors.textMuted} />
+            <Text style={styles.footerText}>Your data is secured with end-to-end encryption</Text>
           </View>
-
-          <TouchableOpacity style={styles.registerPrompt} onPress={onSwitchToRegister}>
-            <Text style={styles.registerText}>
-              Don't have an account?{' '}
-              <Text style={styles.registerLink}>Sign Up</Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.footer}>
-          <MaterialIcons name="security" size={16} color={colors.textMuted} />
-          <Text style={styles.footerText}>Your data is secured with end-to-end encryption</Text>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
+};
 };
 
 const styles = StyleSheet.create({
@@ -239,6 +248,16 @@ const styles = StyleSheet.create({
     color: colors.error,
     marginTop: spacing.xs,
     marginLeft: spacing.xs,
+  },
+  forgotPassword: {
+    alignItems: 'flex-end',
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  forgotPasswordText: {
+    ...typography.small,
+    color: colors.primary,
+    fontWeight: '600',
   },
   loginButton: {
     flexDirection: 'row',

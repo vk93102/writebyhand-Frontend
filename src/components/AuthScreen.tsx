@@ -12,6 +12,7 @@ import {
   Linking,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { registerUser, loginUser } from '../services/api';
@@ -23,6 +24,7 @@ interface AuthScreenProps {
 const isWeb = Platform.OS === 'web';
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [loading, setLoading] = useState(false);
 
@@ -291,7 +293,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
   // Mobile Layout - Simple form
   if (!isWeb) {
     return (
-      <View style={styles.screen}>
+      <SafeAreaView style={[styles.screen, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
         <ScrollView 
           contentContainerStyle={styles.scrollContainer} 
           showsVerticalScrollIndicator={false}
@@ -328,13 +330,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
             </View>
           </View>
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 
   // Web Layout - 50/50 with blue left side
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={[styles.screen, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
       <ScrollView 
         contentContainerStyle={styles.webScrollContainer} 
         showsVerticalScrollIndicator={false}
@@ -386,7 +388,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -39,7 +39,6 @@ export const getAuthToken = async (): Promise<string | null> => {
   }
 };
 
-// Store and retrieve user ID for API calls
 export const setUserId = async (userId: string | null) => {
   try {
     if (userId) {
@@ -62,7 +61,6 @@ export const getUserId = async (): Promise<string | null> => {
   }
 };
 
-// Initialize tokens and user ID from storage
 (async () => {
   const token = await getAuthToken();
   const userId = await getUserId();

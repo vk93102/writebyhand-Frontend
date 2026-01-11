@@ -9,11 +9,12 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { useAuth } from '../contexts/AuthContext';
-import AnimatedLoader from './AnimatedLoader';
 
 interface RegisterScreenProps {
   onSwitchToLogin: () => void;
@@ -21,6 +22,7 @@ interface RegisterScreenProps {
 }
 
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin, onRegisterSuccess }) => {
+  const insets = useSafeAreaInsets();
   const { register } = useAuth();
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
@@ -106,36 +108,37 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <MaterialIcons name="person-add" size={60} color={colors.success} />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <View style={styles.iconContainer}>
+              <MaterialIcons name="person-add" size={60} color={colors.success} />
+            </View>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Sign up to start your learning journey</Text>
           </View>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Sign up to start your learning journey</Text>
-        </View>
 
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full Name</Text>
-            <View style={[styles.inputContainer, errors.fullName && styles.inputError]}>
-              <MaterialIcons name="badge" size={20} color={colors.textMuted} />
-              <TextInput
-                style={styles.input}
-                placeholder="John Doe"
-                placeholderTextColor={colors.textMuted}
-                value={fullName}
-                onChangeText={(text) => {
-                  setFullName(text);
-                  if (errors.fullName) setErrors({ ...errors, fullName: undefined });
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Full Name</Text>
+              <View style={[styles.inputContainer, errors.fullName && styles.inputError]}>
+                <MaterialIcons name="badge" size={20} color={colors.textMuted} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="John Doe"
+                  placeholderTextColor={colors.textMuted}
+                  value={fullName}
+                  onChangeText={(text) => {
+                    setFullName(text);
+                    if (errors.fullName) setErrors({ ...errors, fullName: undefined });
                 }}
                 autoCapitalize="words"
               />
@@ -240,7 +243,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
 
           <TouchableOpacity style={styles.registerButton} onPress={handleRegister} disabled={loading}>
             {loading ? (
-              <AnimatedLoader visible={true} size="small" color={colors.white} />
+              <ActivityIndicator color={colors.white} />
             ) : (
               <>
                 <MaterialIcons name="how-to-reg" size={20} color={colors.white} />
@@ -256,11 +259,22 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
           </View>
 
           <TouchableOpacity style={styles.loginPrompt} onPress={onSwitchToLogin}>
+            <Text style={styles.loginText}>
+              Already have an account?{' '}
+              <Text style={styles.loginLink}>Sign In</Text>
+            </Text>
           </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <MaterialIcons name="security" size={16} color={colors.textMuted} />
+            <Text style={styles.footerText}>Your data is secured with end-to-end encryption</Text>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
+};
 };
 
 const styles = StyleSheet.create({

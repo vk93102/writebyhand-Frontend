@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 
 const sample = Array.from({ length: 6 }).map((_, i) => ({
@@ -10,8 +11,9 @@ const sample = Array.from({ length: 6 }).map((_, i) => ({
 }));
 
 export const Questions: React.FC = () => {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Text style={styles.title}>Questions</Text>
         <View style={styles.actions}>
@@ -48,7 +50,7 @@ export const Questions: React.FC = () => {
           </View>
         ))}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

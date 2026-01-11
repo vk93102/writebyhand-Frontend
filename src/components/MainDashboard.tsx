@@ -8,6 +8,7 @@ import {
   FlatList,
   Modal,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { getDailyQuiz } from '../services/api';
@@ -108,6 +109,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
   onNavigateToFeature,
   onNavigateToPricing,
 }) => {
+  const insets = useSafeAreaInsets();
   const [userStats, setUserStats] = useState({
     questionsAnswered: 24,
     quizzesCompleted: 8,
@@ -266,7 +268,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
   );
 
   return (
-    <>
+    <SafeAreaView style={[styles.safeAreaContainer, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>
@@ -516,11 +518,16 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
         onClose={() => setShowDailyQuiz(false)}
       />
     </Modal>
-    </>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

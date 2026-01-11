@@ -1,5 +1,10 @@
 {
   "android": {
     "package": "com.voidk123.edtechmobile"
+  },
+  "extra": {
+    "eas": {
+      "projectId": "83d9979f-bc03-4c01-8bc9-8a2ea05952bb"
+    }
   }
 }
