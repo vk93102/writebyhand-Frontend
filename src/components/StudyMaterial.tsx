@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import AnimatedLoader from './AnimatedLoader';
@@ -31,6 +32,7 @@ interface StudyMaterialProps {
 }
 
 export const StudyMaterial: React.FC<StudyMaterialProps> = ({ studyMaterialData, loading }) => {
+  const insets = useSafeAreaInsets();
   const [activeSection, setActiveSection] = useState<'topics' | 'concepts' | 'notes' | 'questions'>('topics');
 
   if (loading) {
@@ -81,8 +83,9 @@ export const StudyMaterial: React.FC<StudyMaterialProps> = ({ studyMaterialData,
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
         <View style={styles.headerTop}>
           <MaterialIcons name="auto-awesome" size={28} color={colors.primary} />
           <View style={styles.headerText}>
@@ -197,11 +200,16 @@ export const StudyMaterial: React.FC<StudyMaterialProps> = ({ studyMaterialData,
           </View>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

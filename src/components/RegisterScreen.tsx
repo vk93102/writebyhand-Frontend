@@ -10,6 +10,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -23,6 +24,7 @@ interface RegisterScreenProps {
 
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin, onRegisterSuccess }) => {
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const { register } = useAuth();
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
@@ -32,6 +34,27 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<'fullName' | 'username' | 'email' | 'password' | 'confirmPassword' | null>(null);
+  const [errors, setErrors] = useState<{
+    fullName?: string;
+    username?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
+
+  // Detect screen sizes for responsive design
+  const isMobile = width < 480;
+  const isSmallHeight = height < 900;
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<'fullName' | 'username' | 'email' | 'password' | 'confirmPassword' | null>(null);
   const [errors, setErrors] = useState<{
     fullName?: string;
     username?: string;
@@ -82,6 +105,25 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleGuestLogin = () => {
+    Alert.alert(
+      'Guest Access',
+      'Continue as a guest? You\'ll have limited access to features.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Continue as Guest',
+          onPress: () => onRegisterSuccess(),
+          style: 'default',
+        },
+      ]
+    );
+  };
+
   const handleRegister = async () => {
     if (!validateForm()) {
       return;
@@ -114,7 +156,11 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            isMobile && styles.scrollContentMobile,
+            isSmallHeight && styles.scrollContentCompact,
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -129,7 +175,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
           <View style={styles.form}>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Full Name</Text>
-              <View style={[styles.inputContainer, errors.fullName && styles.inputError]}>
+              <View style={[styles.inputContainer, focusedInput === 'fullName' && styles.inputFocused, errors.fullName && styles.inputError]}>
                 <MaterialIcons name="badge" size={20} color={colors.textMuted} />
                 <TextInput
                   style={styles.input}
@@ -139,16 +185,20 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
                   onChangeText={(text) => {
                     setFullName(text);
                     if (errors.fullName) setErrors({ ...errors, fullName: undefined });
-                }}
-                autoCapitalize="words"
-              />
-            </View>
+                  }}
+                  onFocus={() => setFocusedInput('fullName')}
+                  onBlur={() => setFocusedInput(null)}
+                  autoCapitalize="words"
+                  underlineColorAndroid="transparent"
+                  selectionColor="transparent"
+                />
+              </View>
             {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Username</Text>
-            <View style={[styles.inputContainer, errors.username && styles.inputError]}>
+            <View style={[styles.inputContainer, focusedInput === 'username' && styles.inputFocused, errors.username && styles.inputError]}>
               <MaterialIcons name="person" size={20} color={colors.textMuted} />
               <TextInput
                 style={styles.input}
@@ -159,8 +209,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
                   setUsername(text);
                   if (errors.username) setErrors({ ...errors, username: undefined });
                 }}
+                onFocus={() => setFocusedInput('username')}
+                onBlur={() => setFocusedInput(null)}
                 autoCapitalize="none"
                 autoCorrect={false}
+                underlineColorAndroid="transparent"
+                selectionColor="transparent"
               />
             </View>
             {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
@@ -168,7 +222,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email</Text>
-            <View style={[styles.inputContainer, errors.email && styles.inputError]}>
+            <View style={[styles.inputContainer, focusedInput === 'email' && styles.inputFocused, errors.email && styles.inputError]}>
               <MaterialIcons name="email" size={20} color={colors.textMuted} />
               <TextInput
                 style={styles.input}
@@ -179,9 +233,13 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
                   setEmail(text);
                   if (errors.email) setErrors({ ...errors, email: undefined });
                 }}
+                onFocus={() => setFocusedInput('email')}
+                onBlur={() => setFocusedInput(null)}
                 autoCapitalize="none"
                 keyboardType="email-address"
                 autoCorrect={false}
+                underlineColorAndroid="transparent"
+                selectionColor="transparent"
               />
             </View>
             {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
@@ -189,7 +247,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Password</Text>
-            <View style={[styles.inputContainer, errors.password && styles.inputError]}>
+            <View style={[styles.inputContainer, focusedInput === 'password' && styles.inputFocused, errors.password && styles.inputError]}>
               <MaterialIcons name="lock" size={20} color={colors.textMuted} />
               <TextInput
                 style={styles.input}
@@ -200,8 +258,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
                   setPassword(text);
                   if (errors.password) setErrors({ ...errors, password: undefined });
                 }}
+                onFocus={() => setFocusedInput('password')}
+                onBlur={() => setFocusedInput(null)}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
+                underlineColorAndroid="transparent"
+                selectionColor="transparent"
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <MaterialIcons
@@ -216,7 +278,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Confirm Password</Text>
-            <View style={[styles.inputContainer, errors.confirmPassword && styles.inputError]}>
+            <View style={[styles.inputContainer, focusedInput === 'confirmPassword' && styles.inputFocused, errors.confirmPassword && styles.inputError]}>
               <MaterialIcons name="lock" size={20} color={colors.textMuted} />
               <TextInput
                 style={styles.input}
@@ -227,8 +289,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
                   setConfirmPassword(text);
                   if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
                 }}
+                onFocus={() => setFocusedInput('confirmPassword')}
+                onBlur={() => setFocusedInput(null)}
                 secureTextEntry={!showConfirmPassword}
                 autoCapitalize="none"
+                underlineColorAndroid="transparent"
+                selectionColor="transparent"
               />
               <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                 <MaterialIcons
@@ -250,6 +316,11 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
                 <Text style={styles.registerButtonText}>Create Account</Text>
               </>
             )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.guestButton} onPress={handleGuestLogin} disabled={loading}>
+            <MaterialIcons name="person-outline" size={20} color={colors.primary} />
+            <Text style={styles.guestButtonText}>Continue as Guest</Text>
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -275,132 +346,176 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSwitchToLogin,
     </SafeAreaView>
   );
 };
-};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#F5F7FA',
   },
   scrollContent: {
     flexGrow: 1,
-    padding: spacing.xl,
-    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 32,
+  },
+  scrollContentMobile: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  scrollContentCompact: {
+    paddingVertical: 12,
   },
   header: {
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: 28,
   },
   iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#D1FAE5',
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+    backgroundColor: '#22C55E',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: 16,
   },
   title: {
-    ...typography.h1,
-    color: colors.text,
+    fontSize: 24,
     fontWeight: '700',
-    marginBottom: spacing.xs,
+    color: '#1A1A1A',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
-    ...typography.body,
-    color: colors.textMuted,
+    fontSize: 14,
+    color: '#6B7280',
     textAlign: 'center',
+    lineHeight: 20,
+    paddingHorizontal: 8,
   },
   form: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 500,
     alignSelf: 'center',
   },
   inputGroup: {
-    marginBottom: spacing.md,
+    marginBottom: 14,
   },
   label: {
-    ...typography.h4,
-    color: colors.text,
+    fontSize: 13,
+    color: '#1A1A1A',
     fontWeight: '600',
-    marginBottom: spacing.sm,
+    marginBottom: 6,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    gap: spacing.sm,
-    ...shadows.sm,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    height: 48,
+    gap: 10,
   },
   inputError: {
-    borderColor: colors.error,
+    borderColor: '#EF4444',
+  },
+  inputFocused: {
+    borderColor: '#3B82F6',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   input: {
     flex: 1,
-    ...typography.body,
-    color: colors.text,
-    paddingVertical: spacing.md,
+    fontSize: 14,
+    color: '#1A1A1A',
+    paddingVertical: 12,
   },
   errorText: {
-    ...typography.small,
-    color: colors.error,
-    marginTop: spacing.xs,
-    marginLeft: spacing.xs,
+    fontSize: 11,
+    color: '#EF4444',
+    marginTop: 3,
+    marginLeft: 4,
   },
   registerButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.success,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.md,
-    marginTop: spacing.md,
-    ...shadows.md,
+    gap: 8,
+    backgroundColor: '#3B82F6',
+    borderRadius: 12,
+    paddingVertical: 14,
+    marginTop: 16,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   registerButtonText: {
-    ...typography.h4,
-    color: colors.white,
-    fontWeight: '700',
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  guestButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 12,
+    borderWidth: 1.5,
+    borderColor: '#3B82F6',
+    marginTop: 10,
+  },
+  guestButtonText: {
+    fontSize: 14,
+    color: '#3B82F6',
+    fontWeight: '600',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: 16,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: '#E5E7EB',
   },
   dividerText: {
-    ...typography.body,
-    color: colors.textMuted,
-    marginHorizontal: spacing.md,
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginHorizontal: 10,
   },
   loginPrompt: {
     alignItems: 'center',
+    marginTop: 12,
   },
   loginText: {
-    ...typography.body,
-    color: colors.textMuted,
+    fontSize: 14,
+    color: '#6B7280',
   },
   loginLink: {
-    color: colors.primary,
-    fontWeight: '700',
+    color: '#3B82F6',
+    fontWeight: '600',
   },
   footer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.xl,
+    justifyContent: 'center',
+    gap: 4,
+    marginTop: 16,
+    paddingTop: 12,
   },
   footerText: {
-    ...typography.small,
-    color: colors.textMuted,
-    textAlign: 'center',
-    paddingHorizontal: spacing.lg,
+    fontSize: 11,
+    color: '#9CA3AF',
   },
 });

@@ -135,8 +135,8 @@ export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId
       description: 'For casual learners',
       features: [
         '✓ Unlimited Mock Tests',
-        '⚠️ 5 Quizzes/month (Limited)',
-        '⚠️ 20 Flashcards/month (Limited)',
+        ' 5 Quizzes/month (Limited)',
+        ' 20 Flashcards/month (Limited)',
         '10 PYQs',
         '2 YouTube Summaries',
         'Ask Questions (Upgrade)',
@@ -184,13 +184,13 @@ export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId
   ];
 
   const comparisonData: ComparisonRow[] = [
-    { feature: 'Mock Tests', free: '♾️ Unlimited', scholar: '♾️ Unlimited', genius: '♾️ Unlimited' },
-    { feature: 'Quizzes', free: '5 / month ⚠️', scholar: '♾️ Unlimited', genius: '♾️ Unlimited' },
-    { feature: 'Flashcards', free: '20 / month ⚠️', scholar: '♾️ Unlimited', genius: '♾️ Unlimited' },
-    { feature: 'Previous Year Questions', free: '10 total', scholar: '♾️ Unlimited', genius: '♾️ Unlimited' },
-    { feature: 'YouTube Summarizer', free: '2 videos', scholar: '♾️ Unlimited', genius: '♾️ Unlimited' },
-    { feature: 'Ask Questions (AI)', free: '❌ Upgrade', scholar: '✅ Included', genius: '✅ Included' },
-    { feature: 'Predicted Questions', free: '❌ Upgrade', scholar: '✅ Included', genius: '✅ Included' },
+    { feature: 'Mock Tests', free: ' Unlimited', scholar: ' Unlimited', genius: ' Unlimited' },
+    { feature: 'Quizzes', free: '5 / month ', scholar: ' Unlimited', genius: ' Unlimited' },
+    { feature: 'Flashcards', free: '20 / month ', scholar: ' Unlimited', genius: ' Unlimited' },
+    { feature: 'Previous Year Questions', free: '10 total', scholar: ' Unlimited', genius: ' Unlimited' },
+    { feature: 'YouTube Summarizer', free: '2 videos', scholar: ' Unlimited', genius: ' Unlimited' },
+    { feature: 'Ask Questions (AI)', free: ' Upgrade', scholar: ' Included', genius: ' Included' },
+    { feature: 'Predicted Questions', free: ' Upgrade', scholar: ' Included', genius: ' Included' },
     { feature: 'Support', free: 'Community', scholar: 'Email', genius: '24/7 Priority' },
   ];
 
@@ -627,7 +627,7 @@ export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId
 
         <View style={styles.featuresWrap}>
           {plan.features.map((feature, idx) => {
-            const isRestricted = feature.includes('⚠️');
+            const isRestricted = feature.includes('');
             const isUnlimited = feature.includes('✓');
             const needsUpgrade = feature.toLowerCase().includes('upgrade');
             
@@ -693,7 +693,7 @@ export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId
             <View style={styles.usageAlertContent}>
               <Text style={styles.usageAlertTitle}>Your Current Usage (Free Plan)</Text>
               <Text style={styles.usageAlertText}>
-                ✓ Mock Tests: {usage.mock_tests} (Unlimited) • ⚠️ Quizzes: {usage.quizzes}/{limits.quiz || 5} • ⚠️ Flashcards: {usage.flash_cards}/{limits.flashcards || 20}
+                ✓ Mock Tests: {usage.mock_tests} (Unlimited) •  Quizzes: {usage.quizzes}/{limits.quiz || 5} •  Flashcards: {usage.flash_cards}/{limits.flashcards || 20}
               </Text>
               <Text style={styles.usageAlertUpgrade}>💡 Upgrade to unlock unlimited Quizzes & Flashcards</Text>
             </View>

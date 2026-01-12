@@ -74,7 +74,7 @@ export const YouTubeSummarizer: React.FC<YouTubeSummarizerProps> = ({
     // Check usage limits for free users
     if (subscriptionStatus?.plan === 'free' && usageCount >= usageLimit) {
       Alert.alert(
-        '⚠️ Usage Limit Reached',
+        ' Usage Limit Reached',
         `You've reached your limit of ${usageLimit} YouTube summaries this month.\n\nUpgrade to Premium for unlimited access!`,
         [
           { text: 'Cancel', style: 'cancel' },

@@ -17,6 +17,7 @@ import { colors, spacing, borderRadius, typography, shadows } from '../styles/th
 const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 const isMobile = width < 768;
+const isSmallMobile = width < 480;
 
 interface Paper {
   id: string;
@@ -447,7 +448,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.white,
-    padding: spacing.lg,
+    padding: isSmallMobile ? spacing.md : spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -526,18 +527,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: spacing.lg,
+    padding: isSmallMobile ? spacing.sm : spacing.lg,
   },
   papersGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.lg,
+    gap: isSmallMobile ? spacing.sm : spacing.lg,
+    justifyContent: 'space-between',
   },
   paperCard: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    width: isMobile ? '100%' : '30%',
+    padding: isSmallMobile ? spacing.md : spacing.lg,
+    width: isMobile ? '100%' : '48%',
     minWidth: isMobile ? '100%' : 280,
     ...shadows.md,
     borderWidth: 1,

@@ -637,15 +637,15 @@ class SubscriptionServiceClass {
       string,
       { label: string; color: string; icon: string }
     > = {
-      active: { label: '✅ ACTIVE', color: '#10b981', icon: 'check-circle' },
+      active: { label: ' ACTIVE', color: '#10b981', icon: 'check-circle' },
       trial: { label: '⏱️ TRIAL', color: '#3b82f6', icon: 'clock' },
       past_due: {
-        label: '⚠️ PAST DUE',
+        label: ' PAST DUE',
         color: '#ef4444',
         icon: 'warning',
       },
       cancelled: {
-        label: '❌ CANCELLED',
+        label: ' CANCELLED',
         color: '#6b7280',
         icon: 'cancel',
       },

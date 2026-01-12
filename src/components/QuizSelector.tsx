@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,13 @@ import {
   ScrollView,
   Image,
   Platform,
-  Dimensions,
+  useWindowDimensions,
   TextInput,
   Alert,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows } from '../styles/theme';
 
-const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 
 interface QuizSelectorProps {
@@ -49,6 +48,7 @@ interface ExamLevel {
   description: string;
 }
 
+
 export const QuizSelector: React.FC<QuizSelectorProps> = ({ 
   onStartQuiz, 
   onClose, 
@@ -57,6 +57,7 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
   dailyQuizCount = 0,
   quizType = 'regular'
 }) => {
+  const { width: screenWidth } = useWindowDimensions();
   const [selectedSubject, setSelectedSubject] = useState<string>('maths');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('medium');
@@ -64,14 +65,6 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
   const [timeLimit, setTimeLimit] = useState<number>(30);
   const [timeLimitEnabled, setTimeLimitEnabled] = useState<boolean>(false);
   const [numQuestions, setNumQuestions] = useState<number>(20);
-  const [screenWidth, setScreenWidth] = useState(width);
-
-  useEffect(() => {
-    const subscription = Dimensions.addEventListener('change', ({ window }) => {
-      setScreenWidth(window.width);
-    });
-    return () => subscription?.remove();
-  }, []);
 
   const subjects: Subject[] = [
     {
@@ -246,7 +239,7 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={[styles.header, !isDesktop && styles.headerMobile]}>
+        <View style={[styles.header, !isDesktop && styles.headerMobile, { paddingHorizontal: screenWidth < 480 ? 15 : spacing.xl }]}>
           <View style={styles.breadcrumb}>
             <Text style={styles.breadcrumbText}>Home</Text>
             <Text style={styles.breadcrumbSeparator}>/</Text>
@@ -256,26 +249,15 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
           </View>
         </View>
 
-        <View style={[styles.titleSection, !isDesktop && styles.titleSectionMobile]}>
-          <Text style={[styles.pageTitle, !isDesktop && styles.pageTitleMobile]}>Generate Your Custom Mock Test</Text>
+        <View style={[styles.titleSection, !isDesktop && styles.titleSectionMobile, { paddingHorizontal: screenWidth < 480 ? 15 : spacing.xl }]}>
+          <Text style={[styles.pageTitle, !isDesktop && styles.pageTitleMobile, { fontSize: screenWidth < 480 ? 26 : 32 }]}>Generate Your Custom Mock Test</Text>
           <Text style={[styles.pageSubtitle, !isDesktop && styles.pageSubtitleMobile]}>
             Select your preferences below to create a targeted practice session tailored to your learning goals.
           </Text>
-          
-          {/* Free Account Warning */}
-          {!isPremium && (
-            <View style={styles.limitWarning}>
-              <MaterialIcons name="info" size={18} color={colors.warning} />
-              <Text style={styles.limitWarningText}>
-                Free Account: {1 - dailyQuizCount} quiz remaining today. 
-                <Text style={styles.limitWarningLink}> Upgrade for unlimited access</Text>
-              </Text>
-            </View>
-          )}
         </View>
 
         {/* Main Content - Full Width */}
-        <View style={[styles.mainContent, isDesktop ? styles.mainContentDesktop : styles.mainContentMobile]}>
+        <View style={[styles.mainContent, isDesktop ? styles.mainContentDesktop : styles.mainContentMobile, { paddingHorizontal: screenWidth < 480 ? 15 : spacing.xl }]}>
           <View style={[styles.leftColumn, !isDesktop && styles.leftColumnFull]}>
             {/* Section 1: Select Subject */}
             <View style={styles.section}>
@@ -423,9 +405,6 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
                       </TouchableOpacity>
                     ))}
                   </View>
-                  <View style={styles.rewardInfo}>
-                    <MaterialIcons name="stars" size={16} color={colors.warning} />
-                  </View>
                 </View>
 
                 <View style={[styles.configItem, { flex: 1 }]}>
@@ -515,19 +494,6 @@ export const QuizSelector: React.FC<QuizSelectorProps> = ({
                 </View>
               </View>
 
-              <View style={styles.coinReward}>
-                <Image source={require('../../assets/coins.png')} style={styles.coinIcon} resizeMode="contain" />
-                <View style={styles.coinRewardText}>
-                  <Text style={styles.coinRewardLabel}>Potential Reward</Text>
-                  <Text style={styles.coinRewardValue}>
-                    {calculateCoinsPerQuestion()} coins/question
-                  </Text>
-                  <Text style={styles.coinRewardTotal}>
-                    Total: {calculateTotalCoins()} coins
-                  </Text>
-                </View>
-              </View>
-
               <TouchableOpacity 
                 style={[styles.startButton, !canStartQuiz() && styles.startButtonDisabled]} 
                 onPress={handleStartQuiz}
@@ -570,7 +536,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
   },
@@ -603,14 +568,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   titleSection: {
-    paddingHorizontal: spacing.xl,
     marginBottom: spacing.lg,
   },
   titleSectionMobile: {
     paddingHorizontal: spacing.md,
   },
   pageTitle: {
-    fontSize: 32,
     fontWeight: '700',
     color: colors.text,
     marginTop: spacing.md,
@@ -647,7 +610,6 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   mainContent: {
-    paddingHorizontal: spacing.xl,
     gap: spacing.lg,
     alignItems: 'flex-start',
   },

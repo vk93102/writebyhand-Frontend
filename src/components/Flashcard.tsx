@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions, Platform, Alert } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { TextInputComponent } from './TextInput';
@@ -37,6 +38,7 @@ interface FlashcardProps {
 }
 
 export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, onTextSubmit, onImageSubmit }) => {
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<'text' | 'image'>('text');
   const [activeMethod, setActiveMethod] = useState<'text' | 'image'>('text');
   const [currentCard, setCurrentCard] = useState(0);
@@ -210,7 +212,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
   });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
       {/* Professional Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -403,11 +405,15 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
           </View>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -427,11 +433,9 @@ const styles = StyleSheet.create({
   emptyContent: {
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xl,
-    justifyContent: 'flex-start',
+    paddingVertical: spacing.lg,
+    justifyContent: 'center',
     alignItems: 'center',
-    minHeight: height,
   },
   emptyIconContainer: {
     width: 100,
@@ -440,7 +444,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blue50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   emptyTitle: {
     ...typography.h2,
@@ -451,7 +455,7 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     ...typography.body,
     color: colors.textMuted,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -459,17 +463,17 @@ const styles = StyleSheet.create({
   /* Header */
   header: {
     backgroundColor: colors.white,
-    paddingVertical: spacing.lg,
+    paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
     ...shadows.sm,
   },
   headerContent: {
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   headerTitleSection: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   title: {
     ...typography.h2,
@@ -494,7 +498,7 @@ const styles = StyleSheet.create({
 
   /* Progress Section */
   progressSection: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   progressLabelRow: {
     flexDirection: 'row',
@@ -531,8 +535,8 @@ const styles = StyleSheet.create({
   /* Stats Row */
   statsRow: {
     flexDirection: 'row',
-    gap: spacing.md,
-    paddingVertical: spacing.md,
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     backgroundColor: colors.white,
     borderBottomWidth: 1,
@@ -542,9 +546,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
     backgroundColor: '#F9FAFB',
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
     borderLeftWidth: 3,
@@ -575,13 +579,13 @@ const styles = StyleSheet.create({
   /* Card Viewer */
   cardViewerContainer: {
     flex: 1,
-    paddingVertical: spacing.lg,
+    paddingVertical: spacing.md,
     paddingHorizontal: isLargeScreen ? spacing.xl : spacing.lg,
     justifyContent: 'center',
   },
   cardContainer: {
     height: isLargeScreen ? 500 : isMobile ? 350 : 420,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   card: {
     position: 'absolute',
@@ -682,8 +686,8 @@ const styles = StyleSheet.create({
   navigationFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    paddingVertical: spacing.md,
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     backgroundColor: colors.white,
     borderTopWidth: 1,
@@ -696,7 +700,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.lg,
     borderWidth: 2,
@@ -758,15 +762,15 @@ const styles = StyleSheet.create({
   /* Top Input Container */
   topInputContainer: {
     width: '100%',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md,
     backgroundColor: colors.white,
     borderRadius: borderRadius.xl,
-    padding: spacing.lg,
+    padding: spacing.md,
     ...shadows.md,
   },
   inputTabsRow: {
     flexDirection: 'row',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     gap: spacing.md,
   },
   inputTab: {
@@ -775,8 +779,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     backgroundColor: '#F9FAFB',
     borderRadius: borderRadius.lg,
     borderWidth: 2,

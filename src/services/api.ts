@@ -751,7 +751,7 @@ export const requestPasswordReset = async (email: string) => {
     console.error('[Auth] Password reset request error:', {
       status: error.response?.status,
       message: error.response?.data?.error,
-      endpoint: 'POST /api/auth/request-password-reset/',
+      endpoint: 'POST /auth/request-password-reset/',
     });
     throw new Error(error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to request password reset');
   }
@@ -768,7 +768,7 @@ export const validateResetToken = async (token: string) => {
   } catch (error: any) {
     console.error('[Auth] Reset token validation error:', {
       status: error.response?.status,
-      endpoint: 'POST /api/auth/validate-reset-token/',
+      endpoint: 'POST /auth/validate-reset-token/',
     });
     throw new Error(error.response?.data?.error || error.response?.data?.message || error.message || 'Invalid or expired reset token');
   }
@@ -787,7 +787,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
     console.error('[Auth] Password reset error:', {
       status: error.response?.status,
       message: error.response?.data?.error,
-      endpoint: 'POST /api/auth/reset-password/',
+      endpoint: 'POST /auth/reset-password/',
     });
     throw new Error(error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to reset password');
   }
@@ -1065,7 +1065,6 @@ export const requestCoinWithdrawal = async (
   try {
     // Convert coins to rupees (e.g., 1000 coins = 100 rupees)
     const amount = coinsAmount / 10;
-
     const payload: any = {
       user_id: userId,
       amount: amount, // Send amount in rupees as expected by backend
@@ -1613,7 +1612,8 @@ export const processImageWithOCR = async (imageFile: any): Promise<any> => {
 };
 
 /**
- * Generate flashcards from image using OCR
+ * Generate flashcards from image
+ * Sends image directly to backend for OCR and flashcard generation
  * Extracts text from image and generates flashcards
  * @param imageFile - Image file to process
  * @param numCards - Number of flashcards to generate
@@ -1628,44 +1628,75 @@ export const generateFlashcardsFromImage = async (
   difficulty: string = 'medium'
 ): Promise<any> => {
   try {
+    console.log('[Flashcards] generateFlashcardsFromImage called with:', { imageFile: typeof imageFile, numCards, language, difficulty });
     console.log('[Flashcards] Generating flashcards from image...');
     
-    // First, extract text from image using OCR
-    const ocrResult = await processImageWithOCR(imageFile);
+    const formData = new FormData();
     
-    if (!ocrResult.text || ocrResult.text.trim().length === 0) {
-      throw new Error('No text could be extracted from the image');
+    // Handle different image sources
+    if (typeof imageFile === 'string') {
+      // Image URI from device
+      console.log('[Flashcards] Processing image URI:', imageFile.substring(0, 60) + '...');
+      const filename = imageFile.split('/').pop() || 'image.jpg';
+      const fileData = {
+        uri: imageFile,
+        type: 'image/jpeg',
+        name: filename,
+      } as any;
+      formData.append('document', fileData);
+    } else if (imageFile instanceof File) {
+      // Web File object
+      console.log('[Flashcards] Processing Web File object:', imageFile.name);
+      formData.append('document', imageFile);
+    } else if (imageFile.file) {
+      // DocumentPicker asset with file property
+      console.log('[Flashcards] Processing DocumentPicker asset:', imageFile.name);
+      formData.append('document', imageFile.file);
+    } else {
+      throw new Error('Invalid image source');
     }
 
-    console.log(`[Flashcards] Extracted ${ocrResult.text.length} characters from image`);
+    formData.append('num_cards', numCards.toString());
+    formData.append('language', language.toLowerCase());
+    formData.append('difficulty', difficulty.toLowerCase());
 
-    // Generate flashcards from extracted text
-    const payload = {
-      topic: ocrResult.text,
-      num_cards: numCards,
-      language: language.toLowerCase(),
-      difficulty: difficulty.toLowerCase(),
-    };
+    console.log('[Flashcards] POST /flashcards/generate/ with image form data - num_cards:', numCards, 'language:', language, 'difficulty:', difficulty);
+    
+    const response = await api.post('/flashcards/generate/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 120000,
+    });
 
-    const response = await api.post('/flashcards/generate/', payload);
+    console.log('[Flashcards] Image upload response status:', response.status);
+    console.log('[Flashcards] Image upload response data:', response.data);
 
-    const flashcardData = response.data.data || response.data;
-    return {
-      success: true,
-      data: flashcardData,
-      cards: flashcardData.cards || [],
-      source: 'ocr_image',
-      ocrConfidence: ocrResult.confidence,
-    };
+    // Handle wrapped response format: { success: true, data: { title, cards, ... } }
+    // Return unwrapped data for consistency with generateFlashcards
+    let result: any = response.data;
+    if (response.data.data && response.data.success) {
+      result = response.data.data;
+    }
+    
+    console.log('[Flashcards] Returning flashcard result with', result?.cards?.length || 0, 'cards');
+    return result;
   } catch (error: any) {
-    console.error('[Flashcards] Error generating from image:', error.message);
+    console.error('[Flashcards] Error generating from image:', {
+      endpoint: 'POST /flashcards/generate/',
+      status: error.response?.status,
+      message: error.message,
+      responseData: error.response?.data,
+      errorStack: error.stack,
+    });
     throw new Error(error.response?.data?.error || error.message || 'Failed to generate flashcards from image');
   }
 };
 
+
 /**
- * Generate predicted questions from image using OCR
- * Extracts text from image and generates predicted questions
+ * Generate predicted questions from image
+ * Sends image directly to backend for OCR and question generation
  * @param imageFile - Image file to process
  * @param userId - User ID
  * @param examType - Type of exam (JEE, NEET, General, etc.)
@@ -1679,41 +1710,71 @@ export const generatePredictedQuestionsFromImage = async (
   numQuestions: number = 3
 ): Promise<any> => {
   try {
+    console.log('[PredictedQuestions] generatePredictedQuestionsFromImage called with:', { imageFile: typeof imageFile, userId, examType, numQuestions });
     console.log('[PredictedQuestions] Generating from image...');
     
-    // First, extract text from image using OCR
-    const ocrResult = await processImageWithOCR(imageFile);
+    const formData = new FormData();
     
-    if (!ocrResult.text || ocrResult.text.trim().length === 0) {
-      throw new Error('No text could be extracted from the image');
+    // Handle different image sources
+    if (typeof imageFile === 'string') {
+      // Image URI from device
+      console.log('[PredictedQuestions] Processing image URI:', imageFile.substring(0, 60) + '...');
+      const filename = imageFile.split('/').pop() || 'image.jpg';
+      const fileData = {
+        uri: imageFile,
+        type: 'image/jpeg',
+        name: filename,
+      } as any;
+      formData.append('document', fileData);
+    } else if (imageFile instanceof File) {
+      // Web File object
+      console.log('[PredictedQuestions] Processing Web File object:', imageFile.name);
+      formData.append('document', imageFile);
+    } else if (imageFile.file) {
+      // DocumentPicker asset with file property
+      console.log('[PredictedQuestions] Processing DocumentPicker asset:', imageFile.name);
+      formData.append('document', imageFile.file);
+    } else {
+      throw new Error('Invalid image source');
     }
 
-    console.log(`[PredictedQuestions] Extracted ${ocrResult.text.length} characters from image`);
+    formData.append('user_id', userId);
+    formData.append('difficulty', examType.toLowerCase());
+    formData.append('num_questions', numQuestions.toString());
 
-    // Generate predicted questions from extracted text
-    const payload = {
-      topic: ocrResult.text,
-      user_id: userId,
-      difficulty: examType.toLowerCase(),
-      num_questions: numQuestions,
-    };
+    console.log('[PredictedQuestions] POST /predicted-questions/generate/ with image form data - examType:', examType, 'numQuestions:', numQuestions);
+    
+    const response = await api.post('/predicted-questions/generate/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 120000,
+    });
 
-    const response = await api.post('/predicted-questions/generate/', payload);
+    console.log('[PredictedQuestions] Image response status:', response.status);
+    console.log('[PredictedQuestions] Image response data:', response.data);
 
-    const predictedData = response.data.data || response.data;
-    return {
-      success: true,
-      data: predictedData,
-      questions: predictedData.questions || [],
-      confidence_score: predictedData.confidence_score || 0.85,
-      source: 'ocr_image',
-      ocrConfidence: ocrResult.confidence,
-    };
+    // Handle wrapped response format: { success: true, data: { questions, ... } }
+    // Return unwrapped data for consistency with generatePredictedQuestions
+    let result: any = response.data;
+    if (response.data.data && response.data.success) {
+      result = response.data.data;
+    }
+    
+    console.log('[PredictedQuestions] Returning image-based result with', result?.questions?.length || 0, 'questions');
+    return result;
   } catch (error: any) {
-    console.error('[PredictedQuestions] Error generating from image:', error.message);
+    console.error('[PredictedQuestions] Error generating from image:', {
+      endpoint: 'POST /predicted-questions/generate/',
+      status: error.response?.status,
+      message: error.message,
+      responseData: error.response?.data,
+      errorStack: error.stack,
+    });
     throw new Error(error.response?.data?.error || error.message || 'Failed to generate predicted questions from image');
   }
 };
+
 
 /**
  * Generate flashcards from document file (PDF, TXT, Image)
@@ -1766,13 +1827,15 @@ export const generateFlashcardsFromFile = async (
       timeout: 60000,
     });
 
-    const flashcardData = response.data.data || response.data;
-    return {
-      success: true,
-      data: flashcardData,
-      cards: flashcardData.cards || [],
-      source: 'document',
-    };
+    // Handle wrapped response format: { success: true, data: { title, cards, ... } }
+    // Return unwrapped data for consistency with generateFlashcards
+    let result: any = response.data;
+    if (response.data.data && response.data.success) {
+      result = response.data.data;
+    }
+    
+    console.log('[Flashcards] Returning file-based flashcard result with', result?.cards?.length || 0, 'cards');
+    return result;
   } catch (error: any) {
     console.error('[Flashcards] Error generating from file:', error.message);
     throw new Error(error.response?.data?.error || error.message || 'Failed to generate flashcards from file');
@@ -1830,14 +1893,15 @@ export const generatePredictedQuestionsFromFile = async (
       timeout: 60000,
     });
 
-    const predictedData = response.data.data || response.data;
-    return {
-      success: true,
-      data: predictedData,
-      questions: predictedData.questions || [],
-      confidence_score: predictedData.confidence_score || 0.85,
-      source: 'document',
-    };
+    // Handle wrapped response format: { success: true, data: { questions, ... } }
+    // Return unwrapped data for consistency with generatePredictedQuestions
+    let result: any = response.data;
+    if (response.data.data && response.data.success) {
+      result = response.data.data;
+    }
+    
+    console.log('[PredictedQuestions] Returning file-based result with', result?.questions?.length || 0, 'questions');
+    return result;
   } catch (error: any) {
     console.error('[PredictedQuestions] Error generating from file:', error.message);
     throw new Error(error.response?.data?.error || error.message || 'Failed to generate predicted questions from file');

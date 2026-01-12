@@ -12,6 +12,7 @@ import {
   Dimensions,
   Image
 } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { TextInputComponent } from './src/components/TextInput';
 import { ImageUpload } from './src/components/ImageUpload';
@@ -33,6 +34,7 @@ import { AuthScreen } from './src/components/AuthScreen';
 import { MainDashboard } from './src/components/MainDashboard';
 import { TrendAnalysis } from './src/components/TrendAnalysis';
 import { PreviousYearPapers } from './src/components/PreviousYearPapers';
+import { ResetPasswordScreen } from './src/components/ResetPasswordScreen';
 import { getUserCoins, getSubscriptionStatus } from './src/services/api';
 import { DailyQuizScreen } from './src/components/DailyQuizScreen';
 import { PairQuizContainer } from './src/components/pair-quiz';
@@ -46,7 +48,7 @@ import { colors, spacing, borderRadius, typography, shadows } from './src/styles
 type TabType = 'text' | 'image';
 type PageType = 'dashboard' | 'mock-test' | 'quiz' | 'flashcards' | 'ask' | 'predicted-questions' | 'youtube-summarizer' | 'pricing' | 'usage' | 'profile' | 'trends' | 'daily-quiz' | 'pair-quiz' | 'previous-papers' | 'withdrawal' | 'withdrawal-success';
 type DashboardSection = 'overview' | 'quiz' | 'flashcards' | 'study-material';
-type AppScreenType = 'auth' | 'landing' | 'main';
+type AppScreenType = 'auth' | 'landing' | 'main' | 'reset-password';
 
 interface User {
   id: string;
@@ -700,13 +702,13 @@ export default function App() {
 
       // Generate predicted questions
       const response = await generatePredictedQuestions(topic, userId, examType, 3);
-      console.log('[PredictedQuestions] Text-based generation successful, questions generated:', response?.data?.length || 0);
+      console.log('[PredictedQuestions] Text-based generation successful, questions generated:', response?.questions?.length || 0);
       
       // Record usage after successful generation
       await recordFeatureUsage('predicted-questions', 500, 'text', {
         source: 'text_input',
         exam_type: examType,
-        question_count: response?.data?.length || 3,
+        question_count: response?.questions?.length || 3,
       });
 
       setPredictedQuestionsData(response);
@@ -755,14 +757,14 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       const response = await generatePredictedQuestionsFromImage(imageUri, userId, 'General', 3);
       
-      console.log('[PredictedQuestions] Image processing successful, questions generated:', response?.data?.length || 0);
-      console.log('[PredictedQuestions] OCR Confidence:', response?.ocrConfidence || 'N/A');
+      console.log('[PredictedQuestions] Image processing successful, questions generated:', response?.questions?.length || 0);
+      console.log('[PredictedQuestions] Response data:', response);
 
       // Record usage with image/OCR metadata
       await recordFeatureUsage('predicted-questions', 500, 'image', {
         source: 'ocr_image',
-        ocr_confidence: response?.ocrConfidence || 0,
-        question_count: response?.data?.length || 3,
+        ocr_confidence: response?.ocr_confidence || 0,
+        question_count: response?.questions?.length || 3,
       });
 
       setPredictedQuestionsData(response);
@@ -808,13 +810,13 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       const response = await generatePredictedQuestionsFromFile(files[0], userId, examType, 3);
       
-      console.log('[PredictedQuestions] File processing successful, questions generated:', response?.data?.length || 0);
+      console.log('[PredictedQuestions] File processing successful, questions generated:', response?.questions?.length || 0);
 
       // Record usage with document metadata
       await recordFeatureUsage('predicted-questions', 500, 'file', {
-        source: response.source || 'document',
+        source: response?.source || 'document',
         file_type: files[0]?.type || 'unknown',
-        question_count: response?.data?.length || 3,
+        question_count: response?.questions?.length || 3,
       });
 
       setPredictedQuestionsData(response);
@@ -920,7 +922,7 @@ export default function App() {
         <View style={styles.headerLeft}>
           <MaterialIcons name="school" size={28} color={colors.primary} />
           <View style={styles.headerTextContainer}>
-            <Text style={styles.pageTitle}>ED Tech Solver</Text>
+            <Text style={styles.pageTitle}>Brain Pay</Text>
             <Text style={styles.pageSubtitle}>AI-powered solving</Text>
           </View>
         </View>
@@ -1343,6 +1345,7 @@ export default function App() {
                     predictedQuestionsData={null}
                     loading={predictedQuestionsLoading}
                     onTextSubmit={(topic) => handleGeneratePredictedQuestions(topic, 'General')}
+                    onImageSubmit={handleGeneratePredictedQuestionsFromImage}
                     onFileSubmit={(files) => handleGeneratePredictedQuestionsFromFile(files, 'General')}
                   />
                 </View>
@@ -1569,21 +1572,40 @@ export default function App() {
 
   const showSidebar = isWeb && screenWidth >= 768;
 
+  // Render Reset Password Screen
+  if (appScreen === 'reset-password') {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container}>
+          <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+          <ResetPasswordScreen 
+            onClose={() => setAppScreen('auth')}
+            onBackToLogin={() => setAppScreen('auth')}
+          />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
   // Render Auth Screen
   if (!user) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container}>
+          <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
           <AuthScreen 
             onAuthSuccess={handleAuthSuccess}
+            onForgotPassword={() => setAppScreen('reset-password')}
           />
-      </SafeAreaView>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   // Render Main App with user logged in
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
       <>
         {/* Drawer overlay for mobile */}
@@ -1607,7 +1629,8 @@ export default function App() {
           renderMainContent()
         )}
       </>
-    </SafeAreaView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 
   function renderSidebarWithLogout() {
@@ -1671,7 +1694,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRightWidth: 1,
     borderRightColor: '#E5E7EB',
-    padding: spacing.xl,
+    paddingHorizontal: 15,
+    paddingVertical: spacing.xl,
     flexDirection: 'column',
     justifyContent: 'space-between',
     shadowColor: '#000',
@@ -1716,8 +1740,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: 12,
     borderRadius: borderRadius.md,
     marginBottom: spacing.xs,
   },
@@ -1768,7 +1792,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: 15,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     ...shadows.sm,
@@ -1873,8 +1897,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 15,
     paddingVertical: spacing.sm,
+    marginTop: 20,
     backgroundColor: colors.white,
   },
   topLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
@@ -1963,7 +1988,9 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   featurePageContainer: {
-    padding: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
     maxWidth: 1200,
     width: '100%',
     alignSelf: 'center',

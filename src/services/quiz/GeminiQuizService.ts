@@ -40,7 +40,7 @@ class GeminiQuizService {
   constructor(apiKey?: string) {
     this.apiKey = apiKey || GEMINI_API_KEY;
     if (!this.apiKey) {
-      console.warn('⚠️ Gemini API key not configured. Set EXPO_PUBLIC_GEMINI_API_KEY in .env');
+      console.warn(' Gemini API key not configured. Set EXPO_PUBLIC_GEMINI_API_KEY in .env');
     }
   }
 
@@ -97,7 +97,7 @@ class GeminiQuizService {
         },
       };
     } catch (error: any) {
-      console.error('❌ Gemini Quiz Generation Error:', error);
+      console.error(' Gemini Quiz Generation Error:', error);
       
       return {
         success: false,
@@ -173,7 +173,7 @@ IMPORTANT: Return ONLY the JSON array, no additional text before or after.`;
         topic: q.topic || options.topic,
       }));
     } catch (error) {
-      console.error('❌ Failed to parse Gemini response:', error);
+      console.error(' Failed to parse Gemini response:', error);
       console.error('Raw response:', generatedText);
       
       // Return empty array if parsing fails

@@ -457,44 +457,43 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
             </View>
           </View>
         </View>
-      </ScrollView>
 
-      {/* Loading Overlay */}
-      <Animated.View
-        style={[
-          styles.loadingOverlay,
-          {
-            opacity: loadingOverlayAnim,
-            pointerEvents: loading ? 'auto' : 'none',
-          },
-        ]}
-      >
-        <View style={styles.loadingContent}>
-          <Animated.View
-            style={[
-              styles.loadingSpinner,
-              {
-                transform: [
-                  {
-                    scale: loadingScaleAnim,
-                  },
-                  {
-                    rotate: loadingRotateAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['0deg', '360deg'],
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            <MaterialIcons name="sync" size={60} color={colors.white} />
-          </Animated.View>
-          <Text style={styles.loadingText}>Processing your withdrawal...</Text>
-          <Text style={styles.loadingSubtext}>Sending request to admin for approval</Text>
-        </View>
-      </Animated.View>
-    </ScrollView>
+        {/* Loading Overlay */}
+        <Animated.View
+          style={[
+            styles.loadingOverlay,
+            {
+              opacity: loadingOverlayAnim,
+              pointerEvents: loading ? 'auto' : 'none',
+            },
+          ]}
+        >
+          <View style={styles.loadingContent}>
+            <Animated.View
+              style={[
+                styles.loadingSpinner,
+                {
+                  transform: [
+                    {
+                      scale: loadingScaleAnim,
+                    },
+                    {
+                      rotate: loadingRotateAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0deg', '360deg'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <MaterialIcons name="sync" size={60} color={colors.white} />
+            </Animated.View>
+            <Text style={styles.loadingText}>Processing your withdrawal...</Text>
+            <Text style={styles.loadingSubtext}>Sending request to admin for approval</Text>
+          </View>
+        </Animated.View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

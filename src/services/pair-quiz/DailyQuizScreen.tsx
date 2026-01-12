@@ -150,7 +150,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       // Try to fetch from API first
       try {
         const apiQuizData = await getDailyQuiz(userId || 'anonymous');
-        console.log('✅ Fetched quiz from API with quiz_id:', apiQuizData.quiz_id);
+        console.log(' Fetched quiz from API with quiz_id:', apiQuizData.quiz_id);
         
         // Use API response which contains the correct quiz_id (UUID format)
         const questions = apiQuizData.questions.map((q: any, idx: number) => ({
@@ -169,9 +169,9 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
         });
         setQuizState('not-started');
       } catch (apiError: any) {
-        // ❌ DO NOT use local fallback - it will fail on submission
+        //  DO NOT use local fallback - it will fail on submission
         // The API must work for quiz submission to succeed
-        console.error('❌ CRITICAL: Cannot load daily quiz from API');
+        console.error(' CRITICAL: Cannot load daily quiz from API');
         console.error('Error details:', apiError.response?.data || apiError.message);
         
         // Show user-friendly error instead of silently failing later
@@ -184,7 +184,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
         );
       }
     } catch (error: any) {
-      console.error('❌ Failed to load quiz:', error);
+      console.error(' Failed to load quiz:', error);
       const attemptBonus = quizSettings?.daily_quiz?.attempt_bonus ?? 5;
       const coinsPerCorrect = quizSettings?.daily_quiz?.coins_per_correct ?? 5;
       setQuizData({ questions: [], coins: { attempt_bonus: attemptBonus, per_correct_answer: coinsPerCorrect, max_possible: attemptBonus } });

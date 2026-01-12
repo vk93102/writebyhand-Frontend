@@ -85,7 +85,7 @@ export const runWithdrawalTests = async () => {
       
       // Validate minimum coins
       if (testCase.coinsAmount < 100 && testCase.shouldPass) {
-        console.error(`❌ FAILED: Coins must be at least 100 (got ${testCase.coinsAmount})`);
+        console.error(` FAILED: Coins must be at least 100 (got ${testCase.coinsAmount})`);
         failedTests++;
         continue;
       }
@@ -103,35 +103,35 @@ export const runWithdrawalTests = async () => {
 
       if (testCase.shouldPass) {
         if (response.success) {
-          console.log(`✅ PASSED`);
+          console.log(` PASSED`);
           console.log(`   - Withdrawal ID: ${response.data?.withdrawal_id || 'N/A'}`);
           console.log(`   - Amount: ₹${response.data?.rupees_amount || (testCase.coinsAmount / 10).toFixed(2)}`);
           console.log(`   - Status: ${response.data?.status || 'processing'}`);
           console.log(`   - Remaining Coins: ${response.data?.remaining_coins || 'N/A'}`);
           passedTests++;
         } else {
-          console.error(`❌ FAILED: Expected success but got failure`);
+          console.error(` FAILED: Expected success but got failure`);
           failedTests++;
         }
       } else {
-        console.error(`❌ FAILED: Expected error but request succeeded`);
+        console.error(` FAILED: Expected error but request succeeded`);
         failedTests++;
       }
     } catch (error: any) {
       if (!testCase.shouldPass) {
         const errorMsg = error.message || '';
         if (testCase.expectedError && errorMsg.includes(testCase.expectedError)) {
-          console.log(`✅ PASSED (Expected error caught)`);
+          console.log(` PASSED (Expected error caught)`);
           console.log(`   - Error: ${errorMsg}`);
           passedTests++;
         } else {
-          console.log(`⚠️ PARTIAL: Error caught but message might differ`);
+          console.log(` PARTIAL: Error caught but message might differ`);
           console.log(`   - Expected: ${testCase.expectedError}`);
           console.log(`   - Got: ${errorMsg}`);
           passedTests++;
         }
       } else {
-        console.error(`❌ FAILED: Unexpected error - ${error.message}`);
+        console.error(` FAILED: Unexpected error - ${error.message}`);
         failedTests++;
       }
     }
@@ -140,8 +140,8 @@ export const runWithdrawalTests = async () => {
 
   // Summary
   console.log('========== Test Summary ==========');
-  console.log(`✅ Passed: ${passedTests}`);
-  console.log(`❌ Failed: ${failedTests}`);
+  console.log(` Passed: ${passedTests}`);
+  console.log(` Failed: ${failedTests}`);
   console.log(`Total: ${testCases.length}`);
   console.log(`Success Rate: ${((passedTests / testCases.length) * 100).toFixed(1)}%`);
 

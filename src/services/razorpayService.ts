@@ -198,7 +198,7 @@ export const verifyPayment = async (
       throw new Error(data.error || 'Payment verification failed');
     }
 
-    console.log('✅ Payment verified successfully');
+    console.log(' Payment verified successfully');
     console.log('Payment ID:', data.payment_id);
     console.log('Status:', data.status);
     
@@ -256,23 +256,23 @@ export const processPayment = async (
     // Step 1: Create order on backend
     console.log('\n[Step 1/3] Creating order...');
     const order = await createPaymentOrder(userId, amount, options.notes);
-    console.log(`✅ Order created: ${order.order_id}`);
+    console.log(` Order created: ${order.order_id}`);
 
     // Step 2: Open Razorpay checkout
     console.log('\n[Step 2/3] Opening payment gateway...');
     const paymentResult = await openRazorpayCheckout(order, options);
-    console.log(`✅ Payment completed: ${paymentResult.razorpay_payment_id}`);
+    console.log(` Payment completed: ${paymentResult.razorpay_payment_id}`);
 
     // Step 3: Verify payment on backend
     console.log('\n[Step 3/3] Verifying payment...');
     await verifyPayment(paymentResult);
-    console.log('✅ Payment verified');
+    console.log(' Payment verified');
 
     console.log('\n=== Payment Process Complete ===\n');
     return paymentResult;
     
   } catch (error: any) {
-    console.error('\n❌ Payment process failed:', error.message);
+    console.error('\n Payment process failed:', error.message);
     throw error;
   }
 };

@@ -12,8 +12,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { getDailyQuiz } from '../services/api';
-import { getUserCoins } from '../services/api';
 import { getQuizSettings } from '../services/mockTestService';
+import { useAuth } from '../contexts/AuthContext';
 import { DailyQuizScreen } from './DailyQuizScreen';
 
 interface MainDashboardProps {
@@ -110,6 +110,8 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
   onNavigateToPricing,
 }) => {
   const insets = useSafeAreaInsets();
+  const { user, refreshCoins } = useAuth();
+  
   const [userStats, setUserStats] = useState({
     questionsAnswered: 24,
     quizzesCompleted: 8,
@@ -117,15 +119,18 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
     currentStreak: 5,
   });
   
-  const [userCoins, setUserCoins] = useState(0);
   const [showDailyQuiz, setShowDailyQuiz] = useState(false);
   const [dailyQuizAvailable, setDailyQuizAvailable] = useState<boolean | null>(null);
   const [quizSettings, setQuizSettings] = useState<any>(null);
 
+  // Use coins from AuthContext, fallback to 0
+  const userCoins = user?.coins || 0;
+
   useEffect(() => {
-    loadUserCoins();
     checkDailyQuizStatus();
     loadQuizSettings();
+    // Refresh coins when component mounts
+    refreshCoins();
   }, []);
 
   const loadQuizSettings = async () => {
@@ -133,7 +138,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
       const settings = await getQuizSettings();
       setQuizSettings(settings);
     } catch (error) {
-      console.error('Failed to load quiz settings:', error);
+      console.error('[MainDashboard] Failed to load quiz settings:', error);
       // Use defaults
       setQuizSettings({
         daily_quiz: {
@@ -142,15 +147,6 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
           perfect_score_bonus: 10,
         }
       });
-    }
-  };
-
-  const loadUserCoins = async () => {
-    try {
-      const data = await getUserCoins(userName || 'anonymous');
-      setUserCoins(data.total_coins || 0);
-    } catch (error) {
-      console.error('Failed to load coins:', error);
     }
   };
 
@@ -168,7 +164,8 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
 
   const handleDailyQuizComplete = () => {
     setShowDailyQuiz(false);
-    loadUserCoins(); // Refresh coins after completing quiz
+    // Refresh coins after completing quiz
+    refreshCoins();
   };
 
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([
@@ -503,21 +500,20 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
           <Text style={styles.ctaButtonText}>Explore Premium Features</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
 
-    {/* Play & Win Modal */}
-    <Modal
-      visible={showDailyQuiz}
-      animationType="slide"
-      presentationStyle="fullScreen"
-    >
-      <DailyQuizScreen
+      {/* Play & Win Modal */}
+      <Modal
         visible={showDailyQuiz}
-        userId={userName || 'anonymous'}
-        onComplete={handleDailyQuizComplete}
-        onClose={() => setShowDailyQuiz(false)}
-      />
-    </Modal>
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <DailyQuizScreen
+          visible={showDailyQuiz}
+          userId={userName || 'anonymous'}
+          onComplete={handleDailyQuizComplete}
+          onClose={() => setShowDailyQuiz(false)}
+        />
+      </Modal>
       </ScrollView>
     </SafeAreaView>
   );
@@ -539,7 +535,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 15,
     backgroundColor: colors.white,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
@@ -592,7 +588,7 @@ const styles = StyleSheet.create({
 
   /* Play & Win Banner */
   dailyQuizBanner: {
-    marginHorizontal: spacing.lg,
+    marginHorizontal: 15,
     marginTop: spacing.lg,
     marginBottom: spacing.lg,
     flexDirection: 'row',
@@ -658,7 +654,7 @@ const styles = StyleSheet.create({
 
   /* Tips Section */
   tipsSection: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 15,
     marginBottom: spacing.lg,
   },
   tipCard: {
@@ -695,7 +691,7 @@ const styles = StyleSheet.create({
 
   /* CTA Section */
   ctaSection: {
-    marginHorizontal: spacing.lg,
+    marginHorizontal: 15,
     marginBottom: spacing.xl,
     backgroundColor: colors.primary,
     borderRadius: borderRadius.md,
@@ -727,7 +723,7 @@ const styles = StyleSheet.create({
 
   /* Subscription Banner */
   subscriptionBanner: {
-    marginHorizontal: spacing.lg,
+    marginHorizontal: 15,
     marginTop: spacing.lg,
     marginBottom: spacing.lg,
     flexDirection: 'row',
@@ -777,7 +773,7 @@ const styles = StyleSheet.create({
   /* Stats Section */
   statsSection: {
     paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 15,
   },
   sectionTitle: {
     ...typography.h3,
@@ -811,7 +807,7 @@ const styles = StyleSheet.create({
 
   /* Usage Section */
   usageSection: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 15,
     marginBottom: spacing.lg,
   },
   usageReset: {
@@ -864,7 +860,7 @@ const styles = StyleSheet.create({
 
   /* Quick Access Section */
   quickAccessSection: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 15,
     marginBottom: spacing.lg,
   },
   quickAccessGrid: {
@@ -901,7 +897,7 @@ const styles = StyleSheet.create({
 
   /* Activity Section */
   activitySection: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 15,
     marginBottom: spacing.lg,
   },
   activityHeader: {

@@ -34,8 +34,8 @@ export const generateQuiz = async (
       difficulty: difficulty.toLowerCase(),
     };
     
-    console.log('[Quiz Service] POST /api/quiz/generate/ - Payload:', payload);
-    const response = await axiosInstance.post('/api/quiz/generate/', payload);
+    console.log('[Quiz Service] POST /quiz/generate/ - Payload:', payload);
+    const response = await axiosInstance.post('/quiz/generate/', payload);
 
     console.log('[Quiz Service] generateQuiz response status:', response.status);
     console.log('[Quiz Service] generateQuiz response data:', response.data);
@@ -47,7 +47,7 @@ export const generateQuiz = async (
     };
   } catch (error: any) {
     console.error('[Quiz Service] generateQuiz error:', {
-      endpoint: 'POST /api/quiz/generate/',
+      endpoint: 'POST /quiz/generate/',
       status: error.response?.status,
       message: error.message,
       responseData: error.response?.data,
@@ -108,6 +108,80 @@ export const createQuiz = async (
       error: error.response?.data?.error || error.message,
       details: error.response?.data?.details,
     };
+  }
+};
+
+/**
+ * Generate quiz from image document
+ * Sends image directly to backend for OCR and quiz generation
+ * 
+ * API: POST /quiz/generate/
+ * @param imageFile - Image file to process
+ * @param numQuestions - Number of questions (default: 5)
+ * @param difficulty - Difficulty level (default: medium)
+ * @returns Generated quiz with questions from image
+ */
+export const generateQuizFromImage = async (
+  imageFile: any,
+  numQuestions: number = 5,
+  difficulty: 'easy' | 'medium' | 'hard' = 'medium'
+) => {
+  try {
+    console.log('[Quiz Service] generateQuizFromImage called with:', { num_questions: numQuestions, difficulty });
+    
+    const formData = new FormData();
+    
+    // Handle different image sources
+    if (typeof imageFile === 'string') {
+      // Image URI from device
+      const filename = imageFile.split('/').pop() || 'document.jpg';
+      const fileData = {
+        uri: imageFile,
+        type: 'image/jpeg',
+        name: filename,
+      } as any;
+      formData.append('document', fileData);
+    } else if (imageFile instanceof File) {
+      // Web File object
+      formData.append('document', imageFile);
+    } else if (imageFile.file) {
+      // DocumentPicker asset with file property
+      formData.append('document', imageFile.file);
+    } else {
+      throw new Error('Invalid image source');
+    }
+
+    formData.append('num_questions', numQuestions.toString());
+    formData.append('difficulty', difficulty.toLowerCase());
+
+    console.log('[Quiz Service] POST /quiz/generate/ with form data - num_questions:', numQuestions, 'difficulty:', difficulty);
+    
+    const axiosInstance = api;
+    axiosInstance.defaults.timeout = 120000; // 2 minutes for AI processing
+    
+    const response = await axiosInstance.post('/quiz/generate/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    console.log('[Quiz Service] generateQuizFromImage response status:', response.status);
+    console.log('[Quiz Service] generateQuizFromImage response data:', response.data);
+
+    return {
+      success: true,
+      data: response.data,
+      questions: response.data.questions,
+      source: 'image',
+    };
+  } catch (error: any) {
+    console.error('[Quiz Service] generateQuizFromImage error:', {
+      endpoint: 'POST /quiz/generate/',
+      status: error.response?.status,
+      message: error.message,
+      responseData: error.response?.data,
+    });
+    throw error;
   }
 };
 

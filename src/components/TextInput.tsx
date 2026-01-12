@@ -21,6 +21,7 @@ export const TextInputComponent: React.FC<TextInputComponentProps> = ({
   placeholder = "Paste your problem statement, show your work, or ask for hints..."
 }) => {
   const [text, setText] = useState('');
+  const [focused, setFocused] = useState(false);
 
   const handleSubmit = () => {
     const trimmed = text.trim();
@@ -33,14 +34,18 @@ export const TextInputComponent: React.FC<TextInputComponentProps> = ({
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.textarea}
+        style={[styles.textarea, focused && styles.textareaFocused]}
         placeholder={placeholder}
         placeholderTextColor={colors.textLight}
         value={text}
         onChangeText={setText}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         multiline
         numberOfLines={8}
         editable={!loading}
+        underlineColorAndroid="transparent"
+        selectionColor="transparent"
       />
 
       <View style={styles.footer}>
@@ -78,6 +83,10 @@ const styles = StyleSheet.create({
     minHeight: 240,
     flex: 1,
     textAlignVertical: 'top',
+  },
+  textareaFocused: {
+    borderColor: colors.primary,
+    backgroundColor: colors.white,
   },
   footer: {
     flexDirection: 'row',

@@ -56,7 +56,7 @@ class MockTestLoader {
 
       return mockTest;
     } catch (error) {
-      console.error('❌ Failed to load mock test from file:', error);
+      console.error(' Failed to load mock test from file:', error);
       return null;
     }
   }
@@ -75,7 +75,7 @@ class MockTestLoader {
 
       return mockTest;
     } catch (error) {
-      console.error('❌ Failed to load mock test from asset:', error);
+      console.error(' Failed to load mock test from asset:', error);
       return null;
     }
   }
@@ -88,7 +88,7 @@ class MockTestLoader {
       const key = `${STORAGE_KEY_PREFIX}${mockTest.id}`;
       await AsyncStorage.setItem(key, JSON.stringify(mockTest));
     } catch (error) {
-      console.error('❌ Failed to save mock test:', error);
+      console.error(' Failed to save mock test:', error);
     }
   }
 
@@ -113,7 +113,7 @@ class MockTestLoader {
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
     } catch (error) {
-      console.error('❌ Failed to get all mock tests:', error);
+      console.error(' Failed to get all mock tests:', error);
       return [];
     }
   }
@@ -132,7 +132,7 @@ class MockTestLoader {
 
       return JSON.parse(data);
     } catch (error) {
-      console.error('❌ Failed to get mock test:', error);
+      console.error(' Failed to get mock test:', error);
       return null;
     }
   }
@@ -146,7 +146,7 @@ class MockTestLoader {
       await AsyncStorage.removeItem(key);
       return true;
     } catch (error) {
-      console.error('❌ Failed to delete mock test:', error);
+      console.error(' Failed to delete mock test:', error);
       return false;
     }
   }
@@ -161,7 +161,7 @@ class MockTestLoader {
       
       await AsyncStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(existingResults));
     } catch (error) {
-      console.error('❌ Failed to save test result:', error);
+      console.error(' Failed to save test result:', error);
     }
   }
 
@@ -178,7 +178,7 @@ class MockTestLoader {
 
       return JSON.parse(data);
     } catch (error) {
-      console.error('❌ Failed to get test results:', error);
+      console.error(' Failed to get test results:', error);
       return [];
     }
   }
@@ -191,7 +191,7 @@ class MockTestLoader {
       const allResults = await this.getResults();
       return allResults.filter(result => result.testId === testId);
     } catch (error) {
-      console.error('❌ Failed to get results by test ID:', error);
+      console.error(' Failed to get results by test ID:', error);
       return [];
     }
   }

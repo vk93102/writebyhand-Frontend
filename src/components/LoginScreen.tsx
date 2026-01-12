@@ -10,6 +10,8 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  useWindowDimensions,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -19,16 +21,32 @@ import { useAuth } from '../contexts/AuthContext';
 interface LoginScreenProps {
   onSwitchToRegister: () => void;
   onLoginSuccess: () => void;
+  onForgotPassword?: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister, onLoginSuccess }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ 
+  onSwitchToRegister, 
+  onLoginSuccess,
+  onForgotPassword
+}) => {
   const insets = useSafeAreaInsets();
+  const windowDims = useWindowDimensions();
+  const screenDims = Dimensions.get('screen');
+  const width = Math.min(windowDims.width, screenDims.width);
+  const height = Math.min(windowDims.height, screenDims.height);
+  
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<'username' | 'password' | null>(null);
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+
+  // Responsive detection
+  const isMobile = width < 600;
+  const isSmallMobile = width < 400;
+  const isCompactHeight = height < 800;
 
   const validateForm = (): boolean => {
     const newErrors: { username?: string; password?: string } = {};
@@ -68,248 +86,452 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister, on
     }
   };
 
+  const handleGuestLogin = () => {
+    Alert.alert(
+      'Continue as Guest?',
+      'You will have limited access to features. Premium features will be locked.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Continue',
+          onPress: () => onLoginSuccess(),
+          style: 'default',
+        },
+      ]
+    );
+  };
+
+  const handleForgotPassword = () => {
+    if (onForgotPassword) {
+      onForgotPassword();
+    } else {
+      Alert.alert('Reset Password', 'Enter your email to receive reset instructions');
+    }
+  };
+
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView 
+      style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]} 
+      edges={['top', 'left', 'right', 'bottom']}
+    >
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            isMobile && styles.scrollContentMobile,
+            isCompactHeight && styles.scrollContentCompact,
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <View style={styles.iconContainer}>
-              <MaterialIcons name="school" size={60} color={colors.primary} />
+          {/* Header */}
+          <View style={[styles.header, isCompactHeight && styles.headerCompact]}>
+            <View style={[styles.iconContainer, isSmallMobile && styles.iconContainerSmall]}>
+              <MaterialIcons name="school" size={isSmallMobile ? 48 : 56} color="#FFFFFF" />
             </View>
-            <Text style={styles.title}>Welcome Back!</Text>
-            <Text style={styles.subtitle}>Sign in to continue your learning journey</Text>
+            <Text style={[styles.title, isSmallMobile && styles.titleSmall]}>Welcome Back!</Text>
+            <Text style={[styles.subtitle, isSmallMobile && styles.subtitleSmall]}>
+              Sign in to continue your learning journey
+            </Text>
           </View>
 
+          {/* Form */}
           <View style={styles.form}>
+            {/* Email/Username Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Username or Email</Text>
-              <View style={[styles.inputContainer, errors.username && styles.inputError]}>
-                <MaterialIcons name="person" size={20} color={colors.textMuted} />
+              <Text style={[styles.label, isSmallMobile && styles.labelSmall]}>Email or Username</Text>
+              <View 
+                style={[
+                  styles.inputContainer,
+                  focusedInput === 'username' && styles.inputFocused,
+                  errors.username && styles.inputError
+                ]}
+              >
+                <MaterialIcons name="person" size={20} color="#9CA3AF" />
                 <TextInput
-                  style={styles.input}
-                  placeholder="Enter username or email"
-                  placeholderTextColor={colors.textMuted}
+                  style={[styles.input, isSmallMobile && styles.inputSmall]}
+                  placeholder="student@domain.com"
+                  placeholderTextColor="#D1D5DB"
                   value={username}
                   onChangeText={(text) => {
                     setUsername(text);
                     if (errors.username) setErrors({ ...errors, username: undefined });
                   }}
+                  onFocus={() => setFocusedInput('username')}
+                  onBlur={() => setFocusedInput(null)}
                   autoCapitalize="none"
                   autoCorrect={false}
+                  underlineColorAndroid="transparent"
+                  selectionColor="transparent"
+                  editable={!loading}
                 />
               </View>
               {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
             </View>
 
+            {/* Password Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Password</Text>
-              <View style={[styles.inputContainer, errors.password && styles.inputError]}>
-                <MaterialIcons name="lock" size={20} color={colors.textMuted} />
+              <Text style={[styles.label, isSmallMobile && styles.labelSmall]}>Password</Text>
+              <View 
+                style={[
+                  styles.inputContainer,
+                  focusedInput === 'password' && styles.inputFocused,
+                  errors.password && styles.inputError
+                ]}
+              >
+                <MaterialIcons name="lock" size={20} color="#9CA3AF" />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, isSmallMobile && styles.inputSmall]}
                   placeholder="Enter password"
-                  placeholderTextColor={colors.textMuted}
+                  placeholderTextColor="#D1D5DB"
                   value={password}
                   onChangeText={(text) => {
                     setPassword(text);
                     if (errors.password) setErrors({ ...errors, password: undefined });
                   }}
+                  onFocus={() => setFocusedInput('password')}
+                  onBlur={() => setFocusedInput(null)}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
+                  underlineColorAndroid="transparent"
+                  selectionColor="transparent"
+                  editable={!loading}
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <TouchableOpacity 
+                  onPress={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
                   <MaterialIcons
                     name={showPassword ? 'visibility' : 'visibility-off'}
                     size={20}
-                    color={colors.textMuted}
+                    color="#9CA3AF"
                   />
                 </TouchableOpacity>
               </View>
               {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
             </View>
 
-            <TouchableOpacity style={styles.forgotPassword} onPress={() => Alert.alert('Password Reset', 'Check your email for password reset link')}>
+            {/* Forgot Password Link */}
+            <TouchableOpacity 
+              style={styles.forgotPasswordButton}
+              onPress={handleForgotPassword}
+              disabled={loading}
+            >
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+            {/* Sign In Button */}
+            <TouchableOpacity 
+              style={[styles.signInButton, loading && styles.buttonDisabled]}
+              onPress={handleLogin} 
+              disabled={loading}
+              activeOpacity={0.8}
+            >
               {loading ? (
-                <ActivityIndicator color={colors.white} />
+                <ActivityIndicator color="#FFFFFF" size={isSmallMobile ? 'small' : 'large'} />
               ) : (
-                <>
-                  <MaterialIcons name="login" size={20} color={colors.white} />
-                  <Text style={styles.loginButtonText}>Log In</Text>
-                </>
+                <Text style={[styles.signInButtonText, isSmallMobile && styles.signInButtonTextSmall]}>
+                  Sign In
+                </Text>
               )}
             </TouchableOpacity>
 
-            <View style={styles.divider}>
+            {/* Continue as Guest Button */}
+            <TouchableOpacity 
+              style={[styles.guestButton, loading && styles.buttonDisabled]}
+              onPress={handleGuestLogin}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              <MaterialIcons name="person-outline" size={18} color="#3B82F6" />
+              <Text style={[styles.guestButtonText, isSmallMobile && styles.guestButtonTextSmall]}>
+                Continue as Guest
+              </Text>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={[styles.divider, isCompactHeight && styles.dividerCompact]}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>or</Text>
               <View style={styles.dividerLine} />
             </View>
 
-            <TouchableOpacity style={styles.registerPrompt} onPress={onSwitchToRegister}>
-              <Text style={styles.registerText}>
+            {/* Sign Up Link */}
+            <TouchableOpacity 
+              style={styles.signUpPrompt}
+              onPress={onSwitchToRegister}
+              disabled={loading}
+            >
+              <Text style={[styles.signUpText, isSmallMobile && styles.signUpTextSmall]}>
                 New here?{' '}
-                <Text style={styles.registerLink}>Sign Up</Text>
+                <Text style={styles.signUpLink}>Sign Up</Text>
               </Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.footer}>
-            <MaterialIcons name="security" size={16} color={colors.textMuted} />
-            <Text style={styles.footerText}>Your data is secured with end-to-end encryption</Text>
+          {/* Footer */}
+          <View style={[styles.footer, isCompactHeight && styles.footerCompact]}>
+            <MaterialIcons name="security" size={14} color="#9CA3AF" />
+            <Text style={[styles.footerText, isSmallMobile && styles.footerTextSmall]}>
+              Your data is secured with encryption
+            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
-};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#F5F7FA',
   },
   scrollContent: {
     flexGrow: 1,
-    padding: spacing.xl,
-    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    justifyContent: 'space-between',
   },
+  scrollContentMobile: {
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  },
+  scrollContentCompact: {
+    paddingVertical: 16,
+  },
+
+  /* Header Styles */
   header: {
     alignItems: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: 32,
+  },
+  headerCompact: {
+    marginBottom: 16,
   },
   iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.blue50,
+    width: 80,
+    height: 80,
+    borderRadius: 16,
+    backgroundColor: '#5A8C9E',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: 20,
+    shadowColor: '#5A8C9E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  iconContainerSmall: {
+    width: 64,
+    height: 64,
+    marginBottom: 16,
   },
   title: {
-    ...typography.h1,
-    color: colors.text,
+    fontSize: 28,
     fontWeight: '700',
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.textMuted,
+    color: '#1A1A1A',
+    marginBottom: 8,
     textAlign: 'center',
   },
+  titleSmall: {
+    fontSize: 24,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  subtitleSmall: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+
+  /* Form Styles */
   form: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 500,
     alignSelf: 'center',
   },
   inputGroup: {
-    marginBottom: spacing.lg,
+    marginBottom: 18,
   },
   label: {
-    ...typography.h4,
-    color: colors.text,
+    fontSize: 14,
     fontWeight: '600',
-    marginBottom: spacing.sm,
+    color: '#1A1A1A',
+    marginBottom: 8,
+  },
+  labelSmall: {
+    fontSize: 12,
+    marginBottom: 6,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    gap: spacing.sm,
-    ...shadows.sm,
-  },
-  inputError: {
-    borderColor: colors.error,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 14,
+    height: 52,
+    gap: 10,
   },
   input: {
     flex: 1,
-    ...typography.body,
-    color: colors.text,
-    paddingVertical: spacing.md,
+    fontSize: 15,
+    color: '#1A1A1A',
+    fontWeight: '500',
+  },
+  inputSmall: {
+    fontSize: 14,
+  },
+  inputError: {
+    borderColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
+  },
+  inputFocused: {
+    borderColor: '#3B82F6',
+    borderWidth: 2,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   errorText: {
-    ...typography.small,
-    color: colors.error,
-    marginTop: spacing.xs,
-    marginLeft: spacing.xs,
+    fontSize: 12,
+    color: '#EF4444',
+    marginTop: 4,
+    marginLeft: 4,
+    fontWeight: '500',
   },
-  forgotPassword: {
+
+  /* Button Styles */
+  forgotPasswordButton: {
     alignItems: 'flex-end',
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
+    marginBottom: 18,
+    paddingVertical: 4,
   },
   forgotPasswordText: {
-    ...typography.small,
-    color: colors.primary,
+    fontSize: 13,
+    color: '#3B82F6',
     fontWeight: '600',
   },
-  loginButton: {
-    flexDirection: 'row',
+  signInButton: {
+    backgroundColor: '#3B82F6',
+    borderRadius: 12,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.md,
-    marginTop: spacing.md,
-    ...shadows.md,
+    marginBottom: 10,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  loginButtonText: {
-    ...typography.h4,
-    color: colors.white,
+  signInButtonText: {
+    fontSize: 16,
     fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
+  signInButtonTextSmall: {
+    fontSize: 15,
+  },
+  guestButton: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: '#3B82F6',
+    marginBottom: 20,
+  },
+  guestButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#3B82F6',
+  },
+  guestButtonTextSmall: {
+    fontSize: 13,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+
+  /* Divider */
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: spacing.xl,
+    marginVertical: 20,
+  },
+  dividerCompact: {
+    marginVertical: 14,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: '#E5E7EB',
   },
   dividerText: {
-    ...typography.body,
-    color: colors.textMuted,
-    marginHorizontal: spacing.md,
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginHorizontal: 12,
+    fontWeight: '500',
   },
-  registerPrompt: {
+
+  /* Sign Up Section */
+  signUpPrompt: {
     alignItems: 'center',
+    paddingVertical: 8,
   },
-  registerText: {
-    ...typography.body,
-    color: colors.textMuted,
+  signUpText: {
+    fontSize: 14,
+    color: '#6B7280',
   },
-  registerLink: {
-    color: colors.primary,
+  signUpTextSmall: {
+    fontSize: 13,
+  },
+  signUpLink: {
+    color: '#3B82F6',
     fontWeight: '700',
   },
+
+  /* Footer */
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.xl,
+    gap: 6,
+    marginTop: 24,
+    paddingTop: 16,
+  },
+  footerCompact: {
+    marginTop: 12,
+    paddingTop: 8,
   },
   footerText: {
-    ...typography.small,
-    color: colors.textMuted,
+    fontSize: 12,
+    color: '#9CA3AF',
+    textAlign: 'center',
+  },
+  footerTextSmall: {
+    fontSize: 11,
   },
 });

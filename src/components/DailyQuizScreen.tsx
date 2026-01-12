@@ -12,6 +12,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { getDailyQuiz, submitDailyQuiz, startDailyQuiz, getUserCoins } from '../services/api';
@@ -109,7 +110,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       // Try to fetch from API first
       try {
         const apiQuizData = await getDailyQuiz(userId || 'anonymous');
-        console.log('✅ Fetched quiz from API with quiz_id:', apiQuizData.quiz_id);
+        console.log(' Fetched quiz from API with quiz_id:', apiQuizData.quiz_id);
         
         // Use API response which contains the correct quiz_id (UUID format)
         const questions = apiQuizData.questions.map((q: any, idx: number) => ({
@@ -128,9 +129,9 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
         });
         setQuizState('not-started');
       } catch (apiError: any) {
-        // ❌ DO NOT use local fallback - it will fail on submission
+        //  DO NOT use local fallback - it will fail on submission
         // The API must work for quiz submission to succeed
-        console.error('❌ CRITICAL: Cannot load daily quiz from API');
+        console.error(' CRITICAL: Cannot load daily quiz from API');
         console.error('Error details:', apiError.response?.data || apiError.message);
         
         // Show user-friendly error instead of silently failing later
@@ -143,7 +144,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
         );
       }
     } catch (error: any) {
-      console.error('❌ Failed to load quiz:', error);
+      console.error(' Failed to load quiz:', error);
       // Use default coin values since we can't load from API
       const attemptBonus = 5;
       const coinsPerCorrect = 10;

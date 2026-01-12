@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Linking, TouchableOpacity } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 
@@ -8,6 +9,7 @@ interface ResultsProps {
 }
 
 export const Results: React.FC<ResultsProps> = ({ data }) => {
+  const insets = useSafeAreaInsets();
   const handleLinkPress = async (url: string) => {
     try {
       await Linking.openURL(url);
@@ -25,8 +27,9 @@ export const Results: React.FC<ResultsProps> = ({ data }) => {
   const pipeline = data?.pipeline || 'unknown';
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
         <MaterialIcons name="check-circle" size={28} color={colors.success} />
         <Text style={styles.headerTitle}>Results Found!</Text>
       </View>
@@ -128,7 +131,8 @@ export const Results: React.FC<ResultsProps> = ({ data }) => {
         </View>
       )}
 
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

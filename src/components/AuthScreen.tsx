@@ -1,201 +1,217 @@
 import React, { useState } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
   Alert,
   ActivityIndicator,
-  Platform,
-  Linking,
-  Dimensions,
+  Image,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
-import { registerUser, loginUser } from '../services/api';
+import { colors, spacing, borderRadius, shadows } from '../styles/theme';
+import { loginUser, registerUser } from '../services/api';
+
+const brainPayLogo = require('../../assets/logo.png');
 
 interface AuthScreenProps {
   onAuthSuccess: (user: any) => void;
 }
 
-const isWeb = Platform.OS === 'web';
+type AuthMode = 'login' | 'signup';
+
+type Provider = 'email' | 'guest';
+
+const mapUserPayload = (payload: any, provider: Provider) => {
+  if (!payload) {
+    return null;
+  }
+  const data = payload?.data ?? payload;
+  return {
+    id: data?.user_id ?? data?.id ?? null,
+    username: data?.username ?? '',
+    email: data?.email ?? '',
+    fullName: data?.full_name ?? data?.fullName ?? '',
+    token: data?.token,
+    provider,
+  };
+};
 
 export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
-  const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
-  const [loading, setLoading] = useState(false);
-
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-
+  const [mode, setMode] = useState<AuthMode>('login');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [signupFullName, setSignupFullName] = useState('');
   const [signupUsername, setSignupUsername] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
-  const [signupFullName, setSignupFullName] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupPasswordVisible, setSignupPasswordVisible] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const resetAuthError = () => setError(null);
 
-  const handleEmailLogin = async () => {
-    if (!loginEmail || !loginPassword) {
-      Alert.alert('Error', 'Please fill in both email and password fields.');
-      return;
-    }
+  const handleToggleMode = () => {
+    setMode((prev) => (prev === 'login' ? 'signup' : 'login'));
+    resetAuthError();
+  };
 
-    if (!validateEmail(loginEmail)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
+  const handleLogin = async () => {
+    if (!identifier.trim() || !password.trim()) {
+      const message = 'Enter both your email/username and password.';
+      setError(message);
+      Alert.alert('Missing Details', message);
       return;
     }
 
     try {
       setLoading(true);
-      const result = await loginUser(loginEmail, loginPassword);
-      
-      if (!result || !result.success) {
-        throw new Error('Login failed');
+      resetAuthError();
+      const result = await loginUser(identifier.trim(), password);
+      const mappedUser = mapUserPayload(result?.data, 'email');
+      if (!mappedUser) {
+        throw new Error('Invalid login response received.');
       }
-      
-      onAuthSuccess({
-        ...result.data,
-        provider: 'email',
-      });
-    } catch (error: any) {
-      Alert.alert('Login Failed', error?.message || 'Unable to log in. Please try again.');
+      onAuthSuccess(mappedUser);
+    } catch (err: any) {
+      const message = err?.message || 'Unable to log in right now.';
+      setError(message);
+      Alert.alert('Login Failed', message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEmailSignup = async () => {
-    if (!signupUsername || !signupEmail || !signupFullName || !signupPassword) {
-      Alert.alert('Error', 'Please fill out all fields.');
+  const handleSignup = async () => {
+    if (!signupFullName.trim() || !signupUsername.trim() || !signupEmail.trim() || !password.trim()) {
+      const message = 'Fill out all fields to continue.';
+      setError(message);
+      Alert.alert('Missing Details', message);
       return;
     }
 
-    if (!validateEmail(signupEmail)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
-      return;
-    }
-
-    if (signupPassword.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long.');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(signupEmail.trim().toLowerCase())) {
+      const message = 'Please enter a valid email address.';
+      setError(message);
+      Alert.alert('Invalid Email', message);
       return;
     }
 
     try {
       setLoading(true);
-      const result = await registerUser(signupUsername, signupEmail, signupPassword, signupFullName);
-      
-      if (!result || !result.success) {
-        throw new Error('Unable to create account');
+      resetAuthError();
+      const result = await registerUser(
+        signupUsername.trim(),
+        signupEmail.trim().toLowerCase(),
+        password,
+        signupFullName.trim()
+      );
+      const mappedUser = mapUserPayload(result?.data, 'email');
+      if (!mappedUser) {
+        throw new Error('Invalid signup response received.');
       }
-      
-      onAuthSuccess({
-        ...result.data,
-        provider: 'email',
-      });
-    } catch (error: any) {
-      Alert.alert('Sign Up Failed', error?.message || 'Unable to create your account right now.');
+      onAuthSuccess(mappedUser);
+    } catch (err: any) {
+      const message = err?.message || 'Unable to create an account right now.';
+      setError(message);
+      Alert.alert('Sign Up Failed', message);
     } finally {
       setLoading(false);
     }
   };
 
-  const renderEmailLogin = () => (
-    <View style={styles.formSection}>
+  const handleGuestLogin = async () => {
+    try {
+      setLoading(true);
+      resetAuthError();
+      const timestamp = Date.now();
+      const guestUsername = `guest_${timestamp}`;
+      const guestEmail = `guest_${timestamp}@vaida.app`;
+      const guestPassword = `Guest@${timestamp}`;
+
+      const result = await registerUser(guestUsername, guestEmail, guestPassword, 'Guest User');
+      const mappedUser = mapUserPayload(result?.data, 'guest');
+      if (!mappedUser) {
+        throw new Error('Unable to start a guest session.');
+      }
+      onAuthSuccess(mappedUser);
+    } catch (err: any) {
+      const message = err?.message || 'Unable to start a guest session right now.';
+      setError(message);
+      Alert.alert('Guest Login Failed', message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (loading) {
+      return;
+    }
+    if (mode === 'login') {
+      handleLogin();
+    } else {
+      handleSignup();
+    }
+  };
+
+  const renderLoginFields = () => (
+    <>
       <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Email Address</Text>
-        <View style={styles.inputShell}>
-          <MaterialIcons name="mail-outline" size={18} color="#9CA3AF" />
+        <Text style={styles.label}>Email or Username</Text>
+        <View style={styles.inputWrapper}>
+          <MaterialIcons name="mail-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
-            placeholder={isWeb ? "student@domain.com" : "Enter your email"}
-            placeholderTextColor="#D1D5DB"
-            value={loginEmail}
-            onChangeText={setLoginEmail}
+            placeholder="Enter your email"
+            placeholderTextColor={colors.textLight}
+            value={identifier}
+            onChangeText={setIdentifier}
+            editable={!loading}
             autoCapitalize="none"
-            keyboardType="email-address"
-            editable={!loading}
           />
         </View>
       </View>
 
       <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.inputShell}>
-          <MaterialIcons name="lock-outline" size={18} color="#9CA3AF" />
+        <Text style={[styles.label]}>Password</Text>
+        <View style={styles.inputWrapper}>
+          <MaterialIcons name="lock-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
-            placeholder="Enter password"
-            placeholderTextColor="#D1D5DB"
-            value={loginPassword}
-            onChangeText={setLoginPassword}
-            secureTextEntry={!loginPasswordVisible}
+            placeholder="Enter your password"
+            placeholderTextColor={colors.textLight}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
             editable={!loading}
           />
-          <TouchableOpacity onPress={() => setLoginPasswordVisible(!loginPasswordVisible)} disabled={loading}>
-            <MaterialIcons
-              name={loginPasswordVisible ? 'visibility' : 'visibility-off'}
-              size={18}
-              color="#9CA3AF"
-            />
+          <TouchableOpacity
+            onPress={() => setShowPassword((prev) => !prev)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <MaterialIcons name={showPassword ? 'visibility' : 'visibility-off'} size={18} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
       </View>
-
-      {!isWeb && (
-        <View style={styles.rememberMeContainer}>
-          <TouchableOpacity 
-            style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
-            onPress={() => setRememberMe(!rememberMe)}
-            disabled={loading}
-          >
-            {rememberMe && <MaterialIcons name="check" size={14} color="#FFFFFF" />}
-          </TouchableOpacity>
-          <Text style={styles.rememberMeText}>Remember me</Text>
-          <TouchableOpacity style={styles.forgotPasswordLink} onPress={() => Alert.alert('Reset Password', 'Password reset link sent to your email')}>
-            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <TouchableOpacity
-        style={[styles.primaryButton, loading && styles.disabledButton]}
-        onPress={handleEmailLogin}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#FFFFFF" />
-        ) : (
-          <Text style={styles.primaryButtonText}>{isWeb ? 'Sign In' : 'Sign in'}</Text>
-        )}
-      </TouchableOpacity>
-
-      {!isWeb && (
-        <View style={styles.dividerRow}>
-          <View style={styles.divider} />
-          <Text style={styles.dividerLabel}>or</Text>
-          <View style={styles.divider} />
-        </View>
-      )}
-    </View>
+    </>
   );
 
-  const renderEmailSignup = () => (
-    <View style={styles.formSection}>
+  const renderSignupFields = () => (
+    <>
       <View style={styles.fieldGroup}>
         <Text style={styles.label}>Full Name</Text>
-        <View style={styles.inputShell}>
-          <MaterialIcons name="person-outline" size={18} color="#9CA3AF" />
+        <View style={styles.inputWrapper}>
+          <MaterialIcons name="person-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Enter your full name"
-            placeholderTextColor="#D1D5DB"
+            placeholderTextColor={colors.textLight}
             value={signupFullName}
             onChangeText={setSignupFullName}
             editable={!loading}
@@ -205,12 +221,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
 
       <View style={styles.fieldGroup}>
         <Text style={styles.label}>Username</Text>
-        <View style={styles.inputShell}>
-          <MaterialIcons name="person" size={18} color="#9CA3AF" />
+        <View style={styles.inputWrapper}>
+          <MaterialIcons name="alternate-email" size={18} color={colors.textMuted} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Choose a username"
-            placeholderTextColor="#D1D5DB"
+            placeholderTextColor={colors.textLight}
             value={signupUsername}
             onChangeText={setSignupUsername}
             autoCapitalize="none"
@@ -220,174 +236,105 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
       </View>
 
       <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Email Address</Text>
-        <View style={styles.inputShell}>
-          <MaterialIcons name="mail-outline" size={18} color="#9CA3AF" />
+        <Text style={styles.label}>Email</Text>
+        <View style={styles.inputWrapper}>
+          <MaterialIcons name="mail-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Enter your email"
-            placeholderTextColor="#D1D5DB"
+            placeholderTextColor={colors.textLight}
             value={signupEmail}
             onChangeText={setSignupEmail}
-            autoCapitalize="none"
             keyboardType="email-address"
+            autoCapitalize="none"
             editable={!loading}
           />
         </View>
       </View>
 
       <View style={styles.fieldGroup}>
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.inputShell}>
-          <MaterialIcons name="lock-outline" size={18} color="#9CA3AF" />
+        <Text style={[styles.label]}>Password</Text>
+        <View style={styles.inputWrapper}>
+          <MaterialIcons name="lock-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
-            placeholder="Create a password"
-            placeholderTextColor="#D1D5DB"
-            value={signupPassword}
-            onChangeText={setSignupPassword}
-            secureTextEntry={!signupPasswordVisible}
+            placeholder="Create a strong password"
+            placeholderTextColor={colors.textLight}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
             editable={!loading}
           />
-          <TouchableOpacity onPress={() => setSignupPasswordVisible(!signupPasswordVisible)} disabled={loading}>
-            <MaterialIcons
-              name={signupPasswordVisible ? 'visibility' : 'visibility-off'}
-              size={18}
-              color="#9CA3AF"
-            />
+          <TouchableOpacity
+            onPress={() => setShowPassword((prev) => !prev)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <MaterialIcons name={showPassword ? 'visibility' : 'visibility-off'} size={18} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
       </View>
-
-      <TouchableOpacity
-        style={[styles.primaryButton, loading && styles.disabledButton]}
-        onPress={handleEmailSignup}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#FFFFFF" />
-        ) : (
-          <Text style={styles.primaryButtonText}>Create Account</Text>
-        )}
-      </TouchableOpacity>
-
-      <View style={styles.signupLinksRow}>
-        <Text style={styles.loginPromptText}>Already have an account?</Text>
-        <TouchableOpacity onPress={() => setActiveTab('login')}>
-          <Text style={styles.loginLink}> Sign in</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.policyLinksRow}>
-        <TouchableOpacity onPress={() => Linking.openURL('https://example.com/privacy')}>
-          <Text style={styles.smallLink}>Privacy Policy</Text>
-        </TouchableOpacity>
-        <Text style={styles.smallLinkSeparator}>•</Text>
-        <TouchableOpacity onPress={() => Linking.openURL('https://example.com/terms')}>
-          <Text style={styles.smallLink}>Terms</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </>
   );
 
-  // Mobile Layout - Simple form
-  if (!isWeb) {
-    return (
-      <SafeAreaView style={[styles.screen, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
-        <ScrollView 
-          contentContainerStyle={styles.scrollContainer} 
-          showsVerticalScrollIndicator={false}
+  return (
+    <SafeAreaView style={styles.screen}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.mobileContainer}>
-            <View style={styles.formContainer}>
-              {/* Header - Hidden on mobile */}
-              {isWeb && (
-                <View style={styles.header}>
-                  <Text style={styles.headerTitle}>Get Started</Text>
-                  <Text style={styles.headerSubtitle}>Book appointments with doctors and tutors.</Text>
-                </View>
-              )}
+          <View style={styles.card}>
+            <Image source={brainPayLogo} accessibilityLabel="BrainPayP logo" style={{ width: 140, height: 40, resizeMode: 'contain', alignSelf: 'center', marginBottom: 2 }} />
+           
+            <Text style={styles.title}>{mode === 'login' ? 'Log In' : 'Sign Up'}</Text>
+            <Text style={styles.subtitle}>
+              {mode === 'login'
+                ? 'Unlock your potential with our AI-powered learning platform.'
+                : 'Create an account to start learning with AI-powered study tools.'}
+            </Text>
 
-              {/* Tab Navigation */}
-              <View style={styles.tabNavigation}>
-                <TouchableOpacity 
-                  style={[styles.tabButton, activeTab === 'login' && styles.tabButtonActive]}
-                  onPress={() => setActiveTab('login')}
-                >
-                  <Text style={[styles.tabButtonText, activeTab === 'login' && styles.tabButtonTextActive]}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.tabButton, activeTab === 'signup' && styles.tabButtonActive]}
-                  onPress={() => setActiveTab('signup')}
-                >
-                  <Text style={[styles.tabButtonText, activeTab === 'signup' && styles.tabButtonTextActive]}>Register</Text>
-                </TouchableOpacity>
+           
+
+            {error && (
+              <View style={styles.errorBanner}>
+                <MaterialIcons name="error-outline" size={18} color={colors.error} />
+                <Text style={styles.errorText}>{error}</Text>
               </View>
+            )}
 
-              {/* Form Content */}
-              {activeTab === 'login' ? renderEmailLogin() : renderEmailSignup()}
-            </View>
+            {mode === 'login' ? renderLoginFields() : renderSignupFields()}
+
+            <TouchableOpacity
+              style={[styles.primaryButton, loading && styles.disabledButton]}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <Text style={styles.primaryButtonText}>{mode === 'login' ? 'Log In' : 'Create Account'}</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.guestButton, loading && styles.disabledButton]}
+              onPress={handleGuestLogin}
+              disabled={loading}
+            >
+              <MaterialIcons name="person-outline" size={18} color={colors.primary} />
+              <Text style={styles.guestButtonText}>Continue as Guest</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.switchText}>
+              {mode === 'login' ? 'New here? ' : 'Already have an account? '}
+              <Text style={styles.switchLink} onPress={handleToggleMode}>
+                {mode === 'login' ? 'Sign up' : 'Log in'}
+              </Text>
+            </Text>
           </View>
         </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  // Web Layout - 50/50 with blue left side
-  return (
-    <SafeAreaView style={[styles.screen, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
-      <ScrollView 
-        contentContainerStyle={styles.webScrollContainer} 
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.webContainer}>
-          {/* Left Side - Hero Section */}
-          <View style={styles.leftSide}>
-            <View style={styles.logoHeader}>
-              <MaterialIcons name="school" size={20} color="#5B7EED" />
-            </View>
-
-            <View style={styles.centerContent}>
-              {/* Icon Circle Card */}
-              <View style={styles.iconCircleContainer}>
-                <View style={styles.iconCircle}>
-                  <MaterialIcons name="school" size={56} color="#5B7EED" />
-                </View>
-              </View>
-
-              {/* Hero Text */}
-              <View style={styles.heroTextContainer}>
-                <Text style={styles.heroTitle}>Unlock Your Potential</Text>
-                <Text style={styles.heroSubtitle}>Elevate your learning experience with our innovative AI-powered study tools and resources to support your growth.</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Right Side - Auth Form */}
-          <View style={styles.rightSide}>
-            <View style={styles.webFormCard}>
-              {/* Tab Navigation */}
-              <View style={styles.tabNavigation}>
-                <TouchableOpacity 
-                  style={[styles.tabButton, activeTab === 'login' && styles.tabButtonActive]}
-                  onPress={() => setActiveTab('login')}
-                >
-                  <Text style={[styles.tabButtonText, activeTab === 'login' && styles.tabButtonTextActive]}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.tabButton, activeTab === 'signup' && styles.tabButtonActive]}
-                  onPress={() => setActiveTab('signup')}
-                >
-                  <Text style={[styles.tabButtonText, activeTab === 'signup' && styles.tabButtonTextActive]}>Sign Up</Text>
-                </TouchableOpacity>
-              </View>
-
-              {activeTab === 'login' ? renderEmailLogin() : renderEmailSignup()}
-            </View>
-          </View>
-        </View>
-      </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -395,285 +342,134 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.backgroundGray,
   },
-  scrollContainer: {
+  scrollContent: {
     flexGrow: 1,
-  },
-  webScrollContainer: {
-    flexGrow: 1,
-  },
-
-  // Mobile Layout
-  mobileContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-    paddingTop: spacing.xl,
-  },
-  formContainer: {
-    width: '100%',
-    maxWidth: '100%',
-    paddingHorizontal: spacing.md,
-  },
-
-  // Web Layout
-  webContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    minHeight: '100vh',
-    backgroundColor: '#E3F2FD',
-  },
-
-  // Left Side (Web Only)
-  leftSide: {
-    flex: 1,
-    backgroundColor: '#E3F2FD',
     padding: spacing.xxxl,
-    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  logoHeader: {
-    marginBottom: spacing.xl,
-  },
-  centerContent: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+  },
+  card: {
     width: '100%',
+    maxWidth: 380,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
+    paddingHorizontal: spacing.xxxl,
+    paddingVertical: spacing.xxxl,
+    ...shadows.md,
   },
-  heroTextContainer: {
-    maxWidth: 420,
-  },
-  iconCircleContainer: {
-    marginBottom: spacing.xxxl,
-    justifyContent: 'center',
+  logoRow: {
+    alignSelf: 'stretch',
     alignItems: 'center',
   },
-  iconCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+  logoImage: {
+    width: 250,
+    height: 200,
+    resizeMode: 'contain',
+    marginBottom: -16,
   },
-  heroTitle: {
-    fontSize: 36,
+  title: {
+    fontSize: 28,
     fontWeight: '700',
-    color: '#1A202C',
-    marginBottom: spacing.lg,
     textAlign: 'center',
+    color: colors.text,
+    marginBottom: spacing.sm,
   },
-  heroSubtitle: {
-    fontSize: 15,
-    color: '#4A5568',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-
-  // Right Side (Web Only)
-  rightSide: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xxxl,
-  },
-  webFormCard: {
-    width: '100%',
-    maxWidth: 420,
-  },
-
-  // Header (Mobile Only)
-  header: {
-    marginBottom: spacing.xl,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1A202C',
-    marginBottom: spacing.xs,
-    textAlign: 'center',
-  },
-  headerSubtitle: {
+  subtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: colors.textMuted,
     textAlign: 'center',
-    lineHeight: 18,
+    marginBottom: spacing.xxl,
+    lineHeight: 20,
   },
-
-  // Tab Navigation
-  tabNavigation: {
-    flexDirection: 'row',
-    marginBottom: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xs,
-    alignItems: 'center',
-    borderBottomWidth: 3,
-    borderBottomColor: 'transparent',
-  },
-  tabButtonActive: {
-    borderBottomColor: '#5B7EED',
-  },
-  tabButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#9CA3AF',
-  },
-  tabButtonTextActive: {
-    color: '#5B7EED',
-  },
-
-  // Form Section
-  formSection: {
-    gap: spacing.lg,
-  },
-
-  // Fields
   fieldGroup: {
-    gap: spacing.xs,
+    marginBottom: spacing.xxl,
   },
   label: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#374151',
+    color: colors.text,
+    marginBottom: spacing.sm,
   },
-  inputShell: {
+  commentLabel: {
+    color: colors.textMuted,
+    fontStyle: 'italic',
+  },
+  inputWrapper: {
     flexDirection: 'row',
-    gap: spacing.sm,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: borderRadius.lg,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.blue100,
+    borderRadius: 999,
+    paddingHorizontal: spacing.xxl,
+    minHeight: 48,
+  },
+  inputIcon: {
+    marginRight: spacing.md,
   },
   input: {
     flex: 1,
     fontSize: 14,
-    color: '#1F2937',
-    paddingVertical: spacing.xs,
+    color: colors.text,
+    paddingVertical: spacing.sm,
   },
-
-  // Remember Me
-  rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    justifyContent: 'space-between',
-    marginVertical: spacing.xs,
-  },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#5B7EED',
-    borderColor: '#5B7EED',
-  },
-  rememberMeText: {
-    fontSize: 13,
-    color: '#6B7280',
-    flex: 1,
-  },
-  forgotPasswordLink: {
-    paddingVertical: spacing.xs,
-  },
-  forgotPasswordText: {
-    color: '#5B7EED',
-    fontWeight: '600',
-    fontSize: 13,
-  },
-
-  // Buttons
   primaryButton: {
+    backgroundColor: '#2563eb',
+    borderRadius: 999,
+    minHeight: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#5B7EED',
-    borderRadius: borderRadius.lg,
-    paddingVertical: spacing.lg,
-    marginTop: spacing.lg,
-    minHeight: 50,
+    marginBottom: spacing.lg,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 15,
+  },
+  guestButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    minHeight: 48,
+    marginBottom: spacing.xxl,
+    paddingHorizontal: spacing.xxxl,
+  },
+  guestButtonText: {
+    color: colors.primary,
+    fontWeight: '600',
+    fontSize: 14,
+    marginLeft: spacing.md,
+  },
+  switchText: {
+    fontSize: 13,
+    color: colors.textMuted,
+    textAlign: 'center',
+  },
+  switchLink: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.errorLight,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
+    marginBottom: spacing.xxl,
+  },
+  errorText: {
+    color: colors.error,
+    fontSize: 13,
+    flex: 1,
+    marginLeft: spacing.md,
   },
   disabledButton: {
-    opacity: 0.6,
-  },
-
-  // Divider
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    marginVertical: spacing.lg,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E5E7EB',
-  },
-  dividerLabel: {
-    fontSize: 13,
-    color: '#6B7280',
-  },
-
-  // Links
-  signupLinksRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing.md,
-    flexWrap: 'wrap',
-  },
-  loginPromptText: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  loginLink: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#5B7EED',
-  },
-  policyLinksRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing.xs,
-    flexWrap: 'wrap',
-  },
-  smallLink: {
-    color: '#5B7EED',
-    fontSize: 12,
-    marginHorizontal: spacing.xs,
-  },
-  smallLinkSeparator: {
-    color: '#D1D5DB',
-    fontSize: 12,
-    marginHorizontal: spacing.xs,
+    opacity: 0.7,
   },
 });
 
-
+export default AuthScreen;

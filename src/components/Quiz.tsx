@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import AnimatedLoader from './AnimatedLoader';
@@ -35,6 +36,7 @@ interface UserAnswer {
 }
 
 export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
+  const insets = useSafeAreaInsets();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Map<number, number>>(new Map());
   const [quizCompleted, setQuizCompleted] = useState(false);
@@ -485,8 +487,9 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.quizHeader}>
+    <SafeAreaView style={[styles.safeAreaContainer, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.quizHeader}>
         <View style={styles.headerTop}>
           <View>
             <Text style={styles.quizTitle}>{quizData.title}</Text>
@@ -624,10 +627,15 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
           Answered: {userAnswers.size} / {validData.questions.length}
         </Text>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

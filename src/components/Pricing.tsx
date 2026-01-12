@@ -128,8 +128,8 @@ export const Pricing: React.FC<PricingProps> = ({ userId }) => {
     { feature: 'Flashcards', free: '20 total', scholar: 'Unlimited', genius: 'Unlimited' },
     { feature: 'Previous Year Questions', free: '10 total', scholar: 'Unlimited', genius: 'Unlimited' },
     { feature: 'YouTube Summarizer', free: '2 videos', scholar: 'Unlimited', genius: 'Unlimited' },
-    { feature: 'Ask Questions (AI)', free: '❌', scholar: '✓ Unlimited', genius: '✓ Unlimited' },
-    { feature: 'Predicted Questions', free: '❌', scholar: '✓ Unlimited', genius: '✓ Unlimited' },
+    { feature: 'Ask Questions (AI)', free: '', scholar: '✓ Unlimited', genius: '✓ Unlimited' },
+    { feature: 'Predicted Questions', free: '', scholar: '✓ Unlimited', genius: '✓ Unlimited' },
     { feature: 'Support', free: 'Community', scholar: 'Email', genius: '24/7 Priority' },
   ];
 
