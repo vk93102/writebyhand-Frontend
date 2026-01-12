@@ -1,121 +1,158 @@
-import { api } from './api';
+import { geminiQuizService } from './quiz/GeminiQuizService';
 
-// Note: Using shared api instance from api.ts which includes:
-// - X-User-ID header injection via interceptor
-// - Bearer token authorization
-// - Response/error handling
-// - Timeout: 60s (extended to 120s for quiz operations below)
-
-/**
- * Generate quiz from topic (without saving to database)
- * Quick generation for immediate use
- * 
- * API: POST /quiz/generate/
- * @param topic - The topic to generate quiz about
- * @param numQuestions - Number of questions (default: 5)
- * @param difficulty - Difficulty level: easy, medium, hard (default: medium)
- * @returns Generated quiz with questions
- */
 export const generateQuiz = async (
-  topic: string,
-  numQuestions: number = 5,
-  difficulty: 'easy' | 'medium' | 'hard' = 'medium'
-) => {
-  try {
-    console.log('[Quiz Service] generateQuiz endpoint called with:', { topic, num_questions: numQuestions, difficulty: difficulty.toLowerCase() });
-    
-    // Create axios instance with extended timeout for this specific call
-    const axiosInstance = api;
-    axiosInstance.defaults.timeout = 120000; // 2 minutes for AI processing
-    
-    const payload = {
-      topic,
-      num_questions: numQuestions,
-      difficulty: difficulty.toLowerCase(),
-    };
-    
-    console.log('[Quiz Service] POST /quiz/generate/ - Payload:', payload);
-    const response = await axiosInstance.post('/quiz/generate/', payload);
-
-    console.log('[Quiz Service] generateQuiz response status:', response.status);
-    console.log('[Quiz Service] generateQuiz response data:', response.data);
-
-    return {
-      success: true,
-      data: response.data,
-      questions: response.data.questions,
-    };
-  } catch (error: any) {
-    console.error('[Quiz Service] generateQuiz error:', {
-      endpoint: 'POST /quiz/generate/',
-      status: error.response?.status,
-      message: error.message,
-      responseData: error.response?.data,
-    });
-    throw error; // Throw to let handler catch it with full error details
-  }
-};
-
-/**
- * Create and save quiz to database
- * Stores quiz for later retrieval and tracking
- * 
- * API: POST /quiz/create/
- * @param transcript - Text content for quiz generation
- * @param title - Quiz title
- * @param numQuestions - Number of questions (default: 5)
- * @param difficulty - Difficulty level
- * @param sourceType - Source type: text, youtube, image (default: text)
- * @param sourceId - Optional source identifier
- * @returns Quiz with ID for future reference
- */
-export const createQuiz = async (
-  transcript: string,
-  title: string,
+  input: { topic?: string; document?: any },
+  userId: string,
   numQuestions: number = 5,
   difficulty: 'easy' | 'medium' | 'hard' = 'medium',
-  sourceType: 'text' | 'youtube' | 'image' = 'text',
-  sourceId: string = ''
+  subject?: string
 ) => {
   try {
-    console.log('[Quiz Service] createQuiz called with:', { title, numQuestions, difficulty, sourceType });
+    console.log('[Quiz Service] generateQuiz called with:', { 
+      hasDocument: !!input.document,
+      documentLength: input.document?.length || 0,
+      topic: input.topic,
+      numQuestions,
+      difficulty,
+      subject 
+    });
     
-    const axiosInstance = api;
-    axiosInstance.defaults.timeout = 120000; // 2 minutes for AI processing
+    // Extract topic/content from input
+    let topic = input.topic || subject || 'General Knowledge';
     
-    const response = await axiosInstance.post('/quiz/create/', {
-      transcript,
-      title,
-      source_type: sourceType,
-      source_id: sourceId,
-      num_questions: numQuestions,
-      difficulty: difficulty.toLowerCase(),
+    // If document content is provided, use it as the main content
+    if (input.document && typeof input.document === 'string') {
+      const docLength = input.document.length;
+      
+      // If document is reasonably sized text content (likely a real document, not garbage)
+      if (docLength > 50 && !input.document.includes('\x00') && !input.document.includes('Binary')) {
+        // Use the full document as topic for better context
+        topic = input.document;
+      } else if (!input.topic) {
+        // Fallback to first meaningful part or subject
+        topic = subject || 'General Knowledge';
+      }
+    }
+
+    // Use Gemini service directly
+    console.log('[Quiz Service] Calling Gemini Quiz Service with topic length:', topic.length);
+    const response = await geminiQuizService.generateQuiz({
+      topic,
+      difficulty,
+      numQuestions: numQuestions || 5,
+      language: 'English',
     });
 
-    console.log('[Quiz Service] createQuiz response:', response.data);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to generate quiz from Gemini');
+    }
+
+    console.log('[Quiz Service] generateQuiz response received with', response.questions.length, 'questions');
+
+    // Extract a clean title from topic
+    const titlePreview = topic.substring(0, 50).split('\n')[0].replace(/\[.*?\]/g, '').trim();
+    const title = titlePreview || `Quiz: ${subject || 'General Knowledge'}`;
 
     return {
       success: true,
-      data: response.data,
-      quizId: response.data.quiz_id,
-      questions: response.data.questions,
-      totalQuestions: response.data.total_questions,
+      data: {
+        title,
+        topic: titlePreview || topic.substring(0, 100),
+        difficulty,
+        questions: response.questions,
+      },
+      questions: response.questions,
     };
   } catch (error: any) {
-    console.error('[Quiz Service] createQuiz error:', error.message, error.response?.data);
-    return {
-      success: false,
-      error: error.response?.data?.error || error.message,
-      details: error.response?.data?.details,
-    };
+    console.error('[Quiz Service] generateQuiz error:', error.message);
+    throw error;
   }
 };
+
+/**
+ * Helper function to determine file type from extension
+ */
+function getFileType(fileName: string): string {
+  const extension = fileName.split('.').pop()?.toLowerCase();
+  
+  const mimeTypes: Record<string, string> = {
+    'txt': 'text/plain',
+    'md': 'text/markdown',
+    'pdf': 'application/pdf',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+  };
+
+  return mimeTypes[extension || ''] || 'application/octet-stream';
+}
+
+
+async function extractTextFromImage(imageFile: any): Promise<string> {
+  try {
+    let base64Image: string = '';
+
+    if (typeof imageFile === 'string') {
+      const response = await fetch(imageFile);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } else if (Platform.OS === 'web' && imageFile instanceof File) {
+      // Web File object
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile);
+      });
+    } else if (imageFile.file instanceof File) {
+      // DocumentPicker asset with file property
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile.file);
+      });
+    } else if (imageFile.uri) {
+      // Standard asset object with URI
+      const response = await fetch(imageFile.uri);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    throw new Error('Unable to process image');
+  } catch (error) {
+    console.error('[Quiz Service] Error extracting text from image:', error);
+    throw new Error('Failed to process image: ' + String(error));
+  }
+}
 
 /**
  * Generate quiz from image document
- * Sends image directly to backend for OCR and quiz generation
+ * Extracts text from image and generates quiz using Gemini API
  * 
- * API: POST /quiz/generate/
  * @param imageFile - Image file to process
  * @param numQuestions - Number of questions (default: 5)
  * @param difficulty - Difficulty level (default: medium)
@@ -129,58 +166,44 @@ export const generateQuizFromImage = async (
   try {
     console.log('[Quiz Service] generateQuizFromImage called with:', { num_questions: numQuestions, difficulty });
     
-    const formData = new FormData();
-    
-    // Handle different image sources
-    if (typeof imageFile === 'string') {
-      // Image URI from device
-      const filename = imageFile.split('/').pop() || 'document.jpg';
-      const fileData = {
-        uri: imageFile,
-        type: 'image/jpeg',
-        name: filename,
-      } as any;
-      formData.append('document', fileData);
-    } else if (imageFile instanceof File) {
-      // Web File object
-      formData.append('document', imageFile);
-    } else if (imageFile.file) {
-      // DocumentPicker asset with file property
-      formData.append('document', imageFile.file);
-    } else {
-      throw new Error('Invalid image source');
+    // Extract text from image
+    console.log('[Quiz Service] Extracting text from image...');
+    const extractedText = await extractTextFromImage(imageFile);
+
+    if (!extractedText || extractedText.trim().length === 0) {
+      throw new Error('No text could be extracted from the image');
     }
 
-    formData.append('num_questions', numQuestions.toString());
-    formData.append('difficulty', difficulty.toLowerCase());
+    console.log('[Quiz Service] Image text extracted, length:', extractedText.length);
 
-    console.log('[Quiz Service] POST /quiz/generate/ with form data - num_questions:', numQuestions, 'difficulty:', difficulty);
-    
-    const axiosInstance = api;
-    axiosInstance.defaults.timeout = 120000; // 2 minutes for AI processing
-    
-    const response = await axiosInstance.post('/quiz/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    // Generate quiz from extracted text using Gemini
+    console.log('[Quiz Service] Calling Gemini to generate quiz from extracted text');
+    const response = await geminiQuizService.generateQuiz({
+      topic: 'Image Content',
+      difficulty,
+      numQuestions,
+      language: 'English',
     });
 
-    console.log('[Quiz Service] generateQuizFromImage response status:', response.status);
-    console.log('[Quiz Service] generateQuizFromImage response data:', response.data);
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to generate quiz from image');
+    }
+
+    console.log('[Quiz Service] generateQuizFromImage response received with', response.questions.length, 'questions');
 
     return {
       success: true,
-      data: response.data,
-      questions: response.data.questions,
+      data: {
+        title: 'Quiz from Image',
+        topic: 'Image Content',
+        difficulty,
+        questions: response.questions,
+      },
+      questions: response.questions,
       source: 'image',
     };
   } catch (error: any) {
-    console.error('[Quiz Service] generateQuizFromImage error:', {
-      endpoint: 'POST /quiz/generate/',
-      status: error.response?.status,
-      message: error.message,
-      responseData: error.response?.data,
-    });
+    console.error('[Quiz Service] generateQuizFromImage error:', error.message);
     throw error;
   }
 };
@@ -346,7 +369,6 @@ export const generateQuizFromYouTube = async (
 
 export default {
   generateQuiz,
-  createQuiz,
   getQuizQuestions,
   submitQuiz,
   getQuizResults,

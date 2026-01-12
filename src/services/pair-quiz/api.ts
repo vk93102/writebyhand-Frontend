@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { geminiQuizService } from '../quiz/GeminiQuizService';
+import { geminiFlashcardService } from '../quiz/GeminiFlashcardService';
+import { geminiPredictedQuestionsService } from '../quiz/GeminiPredictedQuestionsService';
 
 // Dynamic API URL based on platform
 const getApiUrl = () => {
@@ -169,6 +172,7 @@ export const checkServiceStatus = async () => {
 
 /**
  * Generate quiz from topic or document
+ * Uses Gemini API directly
  * @param topic - The topic or text content
  * @param numQuestions - Number of questions to generate (default: 5)
  * @param difficulty - Difficulty level: easy, medium, hard (default: medium)
@@ -182,25 +186,31 @@ export const generateQuiz = async (
 ) => {
   try {
     // Validate minimum text length
-    if (!topic || topic.trim().length < 50) {
-      throw new Error('Please provide text content with at least 50 characters');
+    if (!topic || topic.trim().length < 5) {
+      throw new Error('Please provide text content');
     }
     
-    // Map difficulty to backend format
-    const response = await api.post('/quiz/generate/', {
+    // Use Gemini service directly
+    const response = await geminiQuizService.generateQuiz({
       topic: topic,
-      num_questions: numQuestions,
-      difficulty: difficulty
+      numQuestions: numQuestions,
+      difficulty: difficulty,
+      language: 'English',
     });
     
-    return response.data;
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to generate quiz');
+    }
+    
+    return { success: true, data: response };
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate quiz');
+    throw new Error(error.message || 'Failed to generate quiz');
   }
 };
 
 /**
  * Generate flashcards from topic or document
+ * Uses Gemini API directly
  * @param topic - The topic or text content
  * @param numCards - Number of flashcards to generate (default: 10)
  * @param document - Optional document file
@@ -211,41 +221,21 @@ export const generateFlashcards = async (
   document?: any
 ) => {
   try {
-    const formData = new FormData();
-    
-    if (document) {
-      // For web, document might already be a File object
-      if (Platform.OS === 'web' && document.file) {
-        formData.append('document', document.file);
-      } else if (Platform.OS === 'web' && document instanceof File) {
-        formData.append('document', document);
-      } else {
-        // For mobile platforms
-        const documentFile = {
-          uri: document.uri,
-          type: document.mimeType || document.type || 'application/octet-stream',
-          name: document.name || 'document',
-        } as any;
-        formData.append('document', documentFile);
-      }
-    }
-    
-    // Always append topic (can be empty string if document is provided)
-    if (topic) {
-      formData.append('topic', topic);
-    }
-    
-    formData.append('num_cards', numCards.toString());
-    
-    const response = await api.post('/flashcards/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    // Use Gemini service directly
+    const response = await geminiFlashcardService.generateFlashcards({
+      topic: topic || 'General Knowledge',
+      numCards: numCards,
+      language: 'english',
+      difficulty: 'medium',
     });
     
-    return response.data;
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to generate flashcards');
+    }
+    
+    return { success: true, data: response };
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate flashcards');
+    throw new Error(error.message || 'Failed to generate flashcards');
   }
 };
 
@@ -328,6 +318,7 @@ export const checkYouTubeHealth = async () => {
 
 /**
  * Generate predicted important questions from topic or document
+ * Uses Gemini API directly
  * @param topic - Topic name (for text-based generation)
  * @param examType - Type of exam (General, JEE, NEET, etc.)
  * @param numQuestions - Number of questions (default: 5)
@@ -340,42 +331,21 @@ export const generatePredictedQuestions = async (
   document?: any
 ) => {
   try {
-    const formData = new FormData();
-    
-    if (document) {
-      // For web, document might already be a File object
-      if (Platform.OS === 'web' && document.file) {
-        formData.append('document', document.file);
-      } else if (Platform.OS === 'web' && document instanceof File) {
-        formData.append('document', document);
-      } else {
-        // For mobile platforms
-        const documentFile = {
-          uri: document.uri,
-          type: document.mimeType || document.type || 'application/octet-stream',
-          name: document.name || 'document',
-        } as any;
-        formData.append('document', documentFile);
-      }
-    } else if (topic) {
-      formData.append('topic', topic);
-    } else {
-      throw new Error('Please provide either a topic or document');
-    }
-    
-    formData.append('exam_type', examType);
-    formData.append('num_questions', numQuestions.toString());
-    
-    const response = await api.post('/predicted-questions/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 60000, // 60 seconds for AI generation
+    // Use Gemini service directly
+    const response = await geminiPredictedQuestionsService.generatePredictedQuestions({
+      topic: topic || 'General Knowledge',
+      examType: examType,
+      numQuestions: numQuestions,
+      language: 'english',
     });
     
-    return response.data;
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to generate predicted questions');
+    }
+    
+    return { success: true, data: response };
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate predicted questions');
+    throw new Error(error.message || 'Failed to generate predicted questions');
   }
 };
 

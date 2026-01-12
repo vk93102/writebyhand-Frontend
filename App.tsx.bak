@@ -272,7 +272,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[Quiz] Checking subscription status for user:', userId);
+      console.log('[Quiz] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -446,7 +446,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[Quiz] Checking subscription status for user:', userId);
+      console.log('[Quiz] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -516,7 +516,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[Quiz] Checking subscription status for user:', userId);
+      console.log('[Quiz] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -597,7 +597,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[Flashcards] Checking subscription status for user:', userId);
+      console.log('[Flashcards] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -686,7 +686,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[Flashcards] Checking subscription status for user:', userId);
+      console.log('[Flashcards] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -755,7 +755,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[Flashcards] Checking subscription status for user:', userId);
+      console.log('[Flashcards] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -873,7 +873,7 @@ export default function App() {
 
     try {
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[PredictedQuestions] Checking subscription status for user:', userId);
+      console.log('[PredictedQuestions] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -946,7 +946,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[PredictedQuestions] Checking subscription status for user:', userId);
+      console.log('[PredictedQuestions] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -1018,7 +1018,7 @@ export default function App() {
       const userId = user?.id || 'guest_user';
       
       // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[PredictedQuestions] Checking subscription status for user:', userId);
+      console.log('[PredictedQuestions] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {

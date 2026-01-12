@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Gemini API Configuration
 const GEMINI_API_KEY = typeof process !== 'undefined' && process.env ? (process.env.EXPO_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '') : '';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
 
 // Debug: Log if key is available
 if (GEMINI_API_KEY) {
@@ -78,7 +78,7 @@ class GeminiQuizService {
           headers: {
             'Content-Type': 'application/json',
           },
-          timeout: 120000, // 120 seconds for AI generation
+          timeout: 30000, // 30 seconds
         }
       );
 

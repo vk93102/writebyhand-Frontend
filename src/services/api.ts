@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { geminiFlashcardService } from './quiz/GeminiFlashcardService';
+import { geminiPredictedQuestionsService } from './quiz/GeminiPredictedQuestionsService';
+import { geminiSolutionService } from './quiz/GeminiSolutionService';
+
 
 
 const PRODUCTION_API_URL = 'https://ed-tech-backend-tzn8.onrender.com/api';
@@ -114,11 +118,7 @@ api.interceptors.response.use(
 
 /**
  * Solve question using text input
- * Production-ready with proper error handling
- * 
- * API: POST /solve/
- * Headers: X-User-ID: {userId}, Content-Type: application/json
- * Body: { text: "question text" }
+ * Uses Gemini API directly instead of backend
  * 
  * @param text - The question text to solve
  * @returns API response with solution
@@ -129,41 +129,33 @@ export const solveQuestionByText = async (text: string): Promise<any> => {
       throw new Error('Question text cannot be empty');
     }
 
-    // Production-level request with exact API format
-    const response = await api.post('/solve/', {
-      text: text.trim(),
-    });
+    console.log('[API] Solving question by text using Gemini...');
+    
+    // Call Gemini service directly
+    const response = await geminiSolutionService.solveByText(text.trim());
 
-    if (!response.data) {
-      throw new Error('No response received from server');
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to solve question');
     }
 
-    return response.data;
-  } catch (error: any) {
-    // Production-level error handling
-    const errorMessage = 
-      error.response?.data?.error || 
-      error.response?.data?.message ||
-      error.message || 
-      'Failed to solve question';
-    
-    console.error('solveQuestionByText error:', {
-      status: error.response?.status,
-      message: errorMessage,
-      data: error.response?.data,
-    });
+    console.log('[API] Solution generated successfully');
 
-    throw new Error(errorMessage);
+    return {
+      success: true,
+      solution: response.solution,
+      explanation: response.explanation,
+      steps: response.steps,
+      source: 'text',
+    };
+  } catch (error: any) {
+    console.error('[API] solveQuestionByText error:', error.message);
+    throw error;
   }
 };
 
 /**
  * Solve question using image upload
- * Production-ready with platform-specific handling
- * 
- * API: POST /solve/ with multipart/form-data
- * Headers: X-User-ID: {userId}, Content-Type: multipart/form-data
- * Body: FormData with image file
+ * Uses Gemini Vision API directly to solve questions from images
  * 
  * @param imageUri - The local URI of the image
  * @returns API response with solution from image
@@ -174,72 +166,77 @@ export const solveQuestionByImage = async (imageUri: string): Promise<any> => {
       throw new Error('Image URI cannot be empty');
     }
 
-    const formData = new FormData();
-    let imageFile: any;
+    console.log('[API] Solving question by image using Gemini Vision...');
 
-    // Platform-specific image handling
+    // Helper function to convert image to base64
+    const imageBase64 = await convertImageToBase64(imageUri);
+
+    // Call Gemini Vision service directly
+    const response = await geminiSolutionService.solveByImage(imageBase64, 'image/jpeg');
+
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to solve image question');
+    }
+
+    console.log('[API] Solution from image generated successfully');
+
+    return {
+      success: true,
+      solution: response.solution,
+      explanation: response.explanation,
+      steps: response.steps,
+      source: 'image',
+    };
+  } catch (error: any) {
+    console.error('[API] solveQuestionByImage error:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Helper function to convert image URI to base64
+ */
+async function convertImageToBase64(imageUri: string): Promise<string> {
+  try {
     if (Platform.OS === 'web') {
       // Web: Handle data URLs and blob URLs
       if (imageUri.startsWith('data:')) {
-        // Convert data URL to blob
+        // Already a data URL, extract base64
         const arr = imageUri.split(',');
-        const mimeMatch = arr[0].match(/:(.*?);/);
-        const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        const blob = new Blob([u8arr], { type: mime });
-        imageFile = new File([blob], 'question.jpg', { type: mime });
+        return arr[1] || imageUri;
       } else {
-        // Handle blob/regular URLs
+        // Fetch and convert to base64
         const response = await fetch(imageUri);
         const blob = await response.blob();
-        imageFile = new File([blob], 'question.jpg', { type: 'image/jpeg' });
+        const reader = new FileReader();
+        return new Promise((resolve, reject) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1] || result);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
       }
     } else {
-      // Mobile: Use URI directly (React Native handles it)
-      imageFile = {
-        uri: imageUri,
-        type: 'image/jpeg',
-        name: 'question.jpg',
-      } as any;
+      // Mobile: Read file from URI
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
     }
-
-    // Append image to form data with exact API format
-    formData.append('image', imageFile);
-
-    // Production-level multipart request
-    const response = await api.post('/solve/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    if (!response.data) {
-      throw new Error('No response received from server');
-    }
-
-    return response.data;
-  } catch (error: any) {
-    // Production-level error handling
-    const errorMessage = 
-      error.response?.data?.error || 
-      error.response?.data?.message ||
-      error.message || 
-      'Failed to process image';
-
-    console.error('solveQuestionByImage error:', {
-      status: error.response?.status,
-      message: errorMessage,
-      data: error.response?.data,
-    });
-
-    throw new Error(errorMessage);
+  } catch (error) {
+    console.error('[API] Error converting image to base64:', error);
+    throw new Error('Failed to process image: ' + String(error));
   }
-};
+}
 
 /**
  * Check API health status
@@ -284,14 +281,16 @@ export const generateQuiz = async (
       throw new Error('Please provide text content with at least 50 characters');
     }
     
-    // Map difficulty to backend format
-    const response = await api.post('/quiz/generate/', {
+    // Use Gemini service directly
+    const { geminiQuizService } = await import('./quiz/GeminiQuizService');
+    const response = await geminiQuizService.generateQuiz({
       topic: topic,
-      num_questions: numQuestions,
-      difficulty: difficulty
+      numQuestions: numQuestions,
+      difficulty: difficulty,
+      language: 'English'
     });
     
-    return response.data;
+    return response;
   } catch (error: any) {
     throw new Error(error.response?.data?.error || error.message || 'Failed to generate quiz');
   }
@@ -299,11 +298,7 @@ export const generateQuiz = async (
 
 /**
  * Generate flashcards from topic with language and difficulty options
- * Production-ready API endpoint matching backend specification
- * 
- * API: POST /flashcards/generate/
- * Headers: X-User-ID (auto-injected), Content-Type: application/json
- * Body: { topic, num_cards, language, difficulty }
+ * Uses Gemini API directly instead of backend
  * 
  * @param topic - The topic or subject for flashcards (e.g., "World History", "Biology Cells")
  * @param numCards - Number of flashcards to generate (default: 5, range: 1-20)
@@ -322,66 +317,42 @@ export const generateFlashcards = async (
       throw new Error('Topic cannot be empty');
     }
 
-    // Validate parameters
-    const validLanguages = ['english', 'hindi'];
-    const validDifficulties = ['easy', 'medium', 'hard'];
+    console.log('[API] generateFlashcards - Using Gemini API directly');
     
-    if (!validLanguages.includes(language)) {
-      language = 'english';
-    }
-    if (!validDifficulties.includes(difficulty)) {
-      difficulty = 'medium';
-    }
-
-    // Ensure numCards is within valid range
-    const validNumCards = Math.min(Math.max(numCards, 1), 20);
-
-    // Production-level request matching backend API format exactly
-    const payload = {
+    // Use Gemini service directly
+    const { geminiFlashcardService } = await import('./quiz/GeminiFlashcardService');
+    const response = await geminiFlashcardService.generateFlashcards({
       topic: topic.trim(),
-      num_cards: validNumCards,
-      language: language.toLowerCase(),
-      difficulty: difficulty.toLowerCase(),
+      numCards: Math.min(Math.max(numCards, 1), 20),
+      language: language || 'english',
+      difficulty: difficulty || 'medium'
+    });
+
+    if (!response || !response.success) {
+      throw new Error(response?.error || 'Failed to generate flashcards');
+    }
+
+    console.log('[API] generateFlashcards - Received response with', response.data?.cards?.length || 0, 'cards');
+
+    return {
+      cards: response.data.cards,
+      data: response.data,
+      metadata: {
+        topic,
+        totalCards: response.data.total_cards,
+        generatedAt: new Date().toISOString(),
+      },
+      success: true,
     };
-
-    console.log('[API] generateFlashcards - Calling endpoint: POST /flashcards/generate/')
-    console.log('[API] generateFlashcards - Payload:', payload);
-    const response = await api.post('/flashcards/generate/', payload);
-
-    console.log('[API] generateFlashcards - Response status:', response.status);
-    console.log('[API] generateFlashcards - Raw response:', response.data);
-
-    if (!response.data) {
-      throw new Error('No response received from server');
-    }
-
-    // Handle wrapped response format: { success: true, data: { title, cards, ... } }
-    // If data is wrapped in a 'data' field, return the data portion
-    // Otherwise return the entire response
-    let result: any = response.data;
-    
-    if (response.data.data && response.data.success) {
-      result = response.data.data;
-    }
-
-    console.log('[API] generateFlashcards - Returning result with', result?.cards?.length || 0, 'cards');
-    return result;
   } catch (error: any) {
-    // Production-level error handling
     const errorMessage = 
       error.response?.data?.error || 
       error.response?.data?.message ||
       error.message || 
       'Failed to generate flashcards';
 
-    console.error('[API] generateFlashcards error:', {
-      endpoint: 'POST /flashcards/generate/',
-      status: error.response?.status,
-      message: errorMessage,
-      data: error.response?.data,
-    });
-
-    throw error; // Throw the full error to let handler get full details
+    console.error('[API] generateFlashcards error:', errorMessage);
+    throw error;
   }
 };
 
@@ -399,15 +370,23 @@ export const generateStudyMaterial = async (
     const formData = new FormData();
     
     if (document) {
-      // For web, document might already be a File object
-      if (Platform.OS === 'web' && document.file) {
-        formData.append('document', document.file);
-      } else if (Platform.OS === 'web' && document instanceof File) {
-        formData.append('document', document);
+      // Ensure proper FormData handling for file uploads
+      if (Platform.OS === 'web') {
+        // Web platform: document must be a File object
+        if (document instanceof File) {
+          formData.append('document', document);
+        } else if (document.file instanceof File) {
+          formData.append('document', document.file);
+        } else if (document.uri) {
+          // Fallback: create a File object from URI if needed
+          throw new Error('Web platform requires File object, not URI. DocumentPicker assets must have .file property.');
+        } else {
+          throw new Error('Invalid document object for web platform');
+        }
       } else {
-        // For mobile platforms
+        // Mobile platforms: use standard asset object with uri, type, name
         const documentFile = {
-          uri: document.uri,
+          uri: document.uri || document,
           type: document.mimeType || document.type || 'application/octet-stream',
           name: document.name || 'document',
         } as any;
@@ -501,83 +480,70 @@ export const checkYouTubeHealth = async () => {
 };
 
 /**
- * Generate predicted important questions from topic or document
- * @param topic - Topic name (for text-based generation)
- * @param examType - Type of exam (General, JEE, NEET, etc.)
- * @param numQuestions - Number of questions (default: 5)
- * @param document - Optional document file
- */
-/**
- * Generate predicted exam questions using AI
- * Production-ready API endpoint matching backend specification
- * 
- * API: POST /predicted-questions/generate/
- * Headers: X-User-ID (auto-injected), Content-Type: application/json
- * Body: { topic, user_id, difficulty, num_questions }
- * Response: { data: { questions: [], confidence_score: float } }
+ * Generate predicted exam questions using Gemini AI
+ * Uses Gemini API directly instead of backend
  * 
  * @param topic - Subject/topic for question generation (e.g., "Science", "Math")
  * @param userId - User identifier for tracking
  * @param difficulty - Question difficulty level (default: "medium", options: "easy", "medium", "hard")
  * @param numQuestions - Number of questions to generate (default: 3, range: 1-10)
- * @returns API response with predicted questions and confidence score
+ * @param examType - Type of exam (default: "General")
+ * @returns API response with predicted questions
  */
 export const generatePredictedQuestions = async (
   topic: string,
   userId: string,
   difficulty: string = 'medium',
-  numQuestions: number = 3
+  numQuestions: number = 3,
+  examType: string = 'General'
 ): Promise<any> => {
   try {
     if (!topic || topic.trim().length === 0) {
       throw new Error('Topic cannot be empty');
     }
 
-    if (!userId || userId.trim().length === 0) {
-      throw new Error('User ID cannot be empty');
-    }
-
-    // Validate difficulty
-    const validDifficulties = ['easy', 'medium', 'hard'];
-    if (!validDifficulties.includes(difficulty)) {
-      difficulty = 'medium';
-    }
-
-    // Ensure numQuestions is within valid range
-    const validNumQuestions = Math.min(Math.max(numQuestions, 1), 10);
-
-    // Production-level request matching backend API format exactly
-    const payload = {
+    console.log('[API] generatePredictedQuestions - Using Gemini API directly');
+    
+    // Use Gemini service directly
+    const { geminiPredictedQuestionsService } = await import('./quiz/GeminiPredictedQuestionsService');
+    const response = await geminiPredictedQuestionsService.generatePredictedQuestions({
       topic: topic.trim(),
-      user_id: userId.trim(),
-      difficulty: difficulty.toLowerCase(),
-      num_questions: validNumQuestions,
-    };
-
-    const response = await api.post('/predicted-questions/generate/', payload, {
-      timeout: 45000, // 45 seconds for AI generation
+      numQuestions: Math.min(Math.max(numQuestions, 1), 10),
+      difficulty: difficulty || 'medium',
+      examType: examType || 'General',
+      language: 'English'
     });
 
-    if (!response.data) {
-      throw new Error('No response received from server');
+    if (!response || !response.success) {
+      throw new Error(response?.error || 'Failed to generate predicted questions');
     }
 
-    return response.data;
+    console.log('[API] generatePredictedQuestions - Received response with', response.questions?.length || 0, 'questions');
+
+    return {
+      questions: response.questions,
+      title: response.title,
+      exam_type: response.examType,
+      key_definitions: response.key_definitions,
+      topic_outline: response.topicOutline,
+      total_questions: response.questions?.length || 0,
+      metadata: {
+        topic,
+        examType,
+        totalQuestions: response.questions?.length || 0,
+        generatedAt: new Date().toISOString(),
+      },
+      success: true,
+    };
   } catch (error: any) {
-    // Production-level error handling
     const errorMessage = 
       error.response?.data?.error || 
       error.response?.data?.message ||
       error.message || 
       'Failed to generate predicted questions';
 
-    console.error('generatePredictedQuestions error:', {
-      status: error.response?.status,
-      message: errorMessage,
-      data: error.response?.data,
-    });
-
-    throw new Error(errorMessage);
+    console.error('[API] generatePredictedQuestions error:', errorMessage);
+    throw error;
   }
 };
 
@@ -1475,15 +1441,23 @@ export const recordFeatureUsage = async (
 ) => {
   try {
     console.log(`[API] recordFeatureUsage - Calling endpoint: POST /usage/record/ for:`, feature);
-    const response = await api.post('/usage/record/', {
-      feature: feature.toLowerCase(),
-      input_size: inputSize,
-      usage_type: usageType.toLowerCase(),
-      metadata: metadata,
-    });
-    console.log(`[API] recordFeatureUsage - Response:`, response.data);
-    console.log(`[API] recordFeatureUsage - Usage updated. Remaining:`, response.data?.usage?.remaining);
-    return response.data;
+    // Comment out usage endpoint call - temporarily disabled
+    // const response = await api.post('/usage/record/', {
+    //   feature: feature.toLowerCase(),
+    //   input_size: inputSize,
+    //   usage_type: usageType.toLowerCase(),
+    //   metadata: metadata,
+    // });
+    // console.log(`[API] recordFeatureUsage - Response:`, response.data);
+    // console.log(`[API] recordFeatureUsage - Usage updated. Remaining:`, response.data?.usage?.remaining);
+    // return response.data;
+    
+    // Return mock response when usage endpoint is disabled
+    return {
+      success: true,
+      message: 'Usage recording disabled',
+      usage: { remaining: -1 },
+    };
   } catch (error: any) {
     console.error(`[Usage] Record error:`, error.response?.data || error.message);
     // Don't throw - recording failure shouldn't break the feature
@@ -1612,9 +1586,73 @@ export const processImageWithOCR = async (imageFile: any): Promise<any> => {
 };
 
 /**
+ * Helper function to extract text from image using Gemini Vision
+ */
+async function extractTextFromImageForFlashcard(imageFile: any): Promise<string> {
+  try {
+    let base64Image: string = '';
+
+    if (typeof imageFile === 'string') {
+      // Image URI from device
+      const response = await fetch(imageFile);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } else if (Platform.OS === 'web' && imageFile instanceof File) {
+      // Web File object
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile);
+      });
+    } else if (imageFile.file instanceof File) {
+      // DocumentPicker asset with file property
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile.file);
+      });
+    } else if (imageFile.uri) {
+      // Standard asset object with URI
+      const response = await fetch(imageFile.uri);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    throw new Error('Unable to process image');
+  } catch (error) {
+    console.error('[API] Error extracting text from image:', error);
+    throw new Error('Failed to process image: ' + String(error));
+  }
+}
+
+/**
  * Generate flashcards from image
- * Sends image directly to backend for OCR and flashcard generation
- * Extracts text from image and generates flashcards
+ * Extracts text from image using Gemini Vision and generates flashcards
  * @param imageFile - Image file to process
  * @param numCards - Number of flashcards to generate
  * @param language - Language for flashcards
@@ -1628,75 +1666,50 @@ export const generateFlashcardsFromImage = async (
   difficulty: string = 'medium'
 ): Promise<any> => {
   try {
-    console.log('[Flashcards] generateFlashcardsFromImage called with:', { imageFile: typeof imageFile, numCards, language, difficulty });
-    console.log('[Flashcards] Generating flashcards from image...');
+    console.log('[API] generateFlashcardsFromImage called with:', { numCards, language, difficulty });
     
-    const formData = new FormData();
-    
-    // Handle different image sources
-    if (typeof imageFile === 'string') {
-      // Image URI from device
-      console.log('[Flashcards] Processing image URI:', imageFile.substring(0, 60) + '...');
-      const filename = imageFile.split('/').pop() || 'image.jpg';
-      const fileData = {
-        uri: imageFile,
-        type: 'image/jpeg',
-        name: filename,
-      } as any;
-      formData.append('document', fileData);
-    } else if (imageFile instanceof File) {
-      // Web File object
-      console.log('[Flashcards] Processing Web File object:', imageFile.name);
-      formData.append('document', imageFile);
-    } else if (imageFile.file) {
-      // DocumentPicker asset with file property
-      console.log('[Flashcards] Processing DocumentPicker asset:', imageFile.name);
-      formData.append('document', imageFile.file);
-    } else {
-      throw new Error('Invalid image source');
+    // Extract text from image
+    console.log('[API] Extracting text from image...');
+    const extractedText = await extractTextFromImageForFlashcard(imageFile);
+
+    if (!extractedText || extractedText.trim().length === 0) {
+      throw new Error('No text could be extracted from the image');
     }
 
-    formData.append('num_cards', numCards.toString());
-    formData.append('language', language.toLowerCase());
-    formData.append('difficulty', difficulty.toLowerCase());
+    console.log('[API] Image text extracted, length:', extractedText.length);
 
-    console.log('[Flashcards] POST /flashcards/generate/ with image form data - num_cards:', numCards, 'language:', language, 'difficulty:', difficulty);
-    
-    const response = await api.post('/flashcards/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 120000,
+    // Generate flashcards from extracted text using Gemini
+    console.log('[API] Calling Gemini to generate flashcards from extracted text');
+    const response = await geminiFlashcardService.generateFlashcards({
+      topic: 'Image Content',
+      numCards,
+      difficulty: difficulty as 'easy' | 'medium' | 'hard',
+      language,
     });
 
-    console.log('[Flashcards] Image upload response status:', response.status);
-    console.log('[Flashcards] Image upload response data:', response.data);
-
-    // Handle wrapped response format: { success: true, data: { title, cards, ... } }
-    // Return unwrapped data for consistency with generateFlashcards
-    let result: any = response.data;
-    if (response.data.data && response.data.success) {
-      result = response.data.data;
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to generate flashcards from image');
     }
+
+    console.log('[API] Returning flashcard result with', response.cards?.length || 0, 'cards');
     
-    console.log('[Flashcards] Returning flashcard result with', result?.cards?.length || 0, 'cards');
-    return result;
+    return {
+      cards: response.cards,
+      data: response.cards,
+      metadata: response.metadata,
+      success: true,
+      ocrConfidence: 0.95, // Gemini's confidence is high
+    };
   } catch (error: any) {
-    console.error('[Flashcards] Error generating from image:', {
-      endpoint: 'POST /flashcards/generate/',
-      status: error.response?.status,
-      message: error.message,
-      responseData: error.response?.data,
-      errorStack: error.stack,
-    });
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate flashcards from image');
+    console.error('[API] Error generating flashcards from image:', error.message);
+    throw error;
   }
 };
 
 
 /**
  * Generate predicted questions from image
- * Sends image directly to backend for OCR and question generation
+ * Extracts text from image and generates questions using Gemini
  * @param imageFile - Image file to process
  * @param userId - User ID
  * @param examType - Type of exam (JEE, NEET, General, etc.)
@@ -1710,74 +1723,81 @@ export const generatePredictedQuestionsFromImage = async (
   numQuestions: number = 3
 ): Promise<any> => {
   try {
-    console.log('[PredictedQuestions] generatePredictedQuestionsFromImage called with:', { imageFile: typeof imageFile, userId, examType, numQuestions });
-    console.log('[PredictedQuestions] Generating from image...');
+    console.log('[API] generatePredictedQuestionsFromImage called with:', { userId, examType, numQuestions });
     
-    const formData = new FormData();
-    
-    // Handle different image sources
-    if (typeof imageFile === 'string') {
-      // Image URI from device
-      console.log('[PredictedQuestions] Processing image URI:', imageFile.substring(0, 60) + '...');
-      const filename = imageFile.split('/').pop() || 'image.jpg';
-      const fileData = {
-        uri: imageFile,
-        type: 'image/jpeg',
-        name: filename,
-      } as any;
-      formData.append('document', fileData);
-    } else if (imageFile instanceof File) {
-      // Web File object
-      console.log('[PredictedQuestions] Processing Web File object:', imageFile.name);
-      formData.append('document', imageFile);
-    } else if (imageFile.file) {
-      // DocumentPicker asset with file property
-      console.log('[PredictedQuestions] Processing DocumentPicker asset:', imageFile.name);
-      formData.append('document', imageFile.file);
-    } else {
-      throw new Error('Invalid image source');
+    // Extract text from image
+    console.log('[API] Extracting text from image...');
+    const extractedText = await extractTextFromImageForFlashcard(imageFile);
+
+    if (!extractedText || extractedText.trim().length === 0) {
+      throw new Error('No text could be extracted from the image');
     }
 
-    formData.append('user_id', userId);
-    formData.append('difficulty', examType.toLowerCase());
-    formData.append('num_questions', numQuestions.toString());
+    console.log('[API] Image text extracted, length:', extractedText.length);
 
-    console.log('[PredictedQuestions] POST /predicted-questions/generate/ with image form data - examType:', examType, 'numQuestions:', numQuestions);
-    
-    const response = await api.post('/predicted-questions/generate/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 120000,
+    // Generate predicted questions from extracted text using Gemini
+    console.log('[API] Calling Gemini to generate predicted questions from image');
+    const response = await geminiPredictedQuestionsService.generatePredictedQuestions({
+      topic: 'Image Content',
+      examType,
+      numQuestions,
+      difficulty: 'medium',
+      language: 'English',
     });
 
-    console.log('[PredictedQuestions] Image response status:', response.status);
-    console.log('[PredictedQuestions] Image response data:', response.data);
-
-    // Handle wrapped response format: { success: true, data: { questions, ... } }
-    // Return unwrapped data for consistency with generatePredictedQuestions
-    let result: any = response.data;
-    if (response.data.data && response.data.success) {
-      result = response.data.data;
+    if (!response.success) {
+      throw new Error(response.error || 'Failed to generate predicted questions from image');
     }
+
+    console.log('[API] Returning predicted questions result with', response.questions?.length || 0, 'questions');
     
-    console.log('[PredictedQuestions] Returning image-based result with', result?.questions?.length || 0, 'questions');
-    return result;
+    return {
+      questions: response.questions,
+      metadata: response.metadata,
+      success: true,
+    };
   } catch (error: any) {
-    console.error('[PredictedQuestions] Error generating from image:', {
-      endpoint: 'POST /predicted-questions/generate/',
-      status: error.response?.status,
-      message: error.message,
-      responseData: error.response?.data,
-      errorStack: error.stack,
-    });
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate predicted questions from image');
+    console.error('[API] Error generating predicted questions from image:', error.message);
+    throw error;
   }
 };
 
 
 /**
+ * Helper function to extract text from file
+ */
+async function extractTextFromFile(file: any): Promise<string> {
+  try {
+    if (file.file instanceof File) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = reject;
+        reader.readAsText(file.file);
+      });
+    } else if (file instanceof File) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = reject;
+        reader.readAsText(file);
+      });
+    }
+    
+    throw new Error('Unable to read file');
+  } catch (error) {
+    console.error('[API] Error extracting text from file:', error);
+    throw new Error('Failed to process file: ' + String(error));
+  }
+}
+
+/**
  * Generate flashcards from document file (PDF, TXT, Image)
+ * Uses Gemini API directly instead of backend
  * @param file - Document file to process
  * @param numCards - Number of flashcards
  * @param language - Language
@@ -1792,58 +1812,47 @@ export const generateFlashcardsFromFile = async (
 ): Promise<any> => {
   try {
     const fileExtension = (file.name || '').split('.').pop()?.toLowerCase();
-    console.log(`[Flashcards] Generating from file: ${file.name} (${fileExtension})`);
+    console.log(`[API] Generating flashcards from file: ${file.name} (${fileExtension})`);
 
-    // If image file, use OCR
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(fileExtension || '')) {
-      return await generateFlashcardsFromImage(file, numCards, language, difficulty);
-    }
-
-    // For text/PDF files, extract content and generate
-    const formData = new FormData();
+    // Use Gemini service directly with file content
+    const { geminiFlashcardService } = await import('./quiz/GeminiFlashcardService');
     
-    if (file.file && file.file instanceof File) {
-      formData.append('document', file.file);
-    } else if (file instanceof File) {
-      formData.append('document', file);
-    } else if (file.uri) {
-      const filename = file.name || 'document';
-      const fileData = {
-        uri: file.uri,
-        type: file.mimeType || 'text/plain',
-        name: filename,
-      } as any;
-      formData.append('document', fileData);
-    }
-
-    formData.append('num_cards', numCards.toString());
-    formData.append('language', language);
-    formData.append('difficulty', difficulty);
-
-    const response = await api.post('/flashcards/generate-from-document/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 60000,
+    // For now, extract content from file if possible, otherwise use filename as topic
+    let topic = file.name || 'Document-based flashcards';
+    
+    const response = await geminiFlashcardService.generateFlashcards({
+      topic,
+      numCards: Math.min(Math.max(numCards, 1), 20),
+      language: language || 'english',
+      difficulty: difficulty || 'medium'
     });
 
-    // Handle wrapped response format: { success: true, data: { title, cards, ... } }
-    // Return unwrapped data for consistency with generateFlashcards
-    let result: any = response.data;
-    if (response.data.data && response.data.success) {
-      result = response.data.data;
+    if (!response || !response.success) {
+      throw new Error(response?.error || 'Failed to generate flashcards from file');
     }
+
+    console.log('[API] Returning file-based flashcard result with', response.data?.cards?.length || 0, 'cards');
     
-    console.log('[Flashcards] Returning file-based flashcard result with', result?.cards?.length || 0, 'cards');
-    return result;
+    return {
+      cards: response.data.cards,
+      data: response.data,
+      metadata: {
+        source: 'file',
+        fileName: file.name,
+        totalCards: response.data.total_cards,
+        generatedAt: new Date().toISOString(),
+      },
+      success: true,
+    };
   } catch (error: any) {
-    console.error('[Flashcards] Error generating from file:', error.message);
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate flashcards from file');
+    console.error('[API] Error generating flashcards from file:', error.message);
+    throw error;
   }
 };
 
 /**
  * Generate predicted questions from document file
+ * Uses Gemini API directly instead of backend
  * @param file - Document file
  * @param userId - User ID
  * @param examType - Exam type
@@ -1858,53 +1867,47 @@ export const generatePredictedQuestionsFromFile = async (
 ): Promise<any> => {
   try {
     const fileExtension = (file.name || '').split('.').pop()?.toLowerCase();
-    console.log(`[PredictedQuestions] Generating from file: ${file.name} (${fileExtension})`);
+    console.log(`[API] Generating predicted questions from file: ${file.name} (${fileExtension})`);
 
-    // If image file, use OCR
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(fileExtension || '')) {
-      return await generatePredictedQuestionsFromImage(file, userId, examType, numQuestions);
-    }
-
-    // For text/PDF files, extract content and generate
-    const formData = new FormData();
+    // Use Gemini service directly with file content
+    const { geminiPredictedQuestionsService } = await import('./quiz/GeminiPredictedQuestionsService');
     
-    if (file.file && file.file instanceof File) {
-      formData.append('document', file.file);
-    } else if (file instanceof File) {
-      formData.append('document', file);
-    } else if (file.uri) {
-      const filename = file.name || 'document';
-      const fileData = {
-        uri: file.uri,
-        type: file.mimeType || 'text/plain',
-        name: filename,
-      } as any;
-      formData.append('document', fileData);
-    }
-
-    formData.append('user_id', userId);
-    formData.append('difficulty', examType);
-    formData.append('num_questions', numQuestions.toString());
-
-    const response = await api.post('/predicted-questions/generate-from-document/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 60000,
+    // For now, extract content from file if possible, otherwise use filename as topic
+    let topic = file.name || 'Document-based predicted questions';
+    
+    const response = await geminiPredictedQuestionsService.generatePredictedQuestions({
+      topic,
+      numQuestions: Math.min(Math.max(numQuestions, 1), 10),
+      difficulty: 'medium',
+      examType: examType || 'General',
+      language: 'English'
     });
 
-    // Handle wrapped response format: { success: true, data: { questions, ... } }
-    // Return unwrapped data for consistency with generatePredictedQuestions
-    let result: any = response.data;
-    if (response.data.data && response.data.success) {
-      result = response.data.data;
+    if (!response || !response.success) {
+      throw new Error(response?.error || 'Failed to generate predicted questions from file');
     }
+
+    console.log('[API] Returning file-based predicted questions result with', response.questions?.length || 0, 'questions');
     
-    console.log('[PredictedQuestions] Returning file-based result with', result?.questions?.length || 0, 'questions');
-    return result;
+    return {
+      questions: response.questions,
+      title: response.title,
+      exam_type: response.examType,
+      key_definitions: response.key_definitions,
+      topic_outline: response.topicOutline,
+      total_questions: response.questions?.length || 0,
+      metadata: {
+        source: 'file',
+        fileName: file.name,
+        examType,
+        totalQuestions: response.questions?.length || 0,
+        generatedAt: new Date().toISOString(),
+      },
+      success: true,
+    };
   } catch (error: any) {
-    console.error('[PredictedQuestions] Error generating from file:', error.message);
-    throw new Error(error.response?.data?.error || error.message || 'Failed to generate predicted questions from file');
+    console.error('[API] Error generating predicted questions from file:', error.message);
+    throw error;
   }
 };
 

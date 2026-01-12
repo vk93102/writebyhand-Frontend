@@ -1,47 +1,51 @@
 import axios from 'axios';
 
-// Gemini API Configuration
 const GEMINI_API_KEY = typeof process !== 'undefined' && process.env ? (process.env.EXPO_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '') : '';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent';
 
-// Debug: Log if key is available
 if (GEMINI_API_KEY) {
   console.log('✅ Gemini API Key loaded successfully');
 } else {
   console.warn('⚠️ Gemini API Key NOT found in environment');
 }
 
-export interface QuizQuestion {
-  id: string;
+export interface PredictedQuestion {
+  id: string | number;
   question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  topic: string;
+  importance: 'high' | 'medium' | 'low';
+  question_type?: string;
+  depth_level?: string;
+  expected_answer_length?: string;
+  key_concepts?: string[];
+  hint?: string;
+  sample_answer?: string;
+  why_important?: string;
+  related_topics?: string[];
+  tags?: string[];
 }
 
-export interface QuizGenerationOptions {
+export interface PredictedQuestionsGenerationOptions {
   topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  examType: string;
   numQuestions: number;
-  questionTypes?: string[]; // ['multiple-choice', 'true-false', 'fill-blank']
+  difficulty?: 'easy' | 'medium' | 'hard';
   language?: string;
 }
 
-export interface QuizResponse {
+export interface PredictedQuestionsResponse {
   success: boolean;
-  questions: QuizQuestion[];
+  questions: PredictedQuestion[];
   metadata: {
     topic: string;
-    difficulty: string;
+    examType: string;
     totalQuestions: number;
     generatedAt: string;
   };
   error?: string;
 }
 
-class GeminiQuizService {
+class GeminiPredictedQuestionsService {
   private apiKey: string;
 
   constructor(apiKey?: string) {
@@ -49,9 +53,9 @@ class GeminiQuizService {
   }
 
   /**
-   * Generate quiz questions using Gemini API
+   * Generate predicted questions using Gemini API
    */
-  async generateQuiz(options: QuizGenerationOptions): Promise<QuizResponse> {
+  async generatePredictedQuestions(options: PredictedQuestionsGenerationOptions): Promise<PredictedQuestionsResponse> {
     try {
       if (!this.apiKey) {
         throw new Error('Gemini API key is not configured');
@@ -95,24 +99,24 @@ class GeminiQuizService {
         questions,
         metadata: {
           topic: options.topic,
-          difficulty: options.difficulty,
+          examType: options.examType,
           totalQuestions: questions.length,
           generatedAt: new Date().toISOString(),
         },
       };
     } catch (error: any) {
-      console.error(' Gemini Quiz Generation Error:', error);
+      console.error('❌ Gemini Predicted Questions Generation Error:', error);
       
       return {
         success: false,
         questions: [],
         metadata: {
           topic: options.topic,
-          difficulty: options.difficulty,
+          examType: options.examType,
           totalQuestions: 0,
           generatedAt: new Date().toISOString(),
         },
-        error: error.response?.data?.error?.message || error.message || 'Failed to generate quiz',
+        error: error.response?.data?.error?.message || error.message || 'Failed to generate predicted questions',
       };
     }
   }
@@ -120,29 +124,33 @@ class GeminiQuizService {
   /**
    * Build the prompt for Gemini API
    */
-  private buildPrompt(options: QuizGenerationOptions): string {
-    const { topic, difficulty, numQuestions, questionTypes, language = 'English' } = options;
+  private buildPrompt(options: PredictedQuestionsGenerationOptions): string {
+    const { topic, numQuestions, difficulty = 'medium', examType, language = 'English' } = options;
 
-    return `Generate ${numQuestions} ${difficulty} difficulty multiple-choice quiz questions about "${topic}".
+    return `Generate ${numQuestions} predicted exam questions for "${examType}" based on "${topic}".
 
 Requirements:
-- Each question must have 4 options (A, B, C, D)
-- Provide the correct answer
-- Include a brief explanation for each answer
-- Questions should be clear, concise, and educational
+- These should be questions that are likely to appear in the ${examType} exam
+- Focus on important concepts and frequently tested topics
+- Each question should have detailed information
 - Difficulty level: ${difficulty}
 - Language: ${language}
-${questionTypes ? `- Question types: ${questionTypes.join(', ')}` : ''}
+- Include sample answers and study tips
 
 Format your response as a valid JSON array with this exact structure:
 [
   {
+    "id": 1,
     "question": "Question text here?",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correctAnswer": 0,
-    "explanation": "Brief explanation why this is correct",
     "difficulty": "${difficulty}",
-    "topic": "${topic}"
+    "importance": "high/medium/low",
+    "question_type": "multiple choice/short answer/essay",
+    "sample_answer": "A comprehensive sample answer to the question",
+    "hint": "A helpful hint to guide students",
+    "why_important": "Why this question is important to know for the exam",
+    "key_concepts": ["concept1", "concept2", "concept3"],
+    "related_topics": ["related topic 1", "related topic 2"],
+    "expected_answer_length": "2-3 paragraphs"
   }
 ]
 
@@ -154,8 +162,8 @@ IMPORTANT: Return ONLY the JSON array, no additional text before or after.`;
    */
   private parseGeneratedQuestions(
     generatedText: string,
-    options: QuizGenerationOptions
-  ): QuizQuestion[] {
+    options: PredictedQuestionsGenerationOptions
+  ): PredictedQuestion[] {
     try {
       // Remove markdown code blocks if present
       let jsonText = generatedText.trim();
@@ -168,65 +176,30 @@ IMPORTANT: Return ONLY the JSON array, no additional text before or after.`;
       }
 
       return parsedQuestions.map((q, index) => ({
-        id: `quiz_${Date.now()}_${index}`,
+        id: q.id ?? `predicted_${Date.now()}_${index}`,
         question: q.question || '',
-        options: q.options || [],
-        correctAnswer: q.correctAnswer ?? 0,
-        explanation: q.explanation,
-        difficulty: q.difficulty || options.difficulty,
-        topic: q.topic || options.topic,
+        difficulty: q.difficulty || options.difficulty || 'medium',
+        importance: q.importance || 'medium',
+        question_type: q.question_type || 'multiple choice',
+        depth_level: q.depth_level,
+        expected_answer_length: q.expected_answer_length,
+        key_concepts: q.key_concepts || [],
+        hint: q.hint,
+        sample_answer: q.sample_answer,
+        why_important: q.why_important,
+        related_topics: q.related_topics || [],
+        tags: q.tags || [],
       }));
     } catch (error) {
-      console.error(' Failed to parse Gemini response:', error);
+      console.error('❌ Failed to parse Gemini response:', error);
       console.error('Raw response:', generatedText);
       
       // Return empty array if parsing fails
       return [];
     }
   }
-
-  /**
-   * Validate a quiz answer
-   */
-  validateAnswer(question: QuizQuestion, userAnswer: number): boolean {
-    return question.correctAnswer === userAnswer;
-  }
-
-  /**
-   * Calculate quiz score
-   */
-  calculateScore(questions: QuizQuestion[], userAnswers: Record<string, number>): {
-    score: number;
-    correct: number;
-    incorrect: number;
-    percentage: number;
-  } {
-    let correct = 0;
-    let incorrect = 0;
-
-    questions.forEach((question) => {
-      const userAnswer = userAnswers[question.id];
-      if (userAnswer !== undefined) {
-        if (this.validateAnswer(question, userAnswer)) {
-          correct++;
-        } else {
-          incorrect++;
-        }
-      }
-    });
-
-    const total = questions.length;
-    const percentage = total > 0 ? (correct / total) * 100 : 0;
-
-    return {
-      score: correct,
-      correct,
-      incorrect,
-      percentage: Math.round(percentage * 100) / 100,
-    };
-  }
 }
 
 // Export singleton instance
-export const geminiQuizService = new GeminiQuizService();
-export default GeminiQuizService;
+export const geminiPredictedQuestionsService = new GeminiPredictedQuestionsService();
+export default GeminiPredictedQuestionsService;

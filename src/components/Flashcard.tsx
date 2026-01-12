@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import { TextInputComponent } from './TextInput';
 import { ImageUpload } from './ImageUpload';
+import { FileUpload } from './FileUpload';
 import AnimatedLoader from './AnimatedLoader';
 import LoadingWebm from './LoadingWebm';
 
@@ -35,12 +36,13 @@ interface FlashcardProps {
   loading: boolean;
   onTextSubmit?: (text: string) => void;
   onImageSubmit?: (imageUri: string) => void;
+  onFileSubmit?: (files: any[]) => void;
 }
 
-export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, onTextSubmit, onImageSubmit }) => {
+export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, onTextSubmit, onImageSubmit, onFileSubmit }) => {
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<'text' | 'image'>('text');
-  const [activeMethod, setActiveMethod] = useState<'text' | 'image'>('text');
+  const [activeTab, setActiveTab] = useState<'text' | 'image' | 'file'>('text');
+  const [activeMethod, setActiveMethod] = useState<'text' | 'image' | 'file'>('text');
   const [currentCard, setCurrentCard] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [flipAnimation] = useState(new Animated.Value(0));
@@ -88,11 +90,11 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.inputTab, activeMethod === 'image' && styles.inputTabActive]}
-                onPress={() => setActiveMethod('image')}
+                style={[styles.inputTab, activeMethod === 'file' && styles.inputTabActive]}
+                onPress={() => setActiveMethod('file')}
               >
-                <MaterialIcons name="image" size={18} color={activeMethod === 'image' ? colors.white : colors.textMuted} />
-                <Text style={[styles.inputTabText, activeMethod === 'image' && styles.inputTabTextActive]}>Image Upload</Text>
+                <MaterialIcons name="upload-file" size={18} color={activeMethod === 'file' ? colors.white : colors.textMuted} />
+                <Text style={[styles.inputTabText, activeMethod === 'file' && styles.inputTabTextActive]}>File Upload</Text>
               </TouchableOpacity>
             </View>
 
@@ -103,9 +105,10 @@ export const Flashcard: React.FC<FlashcardProps> = ({ flashcardData, loading, on
                   placeholder="Enter topic for flashcards (e.g., 'Biology Cells', 'Math Formulas')..."
                 />
               ) : (
-                <ImageUpload
-                  onSubmit={(imageUri) => onImageSubmit?.(imageUri)}
+                <FileUpload
+                  onSubmit={(files) => onFileSubmit?.(files)}
                   loading={loading}
+                  placeholder="Upload PDF, TXT, or Document to generate flashcards"
                 />
               )}
             </View>
@@ -420,9 +423,10 @@ const styles = StyleSheet.create({
   },
   loaderContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: colors.background,
+    paddingTop: height * 0.5,
   },
   
   /* Empty State */
