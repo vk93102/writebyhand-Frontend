@@ -363,7 +363,7 @@ export const generatePredictedQuestions = async (
  */
 export const getDailyQuiz = async (userId: string) => {
   try {
-    const response = await api.get('/daily-quiz/', {
+    const response = await api.get('/quiz/', {
       params: { user_id: userId }
     });
     return response.data;
@@ -471,7 +471,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
  */
 export const startDailyQuiz = async (userId: string, quizId: string) => {
   try {
-    const response = await api.post('/daily-quiz/start/', {
+    const response = await api.post('/quiz/start/', {
       user_id: userId,
       quiz_id: quizId,
     });
@@ -496,7 +496,7 @@ export const submitDailyQuiz = async (
 ) => {
   try {
     console.log('Submitting quiz:', { userId, quizId, answers, timeTaken });
-    const response = await api.post('/daily-quiz/submit/', {
+    const response = await api.post('/quiz/submit/', {
       user_id: userId,
       quiz_id: quizId,
       answers: answers,
@@ -516,7 +516,7 @@ export const submitDailyQuiz = async (
  */
 export const getUserCoins = async (userId: string) => {
   try {
-    const response = await api.get('/daily-quiz/coins/', {
+    const response = await api.get('/quiz/coins/', {
       params: { user_id: userId }
     });
     return response.data;
@@ -532,7 +532,7 @@ export const getUserCoins = async (userId: string) => {
  */
 export const getQuizHistory = async (userId: string, limit: number = 30) => {
   try {
-    const response = await api.get('/daily-quiz/history/', {
+    const response = await api.get('/quiz/history/', {
       params: { user_id: userId, limit: limit }
     });
     return response.data;
@@ -543,7 +543,7 @@ export const getQuizHistory = async (userId: string, limit: number = 30) => {
 
 export const getDailyQuizAttempt = async (userId: string, quizId: string) => {
   try {
-    const response = await api.get('/daily-quiz/attempt/detail/', {
+    const response = await api.get('/quiz/attempt/detail/', {
       params: { user_id: userId, quiz_id: quizId }
     });
     return response.data;

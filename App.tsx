@@ -47,7 +47,7 @@ import { generateQuiz, generateQuizFromImage, generateQuizFromYouTube } from './
 import { colors, spacing, borderRadius, typography, shadows } from './src/styles/theme';
 
 type TabType = 'text' | 'image' | 'file';
-type PageType = 'dashboard' | 'mock-test' | 'quiz' | 'flashcards' | 'ask' | 'predicted-questions' | 'youtube-summarizer' | 'pricing' | 'usage' | 'profile' | 'trends' | 'daily-quiz' | 'pair-quiz' | 'previous-papers' | 'withdrawal' | 'withdrawal-success';
+type PageType = 'dashboard' | 'mock-test' | 'quiz' | 'flashcards' | 'ask' | 'predicted-questions' | /* 'youtube-summarizer' | */ 'pricing' | 'usage' | 'profile' | 'trends' | 'daily-quiz' | 'pair-quiz' | 'previous-papers' | 'withdrawal' | 'withdrawal-success';
 type DashboardSection = 'overview' | 'quiz' | 'flashcards' | 'study-material';
 type AppScreenType = 'auth' | 'landing' | 'main' | 'reset-password';
 
@@ -75,7 +75,7 @@ const isWeb = Platform.OS === 'web';
   { id: 'predicted-questions' as PageType, label: 'Predicted Questions', icon: 'psychology' },
   { id: 'previous-papers' as PageType, label: 'Previous Papers', icon: 'description' },
   { id: 'trends' as PageType, label: 'PYQ Features', icon: 'analytics' },
-  { id: 'youtube-summarizer' as PageType, label: 'YouTube Summarizer', icon: 'ondemand-video' },
+  // { id: 'youtube-summarizer' as PageType, label: 'YouTube Summarizer', icon: 'ondemand-video' },
   { id: 'withdrawal' as PageType, label: 'Withdraw Coins', icon: 'account-balance-wallet' },
   { id: 'usage' as PageType, label: 'Usage Dashboard', icon: 'dashboard' },
   { id: 'pricing' as PageType, label: 'Pricing', icon: 'local-offer' },
@@ -123,7 +123,8 @@ export default function App() {
   const handleAuthSuccess = async (userInfo: User) => {
     setUser(userInfo);
     // Set user ID in API service to auto-inject X-User-ID header
-    await setUserId(userInfo.id);
+    // Ensure userId is always a string
+    await setUserId(String(userInfo.id));
     setAppScreen('main');
     setShowLanding(false);
     setCurrentPage('daily-quiz');
@@ -162,12 +163,8 @@ export default function App() {
       console.log('[App] API Key (first 20 chars):', geminiKey.substring(0, 20) + '...');
     }
     
-    // Only check health once on app start, not continuously
     checkApiHealth();
     loadUserCoins();
-    // Remove the interval to reduce backend load
-    // const interval = setInterval(checkApiHealth, 15000);
-    // return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -514,9 +511,6 @@ export default function App() {
 
     try {
       const userId = user?.id || 'guest_user';
-      
-      // CRITICAL: Check subscription before allowing access to premium feature
-      // console.log('[Quiz] Checking subscription status for user:', userId);
       const hasSubscription = await canAccessPremiumFeature(userId);
       
       if (!hasSubscription) {
@@ -1615,7 +1609,8 @@ export default function App() {
             </View>
           </ScrollView>
         </View>
-      ) : currentPage === 'youtube-summarizer' ? (
+      ) : /* youtube-summarizer disabled
+      currentPage === 'youtube-summarizer' ? (
         <View style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
           <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingVertical: spacing.xl }}>
             <View style={[styles.sectionContainer, { width: '100%', maxWidth: 900, alignItems: 'center' }]}>
@@ -1638,6 +1633,7 @@ export default function App() {
             </View>
           </ScrollView>
         </View>
+      ) : */ false ? null
       ) : currentPage === 'ask' ? (
         <View style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
           <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -1739,7 +1735,7 @@ export default function App() {
           <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
             <View style={styles.featurePageContainer}>
               <DailyQuizScreen
-                userId={user?.id || 'guest'}
+                userId={String(user?.id || 'guest')}
                 onComplete={(totalCoins) => { 
                   console.log('=== APP.TSX onComplete CALLED ===');
                   console.log('Received totalCoins:', totalCoins);
@@ -1845,20 +1841,8 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
-      <>
-        {/* Drawer overlay for mobile */}
-        {!showSidebar && drawerOpen && (
-          <TouchableOpacity style={styles.drawerOverlay} activeOpacity={0.9} onPress={() => toggleDrawer(false)} />
-        )}
-
-        {/* Mobile drawer (slides in) */}
-        {!showSidebar && drawerOpen && (
-          <View style={[styles.sidebar, styles.sidebarDrawer]}>
-            {renderSidebarWithLogout()}
-          </View>
-        )}
-
+        <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
+        
         {showSidebar ? (
           <View style={styles.layoutWithSidebar}>
             {renderSidebarWithLogout()}
@@ -1867,30 +1851,58 @@ export default function App() {
         ) : (
           renderMainContent()
         )}
-      </>
+
+        {/* Mobile Drawer Portal - Rendered Absolutely on Top */}
+        {!showSidebar && drawerOpen && (
+          <View style={styles.drawerPortal}>
+            {/* Overlay Backdrop */}
+            <TouchableOpacity 
+              style={styles.drawerOverlay} 
+              activeOpacity={0.9} 
+              onPress={() => toggleDrawer(false)} 
+            />
+            
+            {/* Drawer Menu */}
+            {renderSidebarWithLogout(true)}
+          </View>
+        )}
       </SafeAreaView>
     </SafeAreaProvider>
   );
 
-  function renderSidebarWithLogout() {
+  function renderSidebarWithLogout(isDrawer = false) {
     // compute sidebar width for different breakpoints
-    const sidebarWidth = screenWidth >= 1280 ? 240 : screenWidth >= 768 ? 200 : 240;
+    const isMobileScreen = screenWidth < 768;
+    const sidebarWidth = isMobileScreen ? screenWidth * 0.85 : (screenWidth >= 1280 ? 240 : 200);
+    
     return (
-      <View style={[styles.sidebar, { width: sidebarWidth, minWidth: sidebarWidth }]}>
+      <View style={isDrawer ? styles.sidebarDrawer : [styles.sidebar, { width: sidebarWidth }]}>
+        {/* User Profile Section */}
         <View style={styles.userProfile}>
           <View style={styles.avatar}>
-            <MaterialIcons name="account-circle" size={64} color={colors.primary} />
+            <MaterialIcons name="account-circle" size={56} color={colors.primary} />
           </View>
           <Text style={styles.userName}>{user?.name || 'User'}</Text>
           <Text style={styles.userRole}>{user?.provider === 'google' ? 'Google User' : 'Learner'}</Text>
         </View>
 
-        <ScrollView style={styles.navMenu} showsVerticalScrollIndicator={false}>
+        {/* Navigation Items - ScrollView */}
+        <ScrollView 
+          style={{ flex: 1 }} 
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={true}
+        >
           {navItems.map((item) => (
             <TouchableOpacity
               key={item.id}
               style={[styles.navItem, currentPage === item.id && styles.navItemActive]}
-              onPress={() => setCurrentPage(item.id)}
+              onPress={() => {
+                setCurrentPage(item.id);
+                // Close drawer on mobile after selection
+                if (screenWidth < 768) {
+                  toggleDrawer(false);
+                }
+              }}
               activeOpacity={0.7}
             >
               <MaterialIcons 
@@ -1908,6 +1920,7 @@ export default function App() {
           ))}
         </ScrollView>
 
+        {/* Logout Button - Footer */}
         <View style={styles.sidebarFooter}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} activeOpacity={0.8}>
             <MaterialIcons name="logout" size={20} color={colors.error} />
@@ -1933,10 +1946,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRightWidth: 1,
     borderRightColor: '#E5E7EB',
-    paddingHorizontal: 15,
-    paddingVertical: spacing.xl,
+    paddingHorizontal: 12,
+    paddingVertical: spacing.md,
     flexDirection: 'column',
-    justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: { width: 1, height: 0 },
     shadowOpacity: 0.08,
@@ -1945,25 +1957,26 @@ const styles = StyleSheet.create({
   },
   userProfile: {
     alignItems: 'center',
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   avatar: {
-    marginBottom: spacing.md,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    marginBottom: spacing.xs,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#EEF2FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   userName: {
-    ...typography.h3,
+    ...typography.h4,
     marginBottom: spacing.xs,
     fontWeight: '700',
     color: '#111827',
+    fontSize: 16,
   },
   userRole: {
     ...typography.small,
@@ -1971,18 +1984,17 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   navMenu: {
-    flex: 1,
-    gap: spacing.sm,
-    marginVertical: spacing.md,
+    paddingRight: spacing.sm,
   },
   navItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     paddingHorizontal: 12,
     borderRadius: borderRadius.md,
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
+    minHeight: 48,
   },
   navItemActive: {
     backgroundColor: '#EEF2FF',
@@ -1992,6 +2004,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontWeight: '500',
     fontSize: 14,
+    flex: 1,
   },
   navTextActive: {
     color: colors.primary,
@@ -1999,8 +2012,9 @@ const styles = StyleSheet.create({
   },
   sidebarFooter: {
     gap: spacing.md,
-    marginTop: 'auto',
-    paddingTop: spacing.lg,
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xs,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },
@@ -2014,7 +2028,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderWidth: 2,
     borderColor: colors.error,
-    backgroundColor: colors.error + '15',
+    backgroundColor: colors.error + '20',
   },
   logoutText: {
     ...typography.body,
@@ -2113,24 +2127,41 @@ const styles = StyleSheet.create({
     color: colors.textLight,
   },
   /* drawer overlay */
+  drawerPortal: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 98,
+    flexDirection: 'row',
+  },
   drawerOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    zIndex: 50,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    zIndex: 1,
   },
   sidebarDrawer: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    zIndex: 60,
-    boxShadow: '6px 0 24px rgba(0, 0, 0, 0.18)',
-    elevation: 12,
+    width: '85%',
+    maxWidth: 320,
+    zIndex: 2,
     backgroundColor: colors.white,
+    paddingHorizontal: 12,
+    paddingVertical: spacing.md,
+    flexDirection: 'column',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 15,
   },
   topBar: {
     flexDirection: 'row',

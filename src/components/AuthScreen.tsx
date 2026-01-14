@@ -33,7 +33,7 @@ const mapUserPayload = (payload: any, provider: Provider) => {
   }
   const data = payload?.data ?? payload;
   return {
-    id: data?.user_id ?? data?.id ?? null,
+    id: String(data?.user_id ?? data?.id ?? ''),
     username: data?.username ?? '',
     email: data?.email ?? '',
     fullName: data?.full_name ?? data?.fullName ?? '',

@@ -579,7 +579,7 @@ export const getDailyQuiz = async (language: string = 'english', userId?: string
       language = 'english';
     }
 
-    const response = await api.get('/daily-quiz/', {
+    const response = await api.get('/quiz/daily-quiz/', {
       params: { 
         language: language.toLowerCase(),
         ...(userId && { user_id: userId })
@@ -800,7 +800,7 @@ export const changePassword = async (email: string, oldPassword: string, newPass
  */
 export const startDailyQuiz = async (userId: string, quizId: string) => {
   try {
-    const response = await api.post('/daily-quiz/start/', {
+    const response = await api.post('/quiz/daily-quiz/start/', {
       user_id: userId,
       quiz_id: quizId,
     });
@@ -810,21 +810,7 @@ export const startDailyQuiz = async (userId: string, quizId: string) => {
   }
 };
 
-/**
- * Submit daily quiz answers
- * Production-ready API endpoint matching backend specification
- * 
- * API: POST /daily-quiz/submit/
- * Headers: X-User-ID (auto-injected), Content-Type: application/json
- * Body: { user_id, quiz_id, answers, time_taken_seconds }
- * Response: { result: { coins_earned, score_percentage }, total_coins }
- * 
- * @param userId - User identifier
- * @param quizId - Quiz ID from getDailyQuiz
- * @param answers - User's answers in format {question_id: option_index} e.g. {"1": 0, "2": 2}
- * @param timeTakenSeconds - Time taken to complete quiz in seconds
- * @returns Result data with coins earned and score
- */
+
 export const submitDailyQuiz = async (
   userId: string,
   quizId: string,
@@ -832,11 +818,11 @@ export const submitDailyQuiz = async (
   timeTakenSeconds: number
 ): Promise<any> => {
   try {
-    if (!userId || userId.trim().length === 0) {
+    if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
       throw new Error('User ID cannot be empty');
     }
 
-    if (!quizId || quizId.trim().length === 0) {
+    if (!quizId || typeof quizId !== 'string' || quizId.trim().length === 0) {
       throw new Error('Quiz ID cannot be empty');
     }
 
@@ -856,7 +842,7 @@ export const submitDailyQuiz = async (
       time_taken_seconds: timeTakenSeconds,
     };
 
-    const response = await api.post('/daily-quiz/submit/', payload);
+    const response = await api.post('/quiz/daily-quiz/submit/', payload);
 
     if (!response.data) {
       throw new Error('No response received from server');
@@ -903,7 +889,7 @@ export const getUserCoins = async (userId: string | number | null): Promise<any>
       throw new Error('User ID cannot be empty');
     }
 
-    const response = await api.get('/daily-quiz/coins/', {
+    const response = await api.get('/quiz/daily-quiz/coins/', {
       params: { user_id: userIdStr }
     });
 
@@ -950,7 +936,7 @@ export const getQuizHistory = async (userId: string, limit: number = 5): Promise
     // Ensure limit is within valid range
     const validLimit = Math.min(Math.max(limit, 1), 100);
 
-    const response = await api.get('/daily-quiz/history/', {
+    const response = await api.get('/quiz/daily-quiz/history/', {
       params: { 
         user_id: userId.trim(), 
         limit: validLimit 
@@ -980,7 +966,7 @@ export const getQuizHistory = async (userId: string, limit: number = 5): Promise
 
 export const getDailyQuizAttempt = async (userId: string, quizId: string) => {
   try {
-    const response = await api.get('/daily-quiz/attempt/detail/', {
+    const response = await api.get('/quiz/daily-quiz/attempt/detail/', {
       params: { user_id: userId, quiz_id: quizId }
     });
     return response.data;
