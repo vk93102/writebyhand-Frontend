@@ -1,116 +1,122 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
+  Text,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 
 interface TextInputComponentProps {
-  onSubmit: (data: string) => void;
+  onSubmit: (text: string) => Promise<void> | void;
   loading?: boolean;
   placeholder?: string;
 }
 
-export const TextInputComponent: React.FC<TextInputComponentProps> = ({ 
-  onSubmit, 
-  loading,
-  placeholder = "Paste your problem statement, show your work, or ask for hints..."
+export const TextInputComponent: React.FC<TextInputComponentProps> = ({
+  onSubmit,
+  loading = false,
+  placeholder = 'Enter text here...',
 }) => {
   const [text, setText] = useState('');
-  const [focused, setFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
-    const trimmed = text.trim();
-    if (trimmed) {
-      // pass the raw trimmed string to the parent handler
-      onSubmit(trimmed);
+  const handleSubmit = async () => {
+    if (!text.trim()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await onSubmit(text);
+      setText('');
+    } catch (error) {
+      console.error('Error submitting text:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={[styles.textarea, focused && styles.textareaFocused]}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textLight}
-        value={text}
-        onChangeText={setText}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        multiline
-        numberOfLines={8}
-        editable={!loading}
-        underlineColorAndroid="transparent"
-        selectionColor="transparent"
-      />
-
-      <View style={styles.footer}>
-        <Text style={styles.charCount}>{text.length} characters</Text>
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textMuted}
+          value={text}
+          onChangeText={setText}
+          multiline
+          editable={!loading && !isLoading}
+          maxLength={2000}
+        />
         <TouchableOpacity
-          style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+          style={[
+            styles.submitButton,
+            (loading || isLoading || !text.trim()) && styles.submitButtonDisabled,
+          ]}
           onPress={handleSubmit}
-          disabled={loading || !text.trim()}
+          disabled={loading || isLoading || !text.trim()}
         >
-          {loading ? (
-            <ActivityIndicator color={colors.white} />
+          {isLoading ? (
+            <ActivityIndicator size="small" color={colors.white} />
           ) : (
-            <Text style={styles.submitButtonText}>Solve Question</Text>
+            <MaterialIcons name="send" size={20} color={colors.white} />
           )}
         </TouchableOpacity>
       </View>
+      <Text style={styles.characterCount}>
+        {text.length}/2000
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    gap: spacing.lg,
-    minHeight: 340,
-    justifyContent: 'space-between',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    ...shadows.sm,
   },
-  textarea: {
-    borderWidth: 2,
-    borderColor: '#e6eefb',
-    borderRadius: borderRadius.xl,
-    padding: spacing.lg * 1.2,
-    fontSize: 16,
-    backgroundColor: colors.backgroundGray,
-    color: colors.text,
-    minHeight: 240,
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+  },
+  input: {
     flex: 1,
+    minHeight: 80,
+    padding: spacing.md,
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    color: colors.text,
+    fontSize: typography.body.fontSize,
+    fontFamily: typography.body.fontFamily,
     textAlignVertical: 'top',
   },
-  textareaFocused: {
-    borderColor: colors.primary,
-    backgroundColor: colors.white,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  charCount: {
-    ...typography.small,
-    color: colors.textMuted,
-  },
   submitButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: colors.primary,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xxl,
-    borderRadius: borderRadius.xl,
-    ...shadows.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.md,
   },
   submitButtonDisabled: {
+    backgroundColor: colors.textMuted,
     opacity: 0.5,
   },
-  submitButtonText: {
-    color: colors.white,
-    fontSize: 15,
-    fontWeight: '600',
+  characterCount: {
+    marginTop: spacing.xs,
+    fontSize: typography.small.fontSize,
+    color: colors.textMuted,
+    textAlign: 'right',
   },
 });

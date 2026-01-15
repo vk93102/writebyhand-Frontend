@@ -516,7 +516,7 @@ export const submitDailyQuiz = async (
  */
 export const getUserCoins = async (userId: string) => {
   try {
-    const response = await api.get('/quiz/coins/', {
+    const response = await api.get('/quiz/daily-quiz/coins/', {
       params: { user_id: userId }
     });
     return response.data;

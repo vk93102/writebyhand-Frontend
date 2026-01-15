@@ -29,7 +29,7 @@ const API_URL = 'https://ed-tech-backend-tzn8.onrender.com/api';
 // Fetch coins from API
 const fetchUserCoinsFromAPI = async (userId: number, token: string): Promise<number> => {
   try {
-    const response = await fetch(`${API_URL}/quiz/coins/?user_id=${userId}`, {
+    const response = await fetch(`${API_URL}/quiz/daily-quiz/coins/?user_id=${userId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

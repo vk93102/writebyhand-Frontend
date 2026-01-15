@@ -15,6 +15,9 @@ import { getDailyQuiz } from '../services/api';
 import { getQuizSettings } from '../services/mockTestService';
 import { useAuth } from '../contexts/AuthContext';
 import { DailyQuizScreen } from './DailyQuizScreen';
+import { FeatureLockIcon } from './FeatureLockIcon';
+import { useFeatureLock } from '../hooks/useFeatureLock';
+import { premiumFeatureService } from '../services/premiumFeatureService';
 
 interface MainDashboardProps {
   userName: string;
@@ -112,6 +115,9 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
   const insets = useSafeAreaInsets();
   const { user, refreshCoins } = useAuth();
   
+  // Get premium status and lock state
+  const featureLock = useFeatureLock(user?.id || 'anonymous');
+  
   const [userStats, setUserStats] = useState({
     questionsAnswered: 24,
     quizzesCompleted: 8,
@@ -207,24 +213,46 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
     daysUntilReset: 18,
   });
 
-  const renderQuickAccessItem = (item: QuickAccess) => (
-    <TouchableOpacity
-      key={item.id}
-      style={styles.quickAccessCard}
-      onPress={() => onNavigateToFeature(item.feature)}
-      activeOpacity={0.8}
-    >
-      <View
-        style={[
-          styles.quickAccessIcon,
-          { backgroundColor: item.color + '20' },
-        ]}
+  const renderQuickAccessItem = (item: QuickAccess) => {
+    // Check if feature is locked
+    const isPremiumFeature = ['ask-question', 'predicted-questions', 'youtube-summarizer'].includes(item.feature);
+    const isLocked = featureLock.isLocked && isPremiumFeature;
+
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={styles.quickAccessCard}
+        onPress={() => {
+          if (isLocked) {
+            onNavigateToPricing();
+          } else {
+            onNavigateToFeature(item.feature);
+          }
+        }}
+        activeOpacity={0.8}
       >
-        <MaterialIcons name={item.icon} size={32} color={item.color} />
-      </View>
-      <Text style={styles.quickAccessText}>{item.title}</Text>
-    </TouchableOpacity>
-  );
+        <View
+          style={[
+            styles.quickAccessIcon,
+            { backgroundColor: item.color + '20' },
+            isLocked && styles.quickAccessIconLocked,
+          ]}
+        >
+          <MaterialIcons
+            name={item.icon}
+            size={32}
+            color={isLocked ? colors.gray400 : item.color}
+          />
+        </View>
+        <Text style={[styles.quickAccessText, isLocked && styles.quickAccessTextLocked]}>
+          {item.title}
+        </Text>
+        {isLocked && (
+          <FeatureLockIcon locked={true} size="small" showLabel={false} />
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   const renderActivityItem = ({ item }: { item: ActivityItem }) => (
     <View style={styles.activityItem}>
@@ -893,6 +921,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.text,
     fontSize: 14,
+  },
+  quickAccessIconLocked: {
+    opacity: 0.6,
+  },
+  quickAccessTextLocked: {
+    color: colors.gray400,
   },
 
   /* Activity Section */

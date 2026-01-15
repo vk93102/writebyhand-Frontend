@@ -9,6 +9,7 @@ dist/
 web-build/
 expo-env.d.ts
 
+bundletool.jar
 # Native
 .kotlin/
 *.orig.*

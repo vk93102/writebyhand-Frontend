@@ -14,7 +14,12 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius } from '../styles/theme';
-import { createRazorpaySubscription } from '../services/api';
+import { 
+  createPaymentOrder, 
+  openRazorpayCheckout, 
+  pollSubscriptionStatus,
+  checkSubscriptionStatus 
+} from '../services/subscriptionService';
 
 const isWeb = Platform.OS === 'web';
 
@@ -44,9 +49,12 @@ interface ComparisonRow {
 
 interface PricingProps {
   userId?: string;
+  userEmail?: string;
+  userName?: string;
+  onSubscriptionComplete?: () => void;
 }
 
-export const Pricing: React.FC<PricingProps> = ({ userId }) => {
+export const Pricing: React.FC<PricingProps> = ({ userId, userEmail, userName, onSubscriptionComplete }) => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string>('scholar');
   const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
@@ -209,6 +217,9 @@ export const Pricing: React.FC<PricingProps> = ({ userId }) => {
       ? '₹1 for first month, then ₹99/month'
       : '₹1 for first month, then ₹499/month';
 
+    // Map plan IDs to backend plan names
+    const planName = planId === 'scholar' ? 'premium' : 'premium_annual';
+
     Alert.alert(
       `Subscribe to ${plan.name}`,
       `You'll be charged ${pricingInfo}. Continue to payment?`,
@@ -218,25 +229,116 @@ export const Pricing: React.FC<PricingProps> = ({ userId }) => {
           onPress: async () => {
             try {
               setProcessing(true);
-              const planName = planId === 'scholar' ? 'basic' : 'premium';
-              const response = await createRazorpaySubscription(userId, planName);
-              
-              if (response.payment_url) {
-                const supported = await Linking.canOpenURL(response.payment_url);
-                if (supported) {
-                  await Linking.openURL(response.payment_url);
+              console.log('[Pricing] 🚀 Starting subscription flow...', { userId, planName });
+
+              // Step 1: Create payment order
+              const orderResponse = await createPaymentOrder(userId, planName);
+
+              if (!orderResponse.success) {
+                // Handle duplicate subscription
+                if (orderResponse.error === 'Already Subscribed') {
                   Alert.alert(
-                    'Payment Initiated',
-                    response.message || 'Complete the payment on Razorpay to activate your subscription.'
+                    'Already Subscribed',
+                    orderResponse.message || 'You already have an active subscription. Would you like to upgrade?',
+                    [
+                      {
+                        text: 'View Subscription',
+                        onPress: async () => {
+                          const status = await checkSubscriptionStatus(userId);
+                          Alert.alert(
+                            'Current Subscription',
+                            `Plan: ${status.plan}\nStatus: ${status.subscription_status}\n${status.is_trial ? `Trial ends: ${status.trial_end_date}` : `Next billing: ${status.next_billing_date}`}`
+                          );
+                        },
+                      },
+                      { text: 'OK' },
+                    ]
                   );
                 } else {
-                  Alert.alert('Error', 'Cannot open payment link');
+                  Alert.alert('Error', orderResponse.error || 'Failed to create order');
                 }
+                setProcessing(false);
+                return;
+              }
+
+              // Step 2: Open Razorpay checkout (web only)
+              if (Platform.OS === 'web') {
+                console.log('[Pricing] 💳 Opening Razorpay checkout...');
+                
+                await openRazorpayCheckout(
+                  orderResponse,
+                  userId,
+                  userEmail || 'user@example.com',
+                  userName || 'User',
+                  async (paymentResponse) => {
+                    console.log('[Pricing] ✅ Payment successful, polling status...');
+                    
+                    // Step 3: Poll subscription status
+                    const isPremium = await pollSubscriptionStatus(userId);
+                    
+                    setProcessing(false);
+                    
+                    if (isPremium) {
+                      Alert.alert(
+                        'Success! 🎉',
+                        'Your subscription has been activated! All premium features are now unlocked.',
+                        [
+                          {
+                            text: 'Start Using',
+                            onPress: () => {
+                              onSubscriptionComplete?.();
+                            },
+                          },
+                        ]
+                      );
+                    } else {
+                      Alert.alert(
+                        'Processing',
+                        'Your payment was successful! Your subscription will be activated shortly. Please refresh the page.',
+                        [
+                          {
+                            text: 'Refresh Now',
+                            onPress: () => {
+                              if (Platform.OS === 'web') {
+                                window.location.reload();
+                              }
+                            },
+                          },
+                          { text: 'OK' },
+                        ]
+                      );
+                    }
+                  },
+                  (error) => {
+                    console.log('[Pricing] ❌ Payment failed or cancelled:', error.message);
+                    setProcessing(false);
+                    Alert.alert('Payment Cancelled', 'No charges were made.');
+                  }
+                );
+              } else {
+                // Mobile: Open external payment link
+                if (orderResponse.order_id) {
+                  // Generate Razorpay payment link for mobile
+                  const paymentUrl = `https://rzp.io/${orderResponse.order_id}`;
+                  const supported = await Linking.canOpenURL(paymentUrl);
+                  
+                  if (supported) {
+                    await Linking.openURL(paymentUrl);
+                    Alert.alert(
+                      'Payment Initiated',
+                      'Complete the payment to activate your subscription. The app will automatically refresh after payment.'
+                    );
+                  }
+                }
+                setProcessing(false);
               }
             } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to create subscription');
-            } finally {
+              console.error('[Pricing] ❌ Subscription error:', error);
               setProcessing(false);
+              Alert.alert(
+                'Error',
+                error.message || 'Failed to process subscription. Please try again.'
+              );
             }
           },
         },

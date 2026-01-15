@@ -10,7 +10,8 @@ import {
   ScrollView,
   Platform,
   Dimensions,
-  Image
+  Image,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -30,12 +31,14 @@ import AnimatedLoader from './src/components/AnimatedLoader';
 import { Pricing } from './src/components/Pricing';
 import { SubscriptionPricing } from './src/components/SubscriptionPricing';
 import { UsageDashboard } from './src/components/UsageDashboard';
+import PremiumGate from './src/components/PremiumGate';
 import { AuthScreen } from './src/components/AuthScreen';
 import { MainDashboard } from './src/components/MainDashboard';
 import { TrendAnalysis } from './src/components/TrendAnalysis';
 import { PreviousYearPapers } from './src/components/PreviousYearPapers';
 import { ResetPasswordScreen } from './src/components/ResetPasswordScreen';
 import { getUserCoins, getSubscriptionStatus } from './src/services/api';
+import { isPremiumFeature, PREMIUM_FEATURES } from './src/config/premiumFeatures';
 import { DailyQuizScreen } from './src/components/DailyQuizScreen';
 import { PairQuizContainer } from './src/components/pair-quiz';
 import { WithdrawalScreen } from './src/components/WithdrawalScreen';
@@ -45,6 +48,7 @@ import { canAccessPremiumFeature, checkSubscriptionStatus, clearSubscriptionCach
 import { generateMockTest } from './src/services/mockTestService';
 import { generateQuiz, generateQuizFromImage, generateQuizFromYouTube } from './src/services/quiz';
 import { colors, spacing, borderRadius, typography, shadows } from './src/styles/theme';
+import { PremiumProvider } from './src/context/PremiumContext';
 
 type TabType = 'text' | 'image' | 'file';
 type PageType = 'dashboard' | 'mock-test' | 'quiz' | 'flashcards' | 'ask' | 'predicted-questions' | /* 'youtube-summarizer' | */ 'pricing' | 'usage' | 'profile' | 'trends' | 'daily-quiz' | 'pair-quiz' | 'previous-papers' | 'withdrawal' | 'withdrawal-success';
@@ -75,9 +79,9 @@ const isWeb = Platform.OS === 'web';
   { id: 'predicted-questions' as PageType, label: 'Predicted Questions', icon: 'psychology' },
   { id: 'previous-papers' as PageType, label: 'Previous Papers', icon: 'description' },
   { id: 'trends' as PageType, label: 'PYQ Features', icon: 'analytics' },
-  // { id: 'youtube-summarizer' as PageType, label: 'YouTube Summarizer', icon: 'ondemand-video' },
   { id: 'withdrawal' as PageType, label: 'Withdraw Coins', icon: 'account-balance-wallet' },
   { id: 'usage' as PageType, label: 'Usage Dashboard', icon: 'dashboard' },
+  { id: 'profile' as PageType, label: 'Profile', icon: 'person' },
   { id: 'pricing' as PageType, label: 'Pricing', icon: 'local-offer' },
 ];
 
@@ -86,6 +90,7 @@ export default function App() {
   const [appScreen, setAppScreen] = useState<AppScreenType>('auth');
   const [user, setUser] = useState<User | null>(null);
   const [showLanding, setShowLanding] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   const [screenWidth, setScreenWidth] = useState(initialWidth);
   const [activeTab, setActiveTab] = useState<TabType>('text');
@@ -128,6 +133,9 @@ export default function App() {
     setAppScreen('main');
     setShowLanding(false);
     setCurrentPage('daily-quiz');
+    
+    // Check premium status and setup periodic refresh
+    checkPremiumStatus();
   };
 
   const handleGuestLogin = () => {
@@ -142,6 +150,7 @@ export default function App() {
 
   const handleLogout = () => {
     setUser(null);
+    setIsPremium(false);
     setAppScreen('landing');
     setShowLanding(true);
     setResults(null);
@@ -155,25 +164,7 @@ export default function App() {
     setYoutubeSummaryData(null);
   };
 
-  useEffect(() => {
-    // Debug: Check if Gemini API key is loaded
-    const geminiKey = typeof process !== 'undefined' && process.env ? process.env.EXPO_PUBLIC_GEMINI_API_KEY : undefined;
-    console.log('[App] Gemini API Key Status:', geminiKey ? '✅ Loaded' : '❌ NOT FOUND');
-    if (geminiKey) {
-      console.log('[App] API Key (first 20 chars):', geminiKey.substring(0, 20) + '...');
-    }
-    
-    checkApiHealth();
-    loadUserCoins();
-  }, []);
 
-  useEffect(() => {
-    // Refresh coins when user changes (login/logout)
-    if (user?.id) {
-      loadUserCoins();
-      loadSubscriptionStatus();
-    }
-  }, [user]);
 
   const loadUserCoins = async () => {
     try {
@@ -202,6 +193,95 @@ export default function App() {
     }
   };
 
+  /**
+   * Render a premium feature - shows PremiumGate if user is not premium
+   */
+  const RenderPremiumFeature = (featureId: string, component: React.ReactNode) => {
+    if (isPremiumFeature(featureId) && !isPremium) {
+      const featureInfo = PREMIUM_FEATURES[featureId as keyof typeof PREMIUM_FEATURES];
+      return (
+        <PremiumGate
+          featureName={featureInfo?.name || 'Premium Feature'}
+          description={featureInfo?.description || 'This feature is only available for premium users'}
+          onUnlock={() => setCurrentPage('pricing')}
+        >
+          {component}
+        </PremiumGate>
+      );
+    }
+    return component;
+  };
+
+  /**
+   * Check if a premium feature can be accessed
+   */
+  const checkPremiumStatus = async () => {
+    try {
+      if (user?.id) {
+        const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://ed-tech-backend-tzn8.onrender.com/api';
+        console.log('[App] 🔍 Checking premium status for user:', user.id);
+        
+        const response = await fetch(`${apiUrl}/subscription/status/?user_id=${encodeURIComponent(user.id)}`, {
+          method: 'GET',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-User-ID': String(user.id)
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[App] 📊 Subscription data received:', JSON.stringify(data, null, 2));
+          
+          // Production-level validation: check multiple conditions
+          const isPremiumUser = (
+            data.success === true &&
+            data.is_paid === true && 
+            data.subscription_active === true &&
+            data.plan && 
+            data.plan !== 'free' &&
+            data.subscription_status === 'active'
+          );
+          
+          console.log('[App] ✅ Premium Status Check:', {
+            isPremium: isPremiumUser,
+            is_paid: data.is_paid,
+            subscription_active: data.subscription_active,
+            plan: data.plan,
+            status: data.subscription_status,
+            is_trial: data.is_trial,
+            next_billing: data.next_billing_date,
+            days_remaining: data.days_until_next_billing
+          });
+          
+          setIsPremium(isPremiumUser);
+          setSubscriptionData(data);
+          
+          if (isPremiumUser) {
+            console.log('[App] 🎉 User is PREMIUM! All features unlocked.');
+            console.log(`[App] 📅 Plan: ${data.plan}, Trial: ${data.is_trial}, Next billing: ${data.next_billing_date}`);
+          } else {
+            console.log('[App] 🔒 User is FREE tier. Premium features locked.');
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          console.log('[App] ❌ Subscription check failed:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData
+          });
+          setIsPremium(false);
+        }
+      } else {
+        console.log('[App] 👤 Guest user or no user ID - setting isPremium to false');
+        setIsPremium(false);
+      }
+    } catch (error) {
+      console.error('[App] ❌ Premium status check error:', error);
+      setIsPremium(false);
+    }
+  };
+
   useEffect(() => {
     const sub = Dimensions.addEventListener?.('change', ({ window }) => {
       setScreenWidth(window.width);
@@ -220,7 +300,17 @@ export default function App() {
 
   const handleTextSubmit = async (question: string) => {
     if (!question.trim()) {
-      Alert.alert('Error', 'Please enter a question');
+      Alert.alert('Validation Error', 'Please enter a question');
+      return;
+    }
+
+    if (question.trim().length < 3) {
+      Alert.alert('Validation Error', 'Question must be at least 3 characters long');
+      return;
+    }
+
+    if (question.trim().length > 5000) {
+      Alert.alert('Validation Error', 'Question must not exceed 5000 characters');
       return;
     }
 
@@ -228,26 +318,70 @@ export default function App() {
     setResults(null);
 
     try {
+      console.log('[App] 🔍 User submitted text question:', question.trim().substring(0, 50), '...');
+      
       const response = await solveQuestionByText(question);
+
+      if (!response || !response.success) {
+        throw new Error(response?.message || 'No response from server');
+      }
+
+      console.log('[App] ✅ Received solution:', response.solution?.substring(0, 100), '...');
+      
       setResults(response);
       setLoading(false);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to solve question');
+      const errorMessage = error?.message || error || 'Failed to solve question';
+      console.error('[App] ❌ Error solving question:', errorMessage);
+
+      Alert.alert(
+        'Error',
+        errorMessage,
+        [
+          { text: 'Try Again', onPress: () => {} },
+          { text: 'Cancel', onPress: () => setLoading(false) }
+        ]
+      );
+
       setLoading(false);
     }
   };
 
   const handleImageSubmit = async (imageUri: string) => {
+    if (!imageUri || !imageUri.trim()) {
+      Alert.alert('Validation Error', 'Please select an image');
+      return;
+    }
+
     setLoading(true);
     setResults(null);
 
     try {
-      // solveQuestionByImage now takes only imageUri parameter (no maxResults)
+      console.log('[App] 🖼️ User submitted image:', imageUri.substring(0, 50), '...');
+
       const response = await solveQuestionByImage(imageUri);
+
+      if (!response || !response.success) {
+        throw new Error(response?.message || 'No response from server');
+      }
+
+      console.log('[App] ✅ Received image solution:', response.solution?.substring(0, 100), '...');
+
       setResults(response);
       setLoading(false);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to process image');
+      const errorMessage = error?.message || error || 'Failed to process image';
+      console.error('[App] ❌ Error solving image question:', errorMessage);
+
+      Alert.alert(
+        'Error',
+        errorMessage,
+        [
+          { text: 'Try Again', onPress: () => {} },
+          { text: 'Cancel', onPress: () => setLoading(false) }
+        ]
+      );
+
       setLoading(false);
     }
   };
@@ -1122,59 +1256,103 @@ export default function App() {
     return null;
   };
 
+  // Initialize health check and coin loading after all functions are defined
+  useEffect(() => {
+    // Debug: Check if Gemini API key is loaded
+    const geminiKey = typeof process !== 'undefined' && process.env ? process.env.EXPO_PUBLIC_GEMINI_API_KEY : undefined;
+    console.log('[App] Gemini API Key Status:', geminiKey ? '✅ Loaded' : '❌ NOT FOUND');
+    if (geminiKey) {
+      console.log('[App] API Key (first 20 chars):', geminiKey.substring(0, 20) + '...');
+    }
+    
+    checkApiHealth();
+    loadUserCoins();
+  }, []);
+
+  useEffect(() => {
+    // Refresh coins when user changes (login/logout)
+    if (user?.id) {
+      loadUserCoins();
+      loadSubscriptionStatus();
+      // Immediately check premium status on user change
+      checkPremiumStatus();
+    }
+  }, [user]);
+
+  // Periodic premium status refresh (every 5 minutes)
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    // Set up interval to refresh premium status
+    const premiumStatusInterval = setInterval(() => {
+      console.log('[App] 🔄 Periodic premium status refresh');
+      checkPremiumStatus();
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(premiumStatusInterval);
+  }, [user?.id]);
+
+  useEffect(() => {
+    // Monitor premium status changes and provide feedback
+    if (isPremium) {
+      console.log('[App] 🎉🎉🎉 PREMIUM STATUS ACTIVE - All features unlocked!');
+    } else {
+      console.log('[App] 🔒 Free user - Premium features locked');
+    }
+  }, [isPremium]);
+
   const renderMainContent = () => {
     return (
       <View style={styles.mainContent}>
-      {/* Top navbar for smaller screens, search + notifications + avatar */}
-      <View style={styles.topBar}>
-        <View style={styles.topLeft}>
-          {screenWidth <= 767 && (
-            <TouchableOpacity onPress={() => toggleDrawer(true)} style={styles.hamburger}>
-              <MaterialIcons name="menu" size={24} color={colors.textMuted} />
+        {/* Top navbar for smaller screens */}
+        <View style={[styles.topBar, styles.pageHeader]}>
+          <View style={styles.topLeft}>
+            {screenWidth <= 767 && (
+              <TouchableOpacity onPress={() => toggleDrawer(true)} style={styles.hamburger}>
+                <MaterialIcons name="menu" size={24} color={colors.textMuted} />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Always show compact right-side: coins + avatar */}
+          <View style={styles.topRightCompact}>
+            <TouchableOpacity 
+              onPress={() => setCurrentPage('withdrawal')}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, backgroundColor: 'transparent', paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.md, borderWidth: 1, borderColor: colors.border }}
+            >
+              <Image source={require('./assets/coins.png')} style={{ width: 20, height: 20 }} />
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{userCoins}</Text>
             </TouchableOpacity>
-          )}
-        </View>
+            <View style={styles.avatarSmall}>
+              <MaterialIcons name="account-circle" size={28} color={colors.primary} />
+            </View>
+          </View>
 
-        {/* Always show compact right-side: coins + avatar (removes search and notifications) */}
-        <View style={styles.topRightCompact}>
-          <TouchableOpacity 
-            onPress={() => setCurrentPage('withdrawal')}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, backgroundColor: 'transparent', paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.md, borderWidth: 1, borderColor: colors.border }}
-          >
-            <Image source={require('./assets/coins.png')} style={{ width: 20, height: 20 }} />
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{userCoins}</Text>
-          </TouchableOpacity>
-          <View style={styles.avatarSmall}>
-            <MaterialIcons name="account-circle" size={28} color={colors.primary} />
+          {/* Header content */}
+          <View style={styles.headerLeft}>
+            <MaterialIcons name="school" size={28} color={colors.primary} />
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.pageTitle}>Brain Pay</Text>
+              <Text style={styles.pageSubtitle}>AI-powered solving</Text>
+            </View>
+          </View>
+          
+          <View style={[styles.statusPill, apiStatus === 'online' ? styles.statusOnline : styles.statusOffline]}>
+            <MaterialIcons 
+              name={apiStatus === 'online' ? 'check-circle' : apiStatus === 'checking' ? 'sync' : 'error'} 
+              size={16} 
+              color={colors.white} 
+            />
+            <Text style={styles.statusText}>
+              {apiStatus === 'online' ? 'Online' : apiStatus === 'checking' ? 'Checking...' : 'Offline'}
+            </Text>
           </View>
         </View>
-      </View>
 
-      <View style={styles.pageHeader}>
-        <View style={styles.headerLeft}>
-          <MaterialIcons name="school" size={28} color={colors.primary} />
-          <View style={styles.headerTextContainer}>
-            <Text style={styles.pageTitle}>Brain Pay</Text>
-            <Text style={styles.pageSubtitle}>AI-powered solving</Text>
-          </View>
-        </View>
-        
-        <View style={[styles.statusPill, apiStatus === 'online' ? styles.statusOnline : styles.statusOffline]}>
-          <MaterialIcons 
-            name={apiStatus === 'online' ? 'check-circle' : apiStatus === 'checking' ? 'sync' : 'error'} 
-            size={16} 
-            color={colors.white} 
-          />
-          <Text style={styles.statusText}>
-            {apiStatus === 'online' ? 'Online' : apiStatus === 'checking' ? 'Checking...' : 'Offline'}
-          </Text>
-        </View>
-      </View>
-
-      {/* If the app page is Questions or Solutions, show that view instead of the ask input */}
-      {currentPage === 'dashboard' ? (
-        <View style={{ flex: 1, padding: spacing.lg }}>
-          {/* Dashboard Sections Tabs */}
+        {/* If the app page is Questions or Solutions, show that view instead of the ask input */}
+        {currentPage === 'dashboard' ? (
+          <View style={{ flex: 1, padding: spacing.lg }}>
+            {/* Dashboard Sections Tabs */}
           <View style={styles.dashboardTabsContainer}>
             <TouchableOpacity
               style={[styles.dashboardTab, dashboardSection === 'overview' && styles.dashboardTabActive]}
@@ -1329,7 +1507,7 @@ export default function App() {
                   <View style={styles.inputSection}>
                     <Text style={styles.sectionTitle}>Generate Flashcards</Text>
                     <TextInputComponent 
-                      onSubmit={(topic) => handleGenerateFlashcards(topic, 10)} 
+                      onSubmit={(topic: string) => handleGenerateFlashcards(topic, 10)} 
                       loading={flashcardLoading}
                       placeholder="Enter a topic (e.g., Spanish vocabulary, Chemistry formulas, History dates)"
                     />
@@ -1479,7 +1657,7 @@ export default function App() {
                   <View style={styles.horizontalTabContent}>
                     {activeTab === 'text' ? (
                       <TextInputComponent 
-                        onSubmit={(text) => handleGenerateQuiz(text, 10, 'medium')} 
+                        onSubmit={(text: string) => handleGenerateQuiz(text, 10, 'medium')} 
                         loading={quizLoading}
                         placeholder="Paste your study material, notes, or topic content here..."
                       />
@@ -1633,8 +1811,7 @@ export default function App() {
             </View>
           </ScrollView>
         </View>
-      ) : */ false ? null
-      ) : currentPage === 'ask' ? (
+      ) : */ currentPage === 'ask' ? (
         <View style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
           <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <View style={styles.askQuestionContainer}>
@@ -1714,18 +1891,32 @@ export default function App() {
           <SubscriptionPricing 
             userId={user?.id || 'guest'}
             onBack={() => setCurrentPage('ask')}
+            onPremiumUnlocked={() => {
+              console.log('[App] Premium status unlocked via payment - refreshing...');
+              checkPremiumStatus();
+            }}
             usage={subscriptionData?.usage}
             limits={subscriptionData?.limits}
           />
         </View>
-      ) : currentPage === 'usage' ? (
-        <View style={{ flex: 1 }}>
-          <UsageDashboard 
-            userId={user?.id || 'guest'}
-            onBack={() => setCurrentPage('ask')}
-            onUpgrade={() => setCurrentPage('pricing')}
-          />
-        </View>
+      ) : currentPage === 'profile' ? (
+        <RenderProfilePage
+          userId={user?.id || 'guest'}
+          userName={user?.name || 'User'}
+          userEmail={user?.email || 'user@example.com'}
+          onNavigateToPricing={() => setCurrentPage('pricing')}
+          onLogout={() => {
+            Alert.alert('Logout', 'Are you sure you want to logout?', [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Logout',
+                style: 'destructive',
+                onPress: () => handleLogout(),
+              },
+            ]);
+          }}
+          onBack={() => setCurrentPage('dashboard')}
+        />
       ) : currentPage === 'pair-quiz' ? (
         <View style={{ flex: 1 }}>
           <PairQuizContainer onExit={() => setCurrentPage('ask')} />
@@ -1804,70 +1995,76 @@ export default function App() {
       ) : null}
       </View>
     );
-  };
+  }
 
   const showSidebar = isWeb && screenWidth >= 768;
 
   // Render Reset Password Screen
   if (appScreen === 'reset-password') {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container}>
-          <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-          <ResetPasswordScreen 
-            onClose={() => setAppScreen('auth')}
-            onBackToLogin={() => setAppScreen('auth')}
-          />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <PremiumProvider userId={user?.id || 'guest'}>
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+            <ResetPasswordScreen 
+              onClose={() => setAppScreen('auth')}
+              onBackToLogin={() => setAppScreen('auth')}
+            />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </PremiumProvider>
     );
   }
 
   // Render Auth Screen
   if (!user) {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container}>
-          <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-          <AuthScreen 
-            onAuthSuccess={handleAuthSuccess}
-          />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <PremiumProvider userId="guest">
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+            <AuthScreen 
+              onAuthSuccess={handleAuthSuccess}
+            />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </PremiumProvider>
     );
   }
 
   // Render Main App with user logged in
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
-        
-        {showSidebar ? (
-          <View style={styles.layoutWithSidebar}>
-            {renderSidebarWithLogout()}
-            {renderMainContent()}
-          </View>
-        ) : (
-          renderMainContent()
-        )}
+    <PremiumProvider userId={String(user?.id || 'guest')}>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container}>
+          <StatusBar barStyle="dark-content" backgroundColor={colors.white} />
+          
+          {showSidebar ? (
+            <View style={styles.layoutWithSidebar}>
+              {renderSidebarWithLogout()}
+              {renderMainContent()}
+            </View>
+          ) : (
+            renderMainContent()
+          )}
 
-        {/* Mobile Drawer Portal - Rendered Absolutely on Top */}
-        {!showSidebar && drawerOpen && (
-          <View style={styles.drawerPortal}>
-            {/* Overlay Backdrop */}
-            <TouchableOpacity 
-              style={styles.drawerOverlay} 
-              activeOpacity={0.9} 
-              onPress={() => toggleDrawer(false)} 
-            />
-            
-            {/* Drawer Menu */}
-            {renderSidebarWithLogout(true)}
-          </View>
-        )}
-      </SafeAreaView>
-    </SafeAreaProvider>
+          {/* Mobile Drawer Portal - Rendered Absolutely on Top */}
+          {!showSidebar && drawerOpen && (
+            <View style={styles.drawerPortal}>
+              {/* Overlay Backdrop */}
+              <TouchableOpacity 
+                style={styles.drawerOverlay} 
+                activeOpacity={0.9} 
+                onPress={() => toggleDrawer(false)} 
+              />
+              
+              {/* Drawer Menu */}
+              {renderSidebarWithLogout(true)}
+            </View>
+          )}
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </PremiumProvider>
   );
 
   function renderSidebarWithLogout(isDrawer = false) {
@@ -1892,32 +2089,68 @@ export default function App() {
           showsVerticalScrollIndicator={false}
           scrollEnabled={true}
         >
-          {navItems.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[styles.navItem, currentPage === item.id && styles.navItemActive]}
-              onPress={() => {
-                setCurrentPage(item.id);
-                // Close drawer on mobile after selection
-                if (screenWidth < 768) {
-                  toggleDrawer(false);
-                }
-              }}
-              activeOpacity={0.7}
-            >
-              <MaterialIcons 
-                name={item.icon as any} 
-                size={20} 
-                color={currentPage === item.id ? colors.primary : colors.textMuted} 
-              />
-              <Text style={[
-                styles.navText,
-                currentPage === item.id && styles.navTextActive
-              ]}>
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {navItems.map((item) => {
+            const isPremium_Feature = isPremiumFeature(item.id);
+            const isAccessible = !isPremium_Feature || isPremium;
+            
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.navItem,
+                  currentPage === item.id && styles.navItemActive,
+                  !isAccessible && { opacity: 0.6 }
+                ]}
+                onPress={() => {
+                  if (!isAccessible) {
+                    // Premium feature - navigate to pricing
+                    setCurrentPage('pricing');
+                    if (screenWidth < 768) {
+                      toggleDrawer(false);
+                    }
+                  } else {
+                    setCurrentPage(item.id);
+                    // Close drawer on mobile after selection
+                    if (screenWidth < 768) {
+                      toggleDrawer(false);
+                    }
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={{ position: 'relative' }}>
+                  <MaterialIcons 
+                    name={item.icon as any} 
+                    size={20} 
+                    color={currentPage === item.id ? colors.primary : colors.textMuted} 
+                  />
+                  {isPremium_Feature && !isPremium && (
+                    <View style={{
+                      position: 'absolute',
+                      top: -6,
+                      right: -6,
+                      width: 14,
+                      height: 14,
+                      borderRadius: 7,
+                      backgroundColor: colors.error,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: colors.white
+                    }}>
+                      <MaterialIcons name="lock" size={9} color={colors.white} />
+                    </View>
+                  )}
+                </View>
+                <Text style={[
+                  styles.navText,
+                  currentPage === item.id && styles.navTextActive
+                ]}>
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
         {/* Logout Button - Footer */}
@@ -1930,6 +2163,248 @@ export default function App() {
       </View>
     );
   }
+}
+
+// Profile Page Component
+interface RenderProfilePageProps {
+  userId: string;
+  userName: string;
+  userEmail: string;
+  onNavigateToPricing: () => void;
+  onLogout: () => void;
+  onBack?: () => void;
+}
+
+function RenderProfilePage({
+  userId,
+  userName,
+  userEmail,
+  onNavigateToPricing,
+  onLogout,
+  onBack,
+}: RenderProfilePageProps) {
+  const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadSubscriptionStatus();
+    // Refresh every 3 seconds to catch subscription updates
+    const interval = setInterval(loadSubscriptionStatus, 3000);
+    return () => clearInterval(interval);
+  }, [userId]);
+
+  const loadSubscriptionStatus = async () => {
+    try {
+      if (userId === 'guest' || userId === 'guest_' + Date.now()) {
+        setIsPremium(false);
+        setLoading(false);
+        return;
+      }
+      
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://ed-tech-backend-tzn8.onrender.com/api';
+      const response = await fetch(`${apiUrl}/subscription/status/?user_id=${encodeURIComponent(userId)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Backend returns: {success, user_id, plan, is_paid, subscription_active, subscription_status, ...}
+        // Premium if is_paid=true AND plan is premium (not free)
+        const isPremiumUser = data.is_paid === true && data.plan && data.plan !== 'free';
+        setIsPremium(isPremiumUser);
+      } else {
+        setIsPremium(false);
+      }
+    } catch (error) {
+      console.error('[ProfilePage] Subscription status check error:', error);
+      setIsPremium(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingVertical: spacing.md }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.lg }}>
+          {onBack && (
+            <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
+              <MaterialIcons name="arrow-back" size={24} color={colors.text} />
+            </TouchableOpacity>
+          )}
+          <Text style={{ fontSize: typography.h2.fontSize, fontWeight: '700' as const, color: colors.text }}>
+            My Profile
+          </Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        {/* Profile Section with Avatar */}
+        <View style={{ backgroundColor: colors.white, borderRadius: borderRadius.md, padding: spacing.lg, marginBottom: spacing.lg, ...shadows.sm, alignItems: 'center' }}>
+          {/* Avatar with Lock Badge - Relative positioned container */}
+          <View style={{ position: 'relative', width: 120, height: 120, marginBottom: spacing.lg }}>
+            {/* Avatar Circle */}
+            <View style={{ width: 100, height: 100, borderRadius: 50, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' }}>
+              <MaterialIcons name="person" size={50} color={colors.white} />
+            </View>
+            
+            {/* Lock Badge - Red for free users */}
+            {!isPremium && (
+              <View style={{ position: 'absolute', bottom: 0, right: 0, width: 36, height: 36, borderRadius: 18, backgroundColor: colors.error, justifyContent: 'center', alignItems: 'center', borderWidth: 4, borderColor: colors.white, ...shadows.md }}>
+                <MaterialIcons name="lock" size={18} color={colors.white} />
+              </View>
+            )}
+
+            {/* Premium Badge - Green checkmark for premium users */}
+            {isPremium && (
+              <View style={{ position: 'absolute', bottom: 0, right: 0, width: 36, height: 36, borderRadius: 18, backgroundColor: colors.success, justifyContent: 'center', alignItems: 'center', borderWidth: 4, borderColor: colors.white, ...shadows.md }}>
+                <MaterialIcons name="check" size={18} color={colors.white} />
+              </View>
+            )}
+          </View>
+
+          {/* User Info */}
+          <View style={{ alignItems: 'center', width: '100%' }}>
+            <Text style={{ fontSize: typography.h3.fontSize, fontWeight: '600' as const, color: colors.text, marginBottom: spacing.xs }}>
+              {userName}
+            </Text>
+            <Text style={{ fontSize: typography.body.fontSize, fontWeight: '400' as const, color: colors.textMuted, marginBottom: spacing.md }}>
+              {userEmail}
+            </Text>
+            <View style={{ paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: borderRadius.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.xs, backgroundColor: isPremium ? '#E5F5E5' : '#FFE5E5' }}>
+              <MaterialIcons name={isPremium ? 'verified' : 'trending-up'} size={16} color={isPremium ? colors.success : colors.error} />
+              <Text style={{ fontSize: 12, fontWeight: '600' as const, color: isPremium ? colors.success : colors.error }}>
+                {isPremium ? 'Premium Member' : 'Free User'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Upgrade Card (Free Users Only) */}
+        {!isPremium && (
+          <View style={{ backgroundColor: colors.white, borderRadius: borderRadius.lg, padding: spacing.lg, alignItems: 'center', marginVertical: spacing.md, ...shadows.md }}>
+            <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: colors.primary + '20', justifyContent: 'center', alignItems: 'center', marginBottom: spacing.lg }}>
+              <MaterialIcons name="lock" size={40} color={colors.primary} />
+            </View>
+            <Text style={{ fontSize: typography.h3.fontSize, fontWeight: '600' as const, color: colors.text, marginBottom: spacing.sm, textAlign: 'center' }}>
+              Premium Features Locked
+            </Text>
+            <Text style={{ fontSize: typography.body.fontSize, fontWeight: '400' as const, color: colors.textMuted, marginBottom: spacing.md, textAlign: 'center', lineHeight: 20 }}>
+              Unlock all features and enjoy unlimited access to:
+            </Text>
+
+            {/* Features List */}
+            <View style={{ width: '100%', marginVertical: spacing.md, paddingVertical: spacing.md, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F0F0F0' }}>
+              {[
+                { icon: 'psychology', text: 'AI-Powered Questions' },
+                { icon: 'video-library', text: 'Video Summaries' },
+                { icon: 'analytics', text: 'Advanced Analytics' },
+                { icon: 'bolt', text: 'Priority Support' },
+              ].map((item, idx) => (
+                <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginVertical: spacing.xs }}>
+                  <MaterialIcons name={item.icon as any} size={20} color={colors.success} />
+                  <Text style={{ fontSize: typography.body.fontSize, fontWeight: '500' as const, color: colors.text }}>
+                    {item.text}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            <Text style={{ fontSize: typography.body.fontSize, fontWeight: '600' as const, color: colors.text, marginVertical: spacing.md, textAlign: 'center' }}>
+              Subscribe to unlock all premium features
+            </Text>
+
+            <TouchableOpacity
+              style={{ backgroundColor: colors.primary, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderRadius: borderRadius.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, marginVertical: spacing.md, width: '100%', ...shadows.md }}
+              onPress={onNavigateToPricing}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons name="lock-open" size={20} color={colors.white} />
+              <Text style={{ color: colors.white, fontSize: 16, fontWeight: '600' as const }}>Subscribe Now</Text>
+            </TouchableOpacity>
+
+            <Text style={{ fontSize: 12, fontWeight: '400' as const, color: colors.textMuted, textAlign: 'center', marginTop: spacing.md }}>
+              ₹1 first month, then ₹99/month • Cancel anytime
+            </Text>
+          </View>
+        )}
+
+        {/* Account Information */}
+        <View style={{ marginVertical: spacing.lg, backgroundColor: colors.white, borderRadius: borderRadius.md, paddingVertical: spacing.md, ...shadows.sm }}>
+          <Text style={{ fontSize: typography.h3.fontSize, fontWeight: '600' as const, color: colors.text, marginBottom: spacing.md, marginHorizontal: spacing.md }}>
+            Account Information
+          </Text>
+          {[
+            { icon: 'person', label: 'Name', value: userName },
+            { icon: 'email', label: 'Email', value: userEmail },
+            { icon: isPremium ? 'verified' : 'info', label: 'Status', value: isPremium ? 'Premium Member' : 'Free Member' },
+          ].map((item, idx) => (
+            <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: idx < 2 ? 1 : 0, borderBottomColor: '#F0F0F0' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, flex: 1 }}>
+                <MaterialIcons name={item.icon as any} size={20} color={colors.primary} />
+                <Text style={{ fontSize: typography.body.fontSize, fontWeight: '500' as const, color: colors.text }}>
+                  {item.label}
+                </Text>
+              </View>
+              <Text style={{ fontSize: typography.body.fontSize, fontWeight: '400' as const, color: item.label === 'Status' && isPremium ? colors.success : colors.textMuted }}>
+                {item.value}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Premium Benefits Section (Premium Users Only) */}
+        {isPremium && (
+          <View style={{ marginVertical: spacing.lg, backgroundColor: colors.white, borderRadius: borderRadius.md, paddingVertical: spacing.md, ...shadows.sm }}>
+            <Text style={{ fontSize: typography.h3.fontSize, fontWeight: '600' as const, color: colors.text, marginBottom: spacing.md, marginHorizontal: spacing.md }}>
+              Your Premium Benefits
+            </Text>
+            {[
+              'Unlimited AI Questions',
+              'All Video Summaries',
+              'Full Analytics Access',
+              'Priority Support',
+              'Ad-free Experience',
+            ].map((benefit, idx) => (
+              <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: idx < 4 ? 1 : 0, borderBottomColor: '#F0F0F0' }}>
+                <MaterialIcons name="check-circle" size={20} color={colors.success} />
+                <Text style={{ fontSize: typography.body.fontSize, fontWeight: '500' as const, color: colors.text }}>
+                  {benefit}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Logout Button */}
+        <TouchableOpacity
+          style={{ backgroundColor: colors.error, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderRadius: borderRadius.md, marginVertical: spacing.lg, marginBottom: spacing.xl, ...shadows.md }}
+          onPress={onLogout}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="logout" size={20} color={colors.white} />
+          <Text style={{ color: colors.white, fontSize: 16, fontWeight: '600' as const }}>Logout</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({

@@ -1,14 +1,28 @@
 import axios from 'axios';
 
-// Gemini API Configuration
-const GEMINI_API_KEY = typeof process !== 'undefined' && process.env ? (process.env.EXPO_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '') : '';
+// Gemini API Configuration - Enhanced with multiple fallbacks
+const GEMINI_API_KEY = (() => {
+  // Try multiple sources for the API key
+  const key = 
+    (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_GEMINI_API_KEY) ||
+    (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) ||
+    (typeof window !== 'undefined' && (window as any).EXPO_PUBLIC_GEMINI_API_KEY) ||
+    '';
+  
+  if (key) {
+    console.log('✅ Gemini API Key loaded successfully (length: ' + key.length + ')');
+  } else {
+    console.warn('⚠️ Gemini API Key NOT found in environment - quiz generation will fail');
+  }
+  
+  return key;
+})();
+
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent';
 
-// Debug: Log if key is available
-if (GEMINI_API_KEY) {
-  console.log('✅ Gemini API Key loaded successfully');
-} else {
-  console.warn('⚠️ Gemini API Key NOT found in environment');
+// Validate API key on module load
+if (!GEMINI_API_KEY) {
+  console.error('[GeminiQuizService] CRITICAL: API key is missing. Check .env file or environment variables.');
 }
 
 export interface QuizQuestion {
@@ -43,19 +57,45 @@ export interface QuizResponse {
 
 class GeminiQuizService {
   private apiKey: string;
+  private retryCount = 0;
+  private maxRetries = 3;
 
   constructor(apiKey?: string) {
     this.apiKey = apiKey || GEMINI_API_KEY;
+    
+    // Log constructor initialization
+    if (this.apiKey) {
+      console.log('[GeminiQuizService] Initialized with API key (length: ' + this.apiKey.length + ')');
+    } else {
+      console.error('[GeminiQuizService] CRITICAL: No API key available in constructor');
+    }
   }
 
   /**
-   * Generate quiz questions using Gemini API
+   * Generate quiz questions using Gemini API with retry logic
    */
   async generateQuiz(options: QuizGenerationOptions): Promise<QuizResponse> {
     try {
-      if (!this.apiKey) {
-        throw new Error('Gemini API key is not configured');
+      // CRITICAL: Validate API key
+      if (!this.apiKey || this.apiKey.trim() === '') {
+        console.error('[GeminiQuizService] API key validation failed', {
+          hasKey: !!this.apiKey,
+          keyLength: this.apiKey?.length || 0,
+          isDefined: this.apiKey !== undefined,
+        });
+        
+        throw new Error(
+          'Gemini API key is not configured. ' +
+          'Please add EXPO_PUBLIC_GEMINI_API_KEY to your .env file and restart the app.'
+        );
       }
+
+      console.log('[GeminiQuizService] Starting quiz generation', {
+        topic: options.topic,
+        difficulty: options.difficulty,
+        numQuestions: options.numQuestions,
+        apiKeyLength: this.apiKey.length,
+      });
 
       const prompt = this.buildPrompt(options);
       
@@ -85,10 +125,18 @@ class GeminiQuizService {
       const generatedText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (!generatedText) {
-        throw new Error('No response from Gemini API');
+        throw new Error('No response from Gemini API - empty response');
       }
 
+      console.log('[GeminiQuizService] Received response from Gemini API');
+
       const questions = this.parseGeneratedQuestions(generatedText, options);
+
+      if (questions.length === 0) {
+        throw new Error('Failed to parse questions from Gemini response');
+      }
+
+      console.log('[GeminiQuizService] Successfully generated ' + questions.length + ' questions');
 
       return {
         success: true,
@@ -101,7 +149,24 @@ class GeminiQuizService {
         },
       };
     } catch (error: any) {
-      console.error(' Gemini Quiz Generation Error:', error);
+      console.error('[GeminiQuizService] Quiz generation error:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        topic: options.topic,
+      });
+      
+      // Provide helpful error message
+      let userMessage = 'Failed to generate quiz';
+      if (error.message.includes('API key')) {
+        userMessage = 'Quiz feature is not configured. Please contact support.';
+      } else if (error.message.includes('timeout')) {
+        userMessage = 'Quiz generation took too long. Please try again.';
+      } else if (error.response?.status === 403) {
+        userMessage = 'API key is invalid or expired.';
+      } else if (error.response?.status === 429) {
+        userMessage = 'Too many requests. Please wait a moment and try again.';
+      }
       
       return {
         success: false,
@@ -112,7 +177,7 @@ class GeminiQuizService {
           totalQuestions: 0,
           generatedAt: new Date().toISOString(),
         },
-        error: error.response?.data?.error?.message || error.message || 'Failed to generate quiz',
+        error: userMessage,
       };
     }
   }

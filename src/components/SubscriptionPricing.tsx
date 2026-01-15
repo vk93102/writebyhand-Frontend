@@ -16,12 +16,15 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing } from '../styles/theme';
 import {
-  createRazorpaySubscription,
   getSubscriptionStatus,
-  createRazorpayOrder,
-  verifyRazorpayPayment,
-  getRazorpayKey,
 } from '../services/api';
+import { 
+  createPaymentOrder,
+  openRazorpayCheckout,
+  pollSubscriptionStatus,
+  checkSubscriptionStatus,
+  verifyPayment,
+} from '../services/subscriptionService';
 
 // Import promo code functions (added inline for now)
 const validatePromoCode = async (code: string, userId: string, plan: string, amount: number) => {
@@ -71,6 +74,7 @@ interface SubscriptionStatus {
 interface SubscriptionPricingProps {
   userId: string;
   onBack: () => void;
+  onPremiumUnlocked?: () => void;
   usage?: {
     mock_tests: number;
     quizzes: number;
@@ -96,7 +100,7 @@ interface PricingPlan {
   subLabel?: string;
 }
 
-export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId, onBack, usage, limits }) => {
+export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId, onBack, onPremiumUnlocked, usage, limits }) => {
   const [processing, setProcessing] = useState(false);
   const [status, setStatus] = useState<SubscriptionStatus | null>(null);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -135,12 +139,12 @@ export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId
       description: 'For casual learners',
       features: [
         '✓ Unlimited Mock Tests',
-        ' 5 Quizzes/month (Limited)',
-        ' 20 Flashcards/month (Limited)',
-        '10 PYQs',
-        '2 YouTube Summaries',
-        'Ask Questions (Upgrade)',
-        'Predicted Questions (Upgrade)',
+        ' 0 Quizzes/month (Limited)',
+        ' 0 Flashcards/month (Limited)',
+        ' 0 PYQs',
+        '0  YouTube Summaries',
+        '0 Ask Questions ',
+        '0 Predicted Questions',
       ],
       cta: 'Start for Free',
     },
@@ -158,29 +162,29 @@ export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId
         'Unlimited Flashcards',
         'Unlimited PYQs',
         'Unlimited YouTube Summaries',
-        'Ask Questions (AI Tutor)',
-        'Predicted Questions',
+        'Unlimited Ask Questions (AI Tutor)',
+        'Unlimited Predicted Questions',
       ],
       cta: 'Get Scholar',
       subLabel: 'Then ₹99/month',
     },
-    // {
-    //   id: 'genius',
-    //   name: 'Genius',
-    //   price: '₹1',
-    //   period: ' first month',
-    //   description: 'For power users & teams',
-    //   features: [
-    //     'Everything in Scholar',
-    //     'Priority Support 24/7',
-    //     'Advanced Analytics',
-    //     'Team Collaboration',
-    //     'Custom Study Plans',
-    //     'Early Access to Features',
-    //   ],
-    //   cta: 'Get Genius',
-    //   subLabel: 'Then ₹499/month',
-    // },
+    {
+      id: 'genius',
+      name: 'Genius',
+      price: '₹199',
+      period: ' first month',
+      description: 'For power users & teams',
+      features: [
+        'Everything in Scholar',
+        'Priority Support 24/7',
+        'Advanced Analytics',
+        'Team Collaboration',
+        'Custom Study Plans',
+        'Early Access to Features',
+      ],
+      cta: 'Get Genius',
+      subLabel: 'Then ₹999/year',
+    },
   ];
 
   const comparisonData: ComparisonRow[] = [
@@ -290,258 +294,247 @@ export const SubscriptionPricing: React.FC<SubscriptionPricingProps> = ({ userId
       return;
     }
 
-    const planName = planId === 'scholar' ? 'basic' : 'premium';
-    const originalAmount = 1; // ₹1 for first month for both plans
-    const finalAmount = promoApplied ? promoApplied.discounted_amount : originalAmount;
-
+    // Map plan IDs to backend plan names
+    const planName = planId === 'scholar' ? 'premium' : 'premium_annual';
+    
     try {
       setProcessing(true);
-      
-      // Web: use Razorpay Checkout with production key and order
-      if (isWeb) {
-        // Load Razorpay script
-        const loaded = await loadRazorpayScript();
-        if (!loaded || !window.Razorpay) {
-          Alert.alert('Error', 'Unable to load Razorpay checkout. Please check your internet connection and try again.');
+      console.log('[SubscriptionPricing] 🚀 Starting subscription flow:', { userId, planName });
+
+      // Step 1: Create payment order with production-level duplicate detection
+      const orderResponse = await createPaymentOrder(userId, planName);
+
+      if (!orderResponse.success) {
+        // Handle duplicate subscription
+        if (orderResponse.error === 'Already Subscribed') {
+          Alert.alert(
+            'Already Subscribed',
+            orderResponse.message || 'You already have an active subscription.',
+            [
+              {
+                text: 'View Subscription',
+                onPress: async () => {
+                  try {
+                    const status = await checkSubscriptionStatus(userId);
+                    Alert.alert(
+                      'Current Subscription',
+                      `Plan: ${status.plan}\\nStatus: ${status.subscription_status}\\n${status.is_trial ? `Trial ends: ${status.trial_end_date}` : `Next billing: ${status.next_billing_date}`}`
+                    );
+                  } catch (error) {
+                    console.error('[SubscriptionPricing] Error fetching status:', error);
+                  }
+                },
+              },
+              { text: 'OK' },
+            ]
+          );
           setProcessing(false);
           return;
         }
 
-        try {
-          // Get Razorpay key
-          const keyId = await getRazorpayKey();
-          
-          // Create order with retry logic
-          let order;
-          let retryCount = 0;
-          const maxRetries = 3;
-          
-          while (retryCount < maxRetries) {
-            try {
-              order = await createRazorpayOrder(finalAmount, userId, { 
-                plan: planName, 
-                type: 'subscription',
-                promo_code: promoApplied?.code,
-                original_amount: originalAmount,
-                discount_applied: promoApplied?.discount_applied
-              });
-              break;
-            } catch (err: any) {
-              retryCount++;
-              if (retryCount >= maxRetries) {
-                throw new Error('Failed to create order after multiple attempts. Please try again.');
-              }
-              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-            }
-          }
-          
-          if (!order) {
-            throw new Error('Failed to create payment order');
-          }
+        // Other errors
+        Alert.alert('Error', orderResponse.error || 'Failed to create order');
+        setProcessing(false);
+        return;
+      }
 
-        const razorpay = new window.Razorpay({
-          key: keyId,
-          amount: order.amount,
-          currency: order.currency,
-          name: 'EdTech Premium',
-          description: `${planName.toUpperCase()} Subscription${promoApplied ? ` (${promoApplied.discount_value}% OFF)` : ''}`,
-          image: 'https://cdn-icons-png.flaticon.com/512/3976/3976625.png', // Education icon
-          order_id: order.order_id,
-          notes: { 
-            plan: planName, 
-            user_id: userId, 
-            promo_code: promoApplied?.code || '',
-            original_amount: originalAmount,
-            discount_applied: promoApplied?.discount_applied || 0
-          },
-          handler: async (resp: any) => {
+      // Step 2: Open Razorpay checkout (web only)
+      if (Platform.OS === 'web') {
+        console.log('[SubscriptionPricing] 💳 Opening Razorpay checkout...');
+        
+        await openRazorpayCheckout(
+          orderResponse,
+          userId,
+          `${userId}@example.com`,
+          'User',
+          async (paymentResponse) => {
+            console.log('[SubscriptionPricing] ✅ Payment successful, verifying with backend...');
+            
+            // Show processing overlay
+            if (Platform.OS === 'web') {
+              const processingDiv = document.createElement('div');
+              processingDiv.id = 'razorpay-processing';
+              processingDiv.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.9); z-index: 99999;
+                display: flex; align-items: center; justify-content: center;
+              `;
+              processingDiv.innerHTML = `
+                <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                  <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+                  <div style="font-size: 20px; font-weight: 700; color: #1E293B; margin-bottom: 8px;">
+                    Verifying Payment...
+                  </div>
+                  <div style="font-size: 14px; color: #64748B;">
+                    Please wait while we confirm your payment with the backend
+                  </div>
+                </div>
+              `;
+              document.body.appendChild(processingDiv);
+            }
+            
             try {
-              setProcessing(true);
-              
-              // Show verification in progress
-              if (Platform.OS === 'web') {
-                const processingDiv = document.createElement('div');
-                processingDiv.id = 'razorpay-processing';
-                processingDiv.style.cssText = `
-                  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                  background: rgba(0,0,0,0.8); z-index: 99999;
-                  display: flex; align-items: center; justify-content: center;
-                `;
-                processingDiv.innerHTML = `
-                  <div style="background: white; padding: 40px; border-radius: 16px; text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
-                    <div style="font-size: 18px; font-weight: 600; color: #1E293B; margin-bottom: 8px;">
-                      Verifying Payment...
-                    </div>
-                    <div style="font-size: 14px; color: #64748B;">
-                      Please wait while we confirm your payment
-                    </div>
-                  </div>
-                `;
-                document.body.appendChild(processingDiv);
-              }
-              
-              // Verify payment with backend
-              await verifyRazorpayPayment(resp.razorpay_order_id, resp.razorpay_payment_id, resp.razorpay_signature);
-              
-              // Apply promo code if used
-              if (promoApplied) {
-                await applyPromoCode(
-                  promoApplied.code,
-                  userId,
-                  null,
-                  originalAmount,
-                  finalAmount
-                );
-              }
-              
-              // Remove processing overlay
-              if (Platform.OS === 'web') {
-                const processingDiv = document.getElementById('razorpay-processing');
-                if (processingDiv) processingDiv.remove();
-              }
-              
-              // Show success message with confetti effect
-              if (Platform.OS === 'web') {
-                const successDiv = document.createElement('div');
-                successDiv.id = 'razorpay-success';
-                successDiv.style.cssText = `
-                  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                  background: rgba(16, 185, 129, 0.95); z-index: 99999;
-                  display: flex; align-items: center; justify-content: center;
-                  animation: fadeIn 0.3s ease-in;
-                `;
-                successDiv.innerHTML = `
-                  <div style="background: white; padding: 48px; border-radius: 20px; text-align: center; max-width: 400px;">
-                    <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
-                    <div style="font-size: 24px; font-weight: 700; color: #047857; margin-bottom: 12px;">
-                      Payment Successful!
-                    </div>
-                    <div style="font-size: 16px; color: #64748B; margin-bottom: 8px;">
-                      Your ${planName.toUpperCase()} subscription is now active
-                    </div>
-                    ${promoApplied ? `
-                      <div style="background: #ECFDF5; padding: 12px; border-radius: 8px; margin-top: 16px;">
-                        <div style="font-size: 14px; color: #059669; font-weight: 600;">
-                          💰 Saved ₹${promoApplied.discount_applied.toFixed(0)} with ${promoApplied.code}
-                        </div>
-                      </div>
-                    ` : ''}
-                    <div style="font-size: 14px; color: #94A3B8; margin-top: 16px;">
-                      Refreshing your account...
-                    </div>
-                  </div>
-                `;
-                document.body.appendChild(successDiv);
-                
-                // Auto close after 3 seconds
-                setTimeout(() => {
-                  successDiv.remove();
-                }, 3000);
-              } else {
-                Alert.alert(
-                  '🎉 Payment Successful!',
-                  `Your ${planName.toUpperCase()} subscription is now active.${promoApplied ? `\n\nYou saved ₹${promoApplied.discount_applied.toFixed(0)} with ${promoApplied.code}!` : ''}`,
-                  [{ text: 'Great!', style: 'default' }]
-                );
-              }
-              
-              await loadStatus();
-              
-            } catch (e: any) {
-              // Remove processing overlay
-              if (Platform.OS === 'web') {
-                const processingDiv = document.getElementById('razorpay-processing');
-                if (processingDiv) processingDiv.remove();
-              }
-              
-              Alert.alert(
-                'Verification Failed',
-                e.message || 'Could not verify payment. Please contact support if amount was deducted.',
-                [{ text: 'OK', style: 'cancel' }]
+              // CRITICAL: Verify payment with backend to update subscription
+              const verificationResult = await verifyPayment(
+                userId,
+                orderResponse.order_id!,
+                paymentResponse.razorpay_payment_id,
+                paymentResponse.razorpay_signature,
+                planName
               );
-            } finally {
-              setProcessing(false);
-            }
-          },
-          prefill: {
-            email: `${userId}@example.com`,
-            contact: '',
-          },
-          theme: { color: colors.primary },
-          modal: {
-            ondismiss: () => {
-              setProcessing(false);
-            },
-          },
-        });
-
-        razorpay.open();
-        
-        } catch (orderError: any) {
-          setProcessing(false);
-          throw new Error(orderError.message || 'Failed to initialize Razorpay checkout');
-        }
-        
-      } else {
-        // Mobile: use payment link
-        const response = await createRazorpaySubscription(userId, planName);
-        const paymentUrl = response.payment_url || response.short_url;
-        if (paymentUrl) {
-          const supported = await Linking.canOpenURL(paymentUrl);
-          if (supported) {
-            await Linking.openURL(paymentUrl);
-            Alert.alert('Payment Initiated', response.message || 'Complete the payment to activate your subscription.');
-
-            // Poll subscription status for confirmation. Poll for up to 10 attempts every 3 seconds.
-            try {
-              for (let i = 0; i < 10; i++) {
-                await new Promise((res) => setTimeout(res, 3000));
-                try {
-                  const s = await getSubscriptionStatus(userId);
-                  setStatus({ user_id: s.user_id, plan: s.plan, subscription_status: s.subscription_status });
-                  if (s.subscription_status === 'active' && s.plan === planName) {
-                    Alert.alert('Success', 'Subscription activated. Enjoy premium features!');
-                    break;
-                  }
-                } catch (e) {
-                  // continue polling silently
+              
+              if (!verificationResult.success) {
+                // Remove processing overlay
+                if (Platform.OS === 'web') {
+                  const processingDiv = document.getElementById('razorpay-processing');
+                  if (processingDiv) processingDiv.remove();
+                }
+                
+                setProcessing(false);
+                Alert.alert(
+                  'Verification Failed',
+                  verificationResult.error || 'Could not verify payment. Please contact support if amount was deducted.',
+                  [{ text: 'OK' }]
+                );
+                return;
+              }
+              
+              console.log('[SubscriptionPricing] ✅ Payment verified, activating subscription...');
+              
+              // Update processing message
+              if (Platform.OS === 'web') {
+                const processingDiv = document.getElementById('razorpay-processing');
+                if (processingDiv) {
+                  processingDiv.innerHTML = `
+                    <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                      <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+                      <div style="font-size: 20px; font-weight: 700; color: #1E293B; margin-bottom: 8px;">
+                        Activating Subscription...
+                      </div>
+                      <div style="font-size: 14px; color: #64748B;">
+                        Please wait while we unlock your premium features
+                      </div>
+                    </div>
+                  `;
                 }
               }
-            } catch (e) {
-              // ignore polling errors
+              
+              // Step 3: Poll subscription status to ensure features unlock
+              const isPremium = await pollSubscriptionStatus(userId);
+              
+              // Remove processing overlay
+              if (Platform.OS === 'web') {
+                const processingDiv = document.getElementById('razorpay-processing');
+                if (processingDiv) processingDiv.remove();
+              }
+              
+              setProcessing(false);
+              
+              if (isPremium) {
+                // Show success message
+                if (Platform.OS === 'web') {
+                  const successDiv = document.createElement('div');
+                  successDiv.id = 'razorpay-success';
+                  successDiv.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(16, 185, 129, 0.95); z-index: 99999;
+                    display: flex; align-items: center; justify-content: center;
+                    animation: fadeIn 0.3s ease-in;
+                  `;
+                  successDiv.innerHTML = `
+                    <div style="background: white; padding: 48px; border-radius: 20px; text-align: center; max-width: 450px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                      <div style="font-size: 80px; margin-bottom: 24px;">🎉</div>
+                      <div style="font-size: 28px; font-weight: 700; color: #047857; margin-bottom: 16px;">
+                        Welcome to Premium!
+                      </div>
+                      <div style="font-size: 16px; color: #64748B; margin-bottom: 24px;">
+                        All premium features are now unlocked
+                      </div>
+                      <div style="background: #ECFDF5; padding: 16px; border-radius: 12px;">
+                        <div style="font-size: 14px; color: #059669; font-weight: 600;">
+                          ✨ Unlimited Access Activated
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                  document.body.appendChild(successDiv);
+                  
+                  setTimeout(() => {
+                    successDiv.remove();
+                  }, 3000);
+                }
+                
+                // Refresh subscription status in parent component
+                if (onPremiumUnlocked) {
+                  onPremiumUnlocked();
+                }
+                
+                await loadStatus();
+                
+                // Navigate back after success
+                setTimeout(() => {
+                  onBack();
+                }, Platform.OS === 'web' ? 3500 : 1000);
+              } else {
+                // Payment verified but status not updated yet
+                Alert.alert(
+                  'Almost There!',
+                  'Your payment was successful and verified! Your subscription will be activated shortly. Please refresh the page.',
+                  [
+                    {
+                      text: 'Refresh Now',
+                      onPress: () => {
+                        if (Platform.OS === 'web') {
+                          window.location.reload();
+                        } else {
+                          onBack();
+                        }
+                      },
+                    },
+                    { text: 'Later' },
+                  ]
+                );
+              }
+            } catch (verificationError: any) {
+              // Remove processing overlay
+              if (Platform.OS === 'web') {
+                const processingDiv = document.getElementById('razorpay-processing');
+                if (processingDiv) processingDiv.remove();
+              }
+              
+              console.error('[SubscriptionPricing] ❌ Verification error:', verificationError);
+              setProcessing(false);
+              
+              Alert.alert(
+                'Verification Error',
+                'Payment was successful but verification failed. Your subscription will be activated shortly. Please contact support if issues persist.',
+                [{ text: 'OK' }]
+              );
             }
-          } else {
-            Alert.alert('Error', 'Cannot open payment link');
+          },
+          (error) => {
+            console.log('[SubscriptionPricing] ❌ Payment failed or cancelled:', error.message);
+            setProcessing(false);
+            Alert.alert('Payment Cancelled', 'No charges were made.');
           }
-        } else {
-          Alert.alert('Error', 'No payment link returned.');
-        }
+        );
+      } else {
+        // Mobile: Show order created message (mobile payment flow not fully implemented yet)
+        setProcessing(false);
+        Alert.alert(
+          'Order Created',
+          'Your payment order has been created. Mobile payment integration coming soon!',
+          [{ text: 'OK' }]
+        );
       }
+      
     } catch (error: any) {
-      console.error('Subscription error:', error);
-      
-      let errorMessage = 'Failed to create subscription. Please try again.';
-      
-      if (error.message?.includes('network') || error.message?.includes('fetch')) {
-        errorMessage = 'Network error. Please check your internet connection and try again.';
-      } else if (error.message?.includes('timeout')) {
-        errorMessage = 'Request timed out. Please try again.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      Alert.alert(
-        'Payment Error',
-        errorMessage,
-        [
-          { text: 'Retry', onPress: () => handleSubscribe(planId) },
-          { text: 'Cancel', style: 'cancel' }
-        ]
-      );
-    } finally {
+      console.error('[SubscriptionPricing] ❌ Subscription error:', error);
       setProcessing(false);
-      await loadStatus();
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to process subscription. Please try again.'
+      );
     }
   };
 

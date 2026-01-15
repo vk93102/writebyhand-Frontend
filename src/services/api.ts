@@ -119,26 +119,51 @@ api.interceptors.response.use(
 /**
  * Solve question using text input
  * Uses Gemini API directly instead of backend
+ * Production-level implementation with error handling
  * 
  * @param text - The question text to solve
  * @returns API response with solution
  */
 export const solveQuestionByText = async (text: string): Promise<any> => {
+  const startTime = Date.now();
+
   try {
-    if (!text || text.trim().length === 0) {
+    // Validate input
+    if (!text) {
+      console.warn('[API] ⚠️ Text is null or undefined');
+      throw new Error('Question text is required');
+    }
+
+    const trimmedText = text.trim();
+
+    if (trimmedText.length === 0) {
+      console.warn('[API] ⚠️ Text is empty after trimming');
       throw new Error('Question text cannot be empty');
     }
 
-    console.log('[API] Solving question by text using Gemini...');
-    
-    // Call Gemini service directly
-    const response = await geminiSolutionService.solveByText(text.trim());
-
-    if (!response.success) {
-      throw new Error(response.error || 'Failed to solve question');
+    if (trimmedText.length < 3) {
+      console.warn('[API] ⚠️ Text is too short:', trimmedText.length, 'characters');
+      throw new Error('Question must be at least 3 characters long');
     }
 
-    console.log('[API] Solution generated successfully');
+    if (trimmedText.length > 5000) {
+      console.warn('[API] ⚠️ Text is too long:', trimmedText.length, 'characters');
+      throw new Error('Question must not exceed 5000 characters');
+    }
+
+    console.log('[API] 🔍 Solving question by text using Gemini... Length:', trimmedText.length);
+
+    // Call Gemini service directly
+    const response = await geminiSolutionService.solveByText(trimmedText);
+
+    if (!response.success) {
+      const error = response.error || 'Failed to solve question';
+      console.error('[API] ❌ Gemini service failed:', error);
+      throw new Error(error);
+    }
+
+    const processingTime = Date.now() - startTime;
+    console.log('[API] ✅ Solution generated successfully in', processingTime, 'ms');
 
     return {
       success: true,
@@ -146,39 +171,69 @@ export const solveQuestionByText = async (text: string): Promise<any> => {
       explanation: response.explanation,
       steps: response.steps,
       source: 'text',
+      processingTime,
+      metadata: {
+        inputLength: trimmedText.length,
+        timestamp: new Date().toISOString(),
+      },
     };
   } catch (error: any) {
-    console.error('[API] solveQuestionByText error:', error.message);
-    throw error;
+    const processingTime = Date.now() - startTime;
+    console.error('[API] ❌ solveQuestionByText failed after', processingTime, 'ms:', error.message);
+
+    // Return error in consistent format
+    throw {
+      message: error.message || 'Failed to solve question',
+      code: error.code || 'SOLUTION_ERROR',
+      processingTime,
+      type: 'text',
+    };
   }
 };
 
 /**
  * Solve question using image upload
  * Uses Gemini Vision API directly to solve questions from images
+ * Production-level implementation with error handling
  * 
  * @param imageUri - The local URI of the image
  * @returns API response with solution from image
  */
 export const solveQuestionByImage = async (imageUri: string): Promise<any> => {
+  const startTime = Date.now();
+
   try {
-    if (!imageUri || imageUri.trim().length === 0) {
+    // Validate input
+    if (!imageUri) {
+      console.warn('[API] ⚠️ Image URI is null or undefined');
+      throw new Error('Image URI is required');
+    }
+
+    const trimmedUri = imageUri.trim();
+
+    if (trimmedUri.length === 0) {
+      console.warn('[API] ⚠️ Image URI is empty after trimming');
       throw new Error('Image URI cannot be empty');
     }
 
-    console.log('[API] Solving question by image using Gemini Vision...');
+    console.log('[API] 🖼️ Solving question by image using Gemini Vision... URI length:', trimmedUri.length);
 
     // Helper function to convert image to base64
-    const imageBase64 = await convertImageToBase64(imageUri);
+    const imageBase64 = await convertImageToBase64(trimmedUri);
+
+    console.log('[API] 🖼️ Image converted to base64, size:', imageBase64.length, 'bytes');
 
     // Call Gemini Vision service directly
     const response = await geminiSolutionService.solveByImage(imageBase64, 'image/jpeg');
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to solve image question');
+      const error = response.error || 'Failed to solve image question';
+      console.error('[API] ❌ Gemini vision service failed:', error);
+      throw new Error(error);
     }
 
-    console.log('[API] Solution from image generated successfully');
+    const processingTime = Date.now() - startTime;
+    console.log('[API] ✅ Solution from image generated successfully in', processingTime, 'ms');
 
     return {
       success: true,
@@ -186,10 +241,23 @@ export const solveQuestionByImage = async (imageUri: string): Promise<any> => {
       explanation: response.explanation,
       steps: response.steps,
       source: 'image',
+      processingTime,
+      metadata: {
+        imageBase64Length: imageBase64.length,
+        timestamp: new Date().toISOString(),
+      },
     };
   } catch (error: any) {
-    console.error('[API] solveQuestionByImage error:', error.message);
-    throw error;
+    const processingTime = Date.now() - startTime;
+    console.error('[API] ❌ solveQuestionByImage failed after', processingTime, 'ms:', error.message);
+
+    // Return error in consistent format
+    throw {
+      message: error.message || 'Failed to solve image question',
+      code: error.code || 'VISION_ERROR',
+      processingTime,
+      type: 'image',
+    };
   }
 };
 
@@ -1227,62 +1295,7 @@ export const cancelRazorpaySubscription = async (
   }
 };
 
-// ---- Razorpay Order/Payment (production checkout) ----
 
-/**
- * Create a Razorpay order for one-time or subscription entry payments.
- * Amount must be in rupees; backend converts to paise.
- */
-export const createRazorpayOrder = async (
-  amountRupees: number,
-  userId: string,
-  notes: Record<string, any> = {},
-  currency: string = 'INR'
-) => {
-  try {
-    const response = await api.post('/payment/create-order/', {
-      amount: amountRupees,
-      currency,
-      user_id: userId,
-      notes,
-    });
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to create Razorpay order');
-  }
-};
-
-/**
- * Verify payment on backend using Razorpay signature.
- */
-export const verifyRazorpayPayment = async (
-  orderId: string,
-  paymentId: string,
-  signature: string
-) => {
-  try {
-    const response = await api.post('/payment/verify-payment/', {
-      razorpay_order_id: orderId,
-      razorpay_payment_id: paymentId,
-      razorpay_signature: signature,
-    });
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to verify payment');
-  }
-};
-
-/**
- * Fetch public Razorpay key for checkout.
- */
-export const getRazorpayKey = async () => {
-  try {
-    const response = await api.get('/razorpay/key/');
-    return response.data?.key_id as string;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message || 'Failed to load Razorpay key');
-  }
-};
 
 /**
  * Validate a promo code
