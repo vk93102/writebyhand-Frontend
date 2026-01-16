@@ -48,6 +48,7 @@ import { canAccessPremiumFeature, checkSubscriptionStatus, clearSubscriptionCach
 import { generateMockTest } from './src/services/mockTestService';
 import { generateQuiz, generateQuizFromImage, generateQuizFromYouTube } from './src/services/quiz';
 import { colors, spacing, borderRadius, typography, shadows } from './src/styles/theme';
+import { adsManager } from './src/services/ads/AdsManager';
 import { PremiumProvider } from './src/context/PremiumContext';
 
 type TabType = 'text' | 'image' | 'file';
@@ -330,6 +331,13 @@ export default function App() {
       
       setResults(response);
       setLoading(false);
+
+      // Show ad for free users after text question is solved
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[AskQuestion] Text ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       const errorMessage = error?.message || error || 'Failed to solve question';
       console.error('[App] ❌ Error solving question:', errorMessage);
@@ -369,6 +377,13 @@ export default function App() {
 
       setResults(response);
       setLoading(false);
+
+      // Show ad for free users after image question is solved
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[AskQuestion] Image ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       const errorMessage = error?.message || error || 'Failed to process image';
       console.error('[App] ❌ Error solving image question:', errorMessage);
@@ -475,6 +490,13 @@ export default function App() {
 
       setQuizData(quizDataToSet);
       setQuizLoading(false);
+
+      // Show ad for free users after text quiz generation
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[Quiz] Text ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('[Quiz] Error details:', {
         message: error.message,
@@ -627,6 +649,13 @@ export default function App() {
       console.log('[Quiz] Setting quiz data from file:', quizDataToSet);
       setQuizData(quizDataToSet);
       setQuizLoading(false);
+
+      // Show ad for free users after file quiz generation
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[Quiz] File ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('[Quiz] Error generating quiz from file:', error);
       Alert.alert('Error', error.message || 'Failed to generate quiz from file');
@@ -697,6 +726,13 @@ export default function App() {
 
       setQuizData(quizDataToSet);
       setQuizLoading(false);
+
+      // Show ad for free users after image quiz generation
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[Quiz] Image ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('[Quiz] Error generating quiz from image:', error);
       const status = error.response?.status;
@@ -785,6 +821,14 @@ export default function App() {
       console.log('[Flashcards] Setting flashcard data with', response?.cards?.length || 0, 'cards');
       setFlashcardData(response);
       setFlashcardLoading(false);
+      
+      // Show Unity ad after flashcard generation (free users only)
+      if (!isPremium) {
+        console.log('[Flashcards] Showing ad after flashcard generation');
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[Flashcards] Ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('[Flashcards] Error details:', {
         message: error.message,
@@ -855,6 +899,13 @@ export default function App() {
 
       setFlashcardData(response);
       setFlashcardLoading(false);
+      
+      // Show Unity ad after image flashcard generation (free users only)
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[Flashcards/Image] Ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('[Flashcards] Error generating from image:', error);
       const status = error.response?.status;
@@ -924,6 +975,13 @@ export default function App() {
 
       setFlashcardData(response);
       setFlashcardLoading(false);
+
+      // Show ad for free users after file flashcard generation
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[Flashcards] File ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('[Flashcards] Error generating from file:', error);
       const status = error.response?.status;
@@ -954,6 +1012,13 @@ export default function App() {
       const response = await generateStudyMaterial(text);
       setStudyMaterialData(response);
       setStudyMaterialLoading(false);
+
+      // Show ad for free users after study material generation
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[StudyMaterial] Ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       const status = error.response?.status;
       const details = error.response?.data?.details || error.response?.data?.error;
@@ -981,6 +1046,13 @@ export default function App() {
       const response = await generateStudyMaterial(undefined, files[0]);
       setStudyMaterialData(response);
       setStudyMaterialLoading(false);
+
+      // Show ad for free users after file study material generation
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[StudyMaterial] File ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to generate study material from file');
       setStudyMaterialLoading(false);
@@ -1041,6 +1113,13 @@ export default function App() {
 
       setPredictedQuestionsData(response);
       setPredictedQuestionsLoading(false);
+      
+      // Show Unity ad after predicted questions generation (free users only)
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[PredictedQuestions] Ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('[PredictedQuestions] Error generating from text:', error);
       // Show backend details if available
@@ -1217,6 +1296,13 @@ export default function App() {
       const response = await summarizeYouTubeVideo(videoUrl, false);
       setYoutubeSummaryData(response);
       setYoutubeSummaryLoading(false);
+      
+      // Show Unity ad after YouTube video summarization (free users only)
+      if (!isPremium) {
+        setTimeout(() => {
+          adsManager.showAd().catch(err => console.log('[YouTube] Ad display failed:', err));
+        }, 1500);
+      }
     } catch (error: any) {
       const message = error.response?.data?.error || error.message || 'Failed to summarize YouTube video';
       const details = error.response?.data?.details;
@@ -1314,7 +1400,7 @@ export default function App() {
             )}
           </View>
 
-          {/* Always show compact right-side: coins + avatar */}
+          {/* Always show compact right-side: coins only */}
           <View style={styles.topRightCompact}>
             <TouchableOpacity 
               onPress={() => setCurrentPage('withdrawal')}
@@ -1323,9 +1409,6 @@ export default function App() {
               <Image source={require('./assets/coins.png')} style={{ width: 20, height: 20 }} />
               <Text style={{ color: colors.text, fontWeight: '700' }}>{userCoins}</Text>
             </TouchableOpacity>
-            <View style={styles.avatarSmall}>
-              <MaterialIcons name="account-circle" size={28} color={colors.primary} />
-            </View>
           </View>
 
           {/* Header content */}
@@ -2077,7 +2160,7 @@ export default function App() {
         {/* User Profile Section */}
         <View style={styles.userProfile}>
           <View style={styles.avatar}>
-            <MaterialIcons name="account-circle" size={56} color={colors.primary} />
+            <MaterialIcons name="account-circle" size={64} color={colors.primary} />
           </View>
           <Text style={styles.userName}>{user?.name || 'User'}</Text>
           <Text style={styles.userRole}>{user?.provider === 'google' ? 'Google User' : 'Learner'}</Text>
@@ -2432,19 +2515,22 @@ const styles = StyleSheet.create({
   },
   userProfile: {
     alignItems: 'center',
-    paddingBottom: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
     marginBottom: spacing.md,
   },
   avatar: {
-    marginBottom: spacing.xs,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    marginBottom: spacing.md,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: '#EEF2FF',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   userName: {
     ...typography.h4,

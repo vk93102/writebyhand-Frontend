@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
+import { usePremium } from '../context/PremiumContext';
+import { AdsManager } from '../services/ads/AdsManager';
 
 const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
@@ -316,6 +318,8 @@ const SAMPLE_PAPERS: Paper[] = [
 ];
 
 export const PreviousYearPapers: React.FC = () => {
+  const { isPremium } = usePremium();
+  const adsManager = AdsManager.getInstance();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
 
@@ -335,6 +339,13 @@ export const PreviousYearPapers: React.FC = () => {
       const supported = await Linking.canOpenURL(url);
       if (supported) {
         await Linking.openURL(url);
+        
+        // Show ad for free users after downloading previous paper
+        if (!isPremium) {
+          setTimeout(() => {
+            adsManager.showAd().catch(err => console.log('[PreviousPapers] Ad display failed:', err));
+          }, 1500);
+        }
       } else {
         Alert.alert('Error', `Cannot open ${type} URL`);
       }

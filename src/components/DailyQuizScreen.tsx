@@ -19,6 +19,7 @@ import { getDailyQuiz, submitDailyQuiz, startDailyQuiz, getUserCoins } from '../
 import { getDailyQuizQuestions } from '../services/mockTestService';
 import LoadingWebm from './LoadingWebm';
 import { DailyQuizResults } from './DailyQuizResults';
+import { useFeatureAds } from '../hooks/useFeatureAds';
 
 // UUID generator function
 const generateUUID = (): string => {
@@ -60,6 +61,12 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
   const [userCoins, setUserCoins] = useState<number>(0);
   const [language, setLanguage] = useState<'english' | 'hindi'>('english');
   const [quizSettings, setQuizSettings] = useState<any>(null);
+  
+  // Unity Ads integration for free users
+  const { showFeatureCompleteAd, isPremium } = useFeatureAds({ 
+    featureName: 'Daily Quiz',
+    showAdOnComplete: true 
+  });
 
   const formatResultText = (value: any): string => {
     if (!value && value !== 0) return '';
@@ -109,7 +116,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       
       // Try to fetch from API first
       try {
-        const apiQuizData = await getDailyQuiz(userId || 'anonymous');
+        const apiQuizData = await getDailyQuiz(language, userId || 'anonymous');
         console.log(' Fetched quiz from API with quiz_id:', apiQuizData.quiz_id);
         
         // Use API response which contains the correct quiz_id (UUID format)
@@ -265,6 +272,14 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       setResults(backendResponse);
       setQuizState('completed');
       animateCoins();
+      
+      // Show Unity ad after quiz completion (free users only)
+      if (!isPremium) {
+        console.log('[DailyQuiz] Showing ad after quiz completion');
+        setTimeout(() => {
+          showFeatureCompleteAd();
+        }, 1500); // Show ad after 1.5s to let results animation complete
+      }
     } catch (error: any) {
       console.error('Submit quiz error:', error);
       Alert.alert('Error', error.message || 'Failed to submit quiz');
@@ -443,7 +458,7 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
                 contentContainerStyle={styles.breakdownCarousel}
               >
               {results.results.map((r: any, idx: number) => (
-                <Animated.View key={idx} style={styles.breakdownItem}>
+                <Animated.View key={`result-${r.question_id || idx}`} style={styles.breakdownItem}>
                   <View style={styles.breakdownHeader}>
                     <Text style={styles.breakdownQ}>Q{r.question_id}</Text>
                     <View style={[styles.breakdownBadge, r.is_correct ? styles.correctBadge : styles.incorrectBadge]}>
@@ -1044,6 +1059,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     padding: spacing.lg,
+    paddingBottom: 50,
     ...shadows.md,
     marginBottom: spacing.lg,
   },

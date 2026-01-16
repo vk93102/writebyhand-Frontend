@@ -1,7 +1,7 @@
 /**
  * Pair Quiz Results Screen - Side-by-side comparison
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { usePairQuiz } from '../../services/pair-quiz/pairQuizContext';
+import { usePremium } from '../../context/PremiumContext';
+import { AdsManager } from '../../services/ads/AdsManager';
 
 interface PairResultScreenProps {
   onDone: () => void;
@@ -19,6 +21,18 @@ interface PairResultScreenProps {
 
 export const PairResultScreen: React.FC<PairResultScreenProps> = ({ onDone }) => {
   const { session, isHost, resetState } = usePairQuiz();
+  const { isPremium } = usePremium();
+  const adsManager = AdsManager.getInstance();
+
+  // Show ad when pair quiz results are displayed
+  useEffect(() => {
+    if (!isPremium) {
+      const timer = setTimeout(() => {
+        adsManager.showAd().catch(err => console.log('[PairQuiz] Ad display failed:', err));
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isPremium]);
 
   if (!session) {
     return null;

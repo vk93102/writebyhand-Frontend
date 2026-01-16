@@ -199,19 +199,16 @@ export const WithdrawalScreen: React.FC<WithdrawalScreenProps> = ({
         ),
       ]).start();
 
-      // Prepare withdrawal request
-      const withdrawalData = {
-        email: emailInput,
-        coins_to_withdraw: coins,
-        account_holder_name: accountHolderName,
-        payout_method: payoutMethod,
-        ...(payoutMethod === 'upi' ? { upi_id: upiId } : {
-          account_number: accountNumber,
-          ifsc_code: ifscCode,
-        }),
-      };
-
-      const response = await requestCoinWithdrawal(userId, withdrawalData);
+      // Prepare withdrawal request - pass individual parameters
+      const response = await requestCoinWithdrawal(
+        userId,
+        coins,
+        payoutMethod,
+        accountHolderName,
+        payoutMethod === 'upi' ? upiId : undefined,
+        payoutMethod === 'bank' ? accountNumber : undefined,
+        payoutMethod === 'bank' ? ifscCode : undefined
+      );
 
       const {
         withdrawal_id: withdrawalId,

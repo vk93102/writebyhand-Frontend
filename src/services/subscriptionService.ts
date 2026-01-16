@@ -4,7 +4,7 @@ import { Platform, Alert } from 'react-native';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://ed-tech-backend-tzn8.onrender.com/api';
-const AUTH_TOKEN_KEY = 'authToken';
+const AUTH_TOKEN_KEY = 'AUTH_TOKEN'; // Must match the key used in api.ts
 
 // Helper to get auth token
 const getAuthToken = async (): Promise<string | null> => {
@@ -341,19 +341,61 @@ export const verifyPayment = async (
     const token = await getAuthToken();
     console.log('[Subscription] 🔑 Auth token status:', token ? `Found (length: ${token.length})` : '❌ NOT FOUND');
     
+    // Decode and check token expiry
+    if (token) {
+      try {
+        // Simple JWT decode (no verification, just to check structure and expiry)
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1]));
+          const expiryTime = new Date(payload.exp * 1000);
+          const now = new Date();
+          const isExpired = now > expiryTime;
+          
+          console.log('[Subscription] 📅 Token expiry check:', {
+            expiresAt: expiryTime.toISOString(),
+            now: now.toISOString(),
+            isExpired: isExpired,
+            minutesUntilExpiry: Math.round((expiryTime.getTime() - now.getTime()) / 60000),
+          });
+          
+          if (isExpired) {
+            console.error('[Subscription] ❌ Token has EXPIRED!');
+          }
+        }
+      } catch (decodeError) {
+        console.warn('[Subscription] ⚠️ Could not decode token for expiry check:', decodeError);
+      }
+    }
+    
     const headers: any = { 
       'Content-Type': 'application/json',
       'X-User-ID': userId 
     };
     
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      const authHeader = `Bearer ${token}`;
+      headers['Authorization'] = authHeader;
       console.log('[Subscription] ✅ Added Authorization header');
+      console.log('[Subscription] 🔍 Auth header format check:', {
+        startsWithBearer: authHeader.startsWith('Bearer '),
+        firstChars: authHeader.substring(0, 20) + '...',
+        hasSpace: authHeader.indexOf(' ') === 6,
+        totalLength: authHeader.length
+      });
+      console.log('[Subscription] 📋 Exact header value:', authHeader.substring(0, 50) + '...');
     } else {
       console.error('[Subscription] ❌ WARNING: No auth token found! Request will likely fail with 401');
     }
 
     console.log('[Subscription] 📤 Sending verification request with headers:', Object.keys(headers));
+    console.log('[Subscription] 📦 Request payload:', {
+      user_id: userId,
+      razorpay_order_id: orderId,
+      razorpay_payment_id: paymentId,
+      razorpay_signature: signature ? signature.substring(0, 20) + '...' : 'MISSING',
+      plan: plan
+    });
 
     const response = await axios.post(
       `${API_BASE_URL}/payment/verify/`,
@@ -378,9 +420,24 @@ export const verifyPayment = async (
     };
   } catch (error: any) {
     console.error('[Subscription] ❌ Payment verification error:', error.message);
+    console.error('[Subscription] ❌ Full Error Response:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      errorMessage: error.response?.data?.error,
+      errorDetail: error.response?.data?.detail,
+      fullResponseData: error.response?.data,
+      errorBody: JSON.stringify(error.response?.data)
+    });
+    
+    // Log specific 401 details
+    if (error.response?.status === 401) {
+      console.error('[Subscription] 🔑 401 UNAUTHORIZED - Token validation failed');
+      console.error('[Subscription] Backend says:', error.response?.data?.message || error.response?.data?.error);
+    }
+    
     return {
       success: false,
-      error: error.response?.data?.error || error.message || 'Payment verification failed',
+      error: error.response?.data?.error || error.response?.data?.detail || error.message || 'Payment verification failed',
     };
   }
 };
@@ -486,6 +543,17 @@ export const openRazorpayCheckout = async (
     
     handler: (response: any) => {
       console.log('[Subscription] 💳 Payment successful:', response.razorpay_payment_id);
+      console.log('[Subscription] 📋 Full Razorpay response:', {
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature ? `Found (length: ${response.razorpay_signature.length})` : '❌ MISSING',
+        allKeys: Object.keys(response)
+      });
+      
+      if (!response.razorpay_signature) {
+        console.error('[Subscription] ❌ CRITICAL: Razorpay signature is missing from response!');
+      }
+      
       onSuccess(response);
     },
 

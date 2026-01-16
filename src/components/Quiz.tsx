@@ -5,6 +5,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 import AnimatedLoader from './AnimatedLoader';
 import LoadingWebm from './LoadingWebm';
+import { usePremium } from '../context/PremiumContext';
+import { AdsManager } from '../services/ads/AdsManager';
 
 interface QuizQuestion {
   id: number;
@@ -37,6 +39,8 @@ interface UserAnswer {
 
 export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
   const insets = useSafeAreaInsets();
+  const { isPremium } = usePremium();
+  const adsManager = AdsManager.getInstance();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Map<number, number>>(new Map());
   const [quizCompleted, setQuizCompleted] = useState(false);
@@ -138,6 +142,13 @@ export const Quiz: React.FC<QuizProps> = ({ quizData, loading }) => {
 
   const handleSubmitQuiz = () => {
     setQuizCompleted(true);
+    
+    // Show ad for free users after quiz completion
+    if (!isPremium) {
+      setTimeout(() => {
+        adsManager.showAd().catch(err => console.log('[Quiz] Ad display failed:', err));
+      }, 1500);
+    }
   };
 
   const calculateResults = () => {

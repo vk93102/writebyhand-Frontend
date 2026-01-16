@@ -1910,5 +1910,193 @@ export const generatePredictedQuestionsFromFile = async (
   }
 };
 
+/**
+ * Ask Question - Search for relevant sources
+ * API: POST /ask-question/search/
+ * 
+ * Request:
+ * {
+ *   "question": "string (required)",
+ *   "max_results": number (optional, default: 3)
+ * }
+ * 
+ * Response:
+ * {
+ *   "success": true,
+ *   "question": "string",
+ *   "search_query": "string",
+ *   "sources": [
+ *     {
+ *       "title": "string",
+ *       "url": "string",
+ *       "snippet": "string",
+ *       "domain": "string",
+ *       "is_trusted": boolean
+ *     }
+ *   ],
+ *   "num_sources": number,
+ *   "processing_time": number,
+ *   "search_time": number
+ * }
+ */
+export const searchQuestion = async (question: string, maxResults: number = 3): Promise<any> => {
+  try {
+    // Validate input
+    if (!question || question.trim().length === 0) {
+      console.error('[API] Question is required');
+      throw {
+        success: false,
+        error: 'Question is required',
+        error_code: 'EMPTY_QUESTION',
+      };
+    }
+
+    if (question.length > 2000) {
+      throw {
+        success: false,
+        error: 'Question is too long (max 2000 characters)',
+        error_code: 'QUESTION_TOO_LONG',
+      };
+    }
+
+    console.log('[API] Searching for question:', question.substring(0, 50), '...');
+
+    const response = await api.post('/ask-question/search/', {
+      question: question.trim(),
+      max_results: Math.max(1, Math.min(maxResults, 10)), // Limit between 1 and 10
+    });
+
+    if (!response.data.success) {
+      console.error('[API] Search failed:', response.data.error);
+      throw {
+        success: false,
+        error: response.data.error || 'Search failed',
+        error_code: response.data.error_code || 'SEARCH_ERROR',
+        details: response.data.details,
+      };
+    }
+
+    console.log('[API] Search successful, found', response.data.num_sources, 'sources');
+
+    return {
+      success: true,
+      question: response.data.question,
+      search_query: response.data.search_query,
+      sources: response.data.sources || [],
+      num_sources: response.data.num_sources || 0,
+      processing_time: response.data.processing_time,
+      search_time: response.data.search_time,
+    };
+  } catch (error: any) {
+    console.error('[API] searchQuestion error:', error);
+
+    // Return proper error format
+    if (error.success === false) {
+      throw error; // Already formatted error
+    }
+
+    throw {
+      success: false,
+      error: error.response?.data?.error || error.message || 'Failed to search question',
+      error_code: error.response?.data?.error_code || 'SEARCH_ERROR',
+      details: error.response?.data?.details,
+    };
+  }
+};
+
+/**
+ * Ask Question - Get answers from trusted sources
+ * API: POST /ask-question/sources/
+ * 
+ * Request:
+ * {
+ *   "question": "string (required)",
+ *   "max_results": number (optional, default: 4)
+ * }
+ * 
+ * Response:
+ * {
+ *   "success": true,
+ *   "question": "string",
+ *   "search_query": "string",
+ *   "sources": [
+ *     {
+ *       "title": "string",
+ *       "url": "string",
+ *       "snippet": "string",
+ *       "domain": "string",
+ *       "is_trusted": boolean
+ *     }
+ *   ],
+ *   "num_sources": number,
+ *   "processing_time": number,
+ *   "search_time": number
+ * }
+ */
+export const askQuestionWithSources = async (question: string, maxResults: number = 4): Promise<any> => {
+  try {
+    // Validate input
+    if (!question || question.trim().length === 0) {
+      console.error('[API] Question is required');
+      throw {
+        success: false,
+        error: 'Question is required',
+        error_code: 'EMPTY_QUESTION',
+      };
+    }
+
+    if (question.length > 2000) {
+      throw {
+        success: false,
+        error: 'Question is too long (max 2000 characters)',
+        error_code: 'QUESTION_TOO_LONG',
+      };
+    }
+
+    console.log('[API] Asking question with trusted sources:', question.substring(0, 50), '...');
+
+    const response = await api.post('/ask-question/sources/', {
+      question: question.trim(),
+      max_results: Math.max(1, Math.min(maxResults, 10)), // Limit between 1 and 10
+    });
+
+    if (!response.data.success) {
+      console.error('[API] Ask question failed:', response.data.error);
+      throw {
+        success: false,
+        error: response.data.error || 'Failed to get sources',
+        error_code: response.data.error_code || 'SOURCES_ERROR',
+        details: response.data.details,
+      };
+    }
+
+    console.log('[API] Found', response.data.num_sources, 'trusted sources for question');
+
+    return {
+      success: true,
+      question: response.data.question,
+      search_query: response.data.search_query,
+      sources: response.data.sources || [],
+      num_sources: response.data.num_sources || 0,
+      processing_time: response.data.processing_time,
+      search_time: response.data.search_time,
+    };
+  } catch (error: any) {
+    console.error('[API] askQuestionWithSources error:', error);
+
+    // Return proper error format
+    if (error.success === false) {
+      throw error; // Already formatted error
+    }
+
+    throw {
+      success: false,
+      error: error.response?.data?.error || error.message || 'Failed to ask question',
+      error_code: error.response?.data?.error_code || 'SOURCES_ERROR',
+      details: error.response?.data?.details,
+    };
+  }
+};
+
 export { api };
 export default api;

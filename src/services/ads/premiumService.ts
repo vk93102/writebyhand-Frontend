@@ -9,6 +9,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const BACKEND_URL = 'https://ed-tech-backend-tzn8.onrender.com/api';
 const CACHE_KEY = 'PREMIUM_STATUS_CACHE';
 const CACHE_TTL_MINUTES = 60; // Cache premium status for 1 hour
+const AUTH_TOKEN_KEY = 'AUTH_TOKEN';
+
+/**
+ * Get authentication token from AsyncStorage
+ */
+const getAuthToken = async (): Promise<string | null> => {
+  try {
+    return await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+  } catch (error) {
+    console.error('[PremiumService] Error getting auth token:', error);
+    return null;
+  }
+};
 
 interface PremiumCacheData {
   isPremium: boolean;
@@ -37,12 +50,23 @@ class PremiumService {
       // Cache expired or doesn't exist, fetch from API
       console.log('[PremiumService] Fetching premium status from backend...');
       
+      // Get authentication token
+      const token = await getAuthToken();
+      
+      if (!token) {
+        console.log('[PremiumService] No auth token (user not logged in), defaulting to free');
+        this.currentPremiumStatus = false;
+        // Don't throw error, just return false for unauthenticated users
+        return false;
+      }
+
       const response = await axios.get(
         `${BACKEND_URL}/subscription/status/`,
         {
           headers: {
-            'X-User-ID': userId,
+            'Authorization': `Bearer ${token}`,
           },
+          timeout: 10000, // 10 second timeout
         }
       );
 
@@ -55,8 +79,13 @@ class PremiumService {
       this.currentPremiumStatus = isPremium;
       
       return isPremium;
-    } catch (error) {
-      console.error('[PremiumService] ❌ Error fetching premium status:', error);
+    } catch (error: any) {
+      // Don't log error for 400/401 (unauthenticated users)
+      if (error?.response?.status === 400 || error?.response?.status === 401) {
+        console.log('[PremiumService] User not authenticated, using free tier');
+      } else {
+        console.error('[PremiumService] ❌ Error fetching premium status:', error.message || error);
+      }
       
       // If API fails, try to use cached value
       const cached = await this._getFromCache();
@@ -67,7 +96,6 @@ class PremiumService {
       }
 
       // Default to free if everything fails
-      console.warn('[PremiumService] No cache available, defaulting to free');
       this.currentPremiumStatus = false;
       return false;
     }

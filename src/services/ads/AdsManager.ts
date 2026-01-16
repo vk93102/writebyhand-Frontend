@@ -2,6 +2,7 @@ import { Platform, NativeModules } from 'react-native';
 
 
 class AdsManager {
+  private static instance: AdsManager | null = null;
   private isInitialized = false;
   private isAdReady = false;
   private isPremium = false;
@@ -9,6 +10,16 @@ class AdsManager {
   private readonly ANDROID_GAME_ID = '6018264';
   private readonly AD_UNIT_ID = 'Interstitial_Android'; // or 'Interstitial_iOS' for iOS
   private initPromise: Promise<void> | null = null;
+
+  /**
+   * Get singleton instance
+   */
+  static getInstance(): AdsManager {
+    if (!AdsManager.instance) {
+      AdsManager.instance = new AdsManager();
+    }
+    return AdsManager.instance;
+  }
 
   /**
    * Initialize Unity Ads SDK
@@ -198,6 +209,11 @@ class AdsManager {
   }
 }
 
-// Export singleton instance
-export const adsManager = new AdsManager();
+// Export class (use AdsManager.getInstance())
+export { AdsManager };
+
+// Export singleton instance for backward compatibility
+export const adsManager = AdsManager.getInstance();
+
+// Default export
 export default AdsManager;
