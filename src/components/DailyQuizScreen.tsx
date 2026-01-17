@@ -15,7 +15,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
-import { getDailyQuiz, submitDailyQuiz, startDailyQuiz, getUserCoins } from '../services/api';
+import { getDailyQuiz, submitDailyQuiz, startDailyQuiz, getUserCoins, ensureQuizId, validateQuizData } from '../services/api';
 import { getDailyQuizQuestions } from '../services/mockTestService';
 import LoadingWebm from './LoadingWebm';
 import { DailyQuizResults } from './DailyQuizResults';
@@ -117,10 +117,28 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       // Try to fetch from API first
       try {
         const apiQuizData = await getDailyQuiz(language, userId || 'anonymous');
-        console.log(' Fetched quiz from API with quiz_id:', apiQuizData.quiz_id);
+        console.log('📋 Fetched quiz from API:', apiQuizData);
+        console.log('📋 API Response keys:', Object.keys(apiQuizData || {}));
+        console.log('📋 quiz_id from API:', apiQuizData?.quiz_id);
         
-        // Use API response which contains the correct quiz_id (UUID format)
-        const questions = apiQuizData.questions.map((q: any, idx: number) => ({
+        // Extract quiz_id from the API response, or generate one if backend doesn't provide it
+        let sessionId = apiQuizData?.quiz_id;
+        
+        if (!sessionId) {
+          // FALLBACK: Generate quiz_id on frontend if backend doesn't provide it
+          // This allows quiz to work while backend is being fixed
+          const timestamp = Date.now();
+          const random = Math.random().toString(36).substring(2, 9);
+          sessionId = `${timestamp}-${random}`;
+          console.warn('⚠️ Backend did not return quiz_id, generating fallback ID:', sessionId);
+          console.log('ℹ️ Note: Backend should return quiz_id in GET /api/quiz/daily-quiz/ response');
+          console.log('ℹ️ Check that backend server was restarted after code changes');
+        } else {
+          console.log('✅ Got session ID from API:', sessionId);
+        }
+        
+        // Use API response which contains the questions
+        const questions = apiQuizData.questions?.map((q: any, idx: number) => ({
           id: q.id ?? idx + 1,
           question: q.question,
           options: q.options,
@@ -128,12 +146,19 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
           explanation: q.explanation,
           category: q.category || 'general',
           difficulty: q.difficulty || 'medium',
-        }));
+        })) || [];
 
-        setQuizData({
-          ...apiQuizData,
+        // CRITICAL: Ensure quiz_id is always present in state for submission
+        const finalQuizData = {
+          quiz_id: sessionId,  // Use API quiz_id or generated fallback
+          quiz_metadata: apiQuizData.quiz_metadata,
           questions,
-        });
+        };
+        
+        console.log('📋 Final quiz data quiz_id:', finalQuizData.quiz_id);
+        console.log('📋 Final quiz data keys:', Object.keys(finalQuizData));
+        
+        setQuizData(finalQuizData);
         setQuizState('not-started');
       } catch (apiError: any) {
         //  DO NOT use local fallback - it will fail on submission
@@ -167,10 +192,38 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       console.log('Starting quiz with ID:', quizData.quiz_id);
       console.log('Quiz has questions:', quizData.questions?.length);
 
-      // For now, skip the backend start call and just proceed
-      // This allows the quiz to work even if the backend endpoint is missing
-      // await startDailyQuiz(userId, quizData.quiz_id);
-      // console.log('Quiz started successfully on backend');
+      // REQUIRED: Call backend to create quiz session and get session ID
+      // The backend will return a session_id/quiz_id that MUST be used for submission
+      let sessionId = quizData.quiz_id;
+      
+      if (!sessionId) {
+        console.log('[Quiz] No quiz_id from getDailyQuiz, calling startDailyQuiz to get session...');
+        const startResponse = await startDailyQuiz(userId, 'daily-quiz-' + Date.now());
+        sessionId = startResponse?.session_id || startResponse?.quiz_id || startResponse?.id;
+        console.log('[Quiz] Received session_id from backend:', sessionId);
+        
+        if (sessionId) {
+          // Update quiz data with the session ID from backend
+          setQuizData({
+            ...quizData,
+            quiz_id: sessionId
+          });
+        }
+      } else {
+        // If we have quiz_id, try to start the session anyway
+        try {
+          const startResponse = await startDailyQuiz(userId, sessionId);
+          // Use the returned session ID if available
+          const backendSessionId = startResponse?.session_id || startResponse?.quiz_id || startResponse?.id || sessionId;
+          console.log('[Quiz] Backend confirmed session:', backendSessionId);
+          setQuizData({
+            ...quizData,
+            quiz_id: backendSessionId
+          });
+        } catch (startError) {
+          console.warn('[Quiz] startDailyQuiz call failed, using existing quiz_id:', sessionId);
+        }
+      }
 
       // Award attempt bonus coins locally
       const coinsAwarded = quizData?.coins?.attempt_bonus ?? 5;
@@ -255,13 +308,35 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       const timeTaken = Math.floor((Date.now() - startTime) / 1000);
       console.log('Time taken:', timeTaken, 'seconds');
       console.log('Submitting to backend API...');
+      console.log('Quiz data state:', quizData);
+      console.log('Quiz data keys:', Object.keys(quizData || {}));
+      console.log('Quiz ID to submit:', quizData?.quiz_id);
+      console.log('User ID:', userId);
+      
+      // CRITICAL: Check if quiz_id is available before submission
+      // Quiz session must be issued by backend, not locally generated
+      if (!quizData.quiz_id) {
+        console.error('❌ CRITICAL: No quiz_id available for submission');
+        console.error('Quiz data structure:', JSON.stringify(quizData, null, 2));
+        console.error('Backend did not issue a valid quiz session');
+        throw new Error('Quiz session not initialized - backend did not provide a valid session ID. Please reload the quiz and try again.');
+      }
+      
+      // Validate quiz data before submission
+      const validation = validateQuizData(quizData);
+      if (!validation.valid) {
+        console.error('❌ Quiz data validation failed:', validation.error);
+        throw new Error(validation.error || 'Invalid quiz data');
+      }
+      console.log('✅ Quiz data validated');
       
       // Submit to backend and get total_coins from server
       const backendResponse = await submitDailyQuiz(
         userId || 'anonymous',
         quizData.quiz_id,
         answers,
-        timeTaken
+        timeTaken,
+        language
       );
       
       console.log('Backend response received:', backendResponse);
@@ -282,7 +357,25 @@ export const DailyQuizScreen: React.FC<DailyQuizScreenProps> = ({
       }
     } catch (error: any) {
       console.error('Submit quiz error:', error);
-      Alert.alert('Error', error.message || 'Failed to submit quiz');
+      
+      const errorMessage = error.message || 'Failed to submit quiz';
+      
+      // Provide specific guidance for "Quiz session expired" error
+      if (errorMessage.includes('Quiz session expired') || errorMessage.includes('session expired')) {
+        Alert.alert(
+          'Quiz Session Expired',
+          'Your quiz session has expired. This can happen if you took too long to complete the quiz or lost connection. Please reload the quiz and try again.',
+          [{ text: 'Reload Quiz', onPress: () => loadQuiz() }]
+        );
+      } else if (errorMessage.includes('Quiz session not initialized')) {
+        Alert.alert(
+          'Unable to Start Quiz Session',
+          'The server did not initialize a valid quiz session. Please reload the app and try again.',
+          [{ text: 'Reload Quiz', onPress: () => loadQuiz() }]
+        );
+      } else {
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setLoading(false);
     }

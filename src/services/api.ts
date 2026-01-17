@@ -5,18 +5,39 @@ import { geminiFlashcardService } from './quiz/GeminiFlashcardService';
 import { geminiPredictedQuestionsService } from './quiz/GeminiPredictedQuestionsService';
 import { geminiSolutionService } from './quiz/GeminiSolutionService';
 
+type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
+interface PredictedQuestionsResponse {
+  success?: boolean;
+  questions?: any[];
+  title?: string;
+  examType?: string;
+  key_definitions?: any;
+  keyDefinitions?: any;
+  topicOutline?: any;
+  topic_outline?: any;
+  error?: string;
+}
 
 const PRODUCTION_API_URL = 'https://ed-tech-backend-tzn8.onrender.com/api';
 
+// IMPORTANT:
+// - The daily-quiz backend uses a session cookie (HttpOnly) for validation.
+// - In browsers, HttpOnly cookies are managed by the browser and are not readable
+//   via JS; cross-site XHR/fetch also depends on server-side CORS + SameSite settings.
+// - For Expo Web dev, we proxy /api through the dev server so the session cookie
+//   is same-origin and will be sent on submit.
+const DEFAULT_API_BASE_URL = Platform.OS === 'web' ? '/api' : PRODUCTION_API_URL;
+const API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, '');
+
 const api = axios.create({
-  baseURL: PRODUCTION_API_URL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 60000,
+  withCredentials: true,
 });
-
 
 const AUTH_TOKEN_KEY = 'AUTH_TOKEN';
 const USER_ID_KEY = 'USER_ID';
@@ -124,7 +145,7 @@ api.interceptors.response.use(
  * @param text - The question text to solve
  * @returns API response with solution
  */
-export const solveQuestionByText = async (text: string): Promise<any> => {
+export const solveQuestionByText = async (text: string, useSearchAPI: boolean = false): Promise<any> => {
   const startTime = Date.now();
 
   try {
@@ -151,9 +172,48 @@ export const solveQuestionByText = async (text: string): Promise<any> => {
       throw new Error('Question must not exceed 5000 characters');
     }
 
-    console.log('[API] 🔍 Solving question by text using Gemini... Length:', trimmedText.length);
+    console.log('[API] 🔍 Solving question by text... Length:', trimmedText.length, 'Use Search API:', useSearchAPI);
 
-    // Call Gemini service directly
+    // PRODUCTION: Use third-party search API if enabled
+    if (useSearchAPI) {
+      try {
+        console.log('[API] 🌐 Calling third-party search API for question...');
+        const searchResults = await searchQuestion(trimmedText, 3);
+        
+        console.log('[API] 📊 Search response:', searchResults);
+        
+        if (searchResults.success && searchResults.sources && searchResults.sources.length > 0) {
+          console.log('[API] ✅ Found', searchResults.num_sources, 'sources from search API');
+          
+          // Format response with search results
+          const processingTime = Date.now() - startTime;
+          return {
+            success: true,
+            solution: formatSearchResults(searchResults.sources),
+            explanation: `Found ${searchResults.num_sources} relevant sources`,
+            sources: searchResults.sources,
+            search_query: searchResults.search_query,
+            source: 'search_api',
+            processingTime,
+            metadata: {
+              inputLength: trimmedText.length,
+              searchTime: searchResults.search_time,
+              timestamp: new Date().toISOString(),
+            },
+          };
+        } else {
+          console.warn('[API] ⚠️ Search API returned no sources, falling back to Gemini');
+        }
+      } catch (searchError: any) {
+        const errorMsg = searchError.error || searchError.message || JSON.stringify(searchError).substring(0, 100);
+        console.warn('[API] ⚠️ Search API failed:', errorMsg);
+        console.log('[API] 💡 Backend may have variations in response format. Falling back to Gemini...');
+        // Continue to Gemini if search fails
+      }
+    }
+
+    // Call Gemini service as default or fallback
+    console.log('[API] 🤖 Using Gemini AI to solve question...');
     const response = await geminiSolutionService.solveByText(trimmedText);
 
     if (!response.success) {
@@ -170,7 +230,7 @@ export const solveQuestionByText = async (text: string): Promise<any> => {
       solution: response.solution,
       explanation: response.explanation,
       steps: response.steps,
-      source: 'text',
+      source: 'gemini_ai',
       processingTime,
       metadata: {
         inputLength: trimmedText.length,
@@ -192,6 +252,28 @@ export const solveQuestionByText = async (text: string): Promise<any> => {
 };
 
 /**
+ * Format search results into readable solution text
+ */
+function formatSearchResults(sources: any[]): string {
+  if (!sources || sources.length === 0) {
+    return 'No relevant sources found.';
+  }
+  
+  let formatted = 'Found the following relevant information:\n\n';
+  
+  sources.forEach((source, index) => {
+    formatted += `**Source ${index + 1}:** ${source.title || 'Unknown'}\n`;
+    formatted += `${source.snippet || source.description || 'No description available'}\n`;
+    if (source.url) {
+      formatted += `Link: ${source.url}\n`;
+    }
+    formatted += '\n';
+  });
+  
+  return formatted;
+}
+
+/**
  * Solve question using image upload
  * Uses Gemini Vision API directly to solve questions from images
  * Production-level implementation with error handling
@@ -199,7 +281,7 @@ export const solveQuestionByText = async (text: string): Promise<any> => {
  * @param imageUri - The local URI of the image
  * @returns API response with solution from image
  */
-export const solveQuestionByImage = async (imageUri: string): Promise<any> => {
+export const solveQuestionByImage = async (imageUri: string, useSearchAPI: boolean = false): Promise<any> => {
   const startTime = Date.now();
 
   try {
@@ -216,14 +298,75 @@ export const solveQuestionByImage = async (imageUri: string): Promise<any> => {
       throw new Error('Image URI cannot be empty');
     }
 
-    console.log('[API] 🖼️ Solving question by image using Gemini Vision... URI length:', trimmedUri.length);
+    console.log('[API] 🖼️ Processing image question... URI length:', trimmedUri.length, 'Use Search API:', useSearchAPI);
 
-    // Helper function to convert image to base64
+    // Convert image to base64
     const imageBase64 = await convertImageToBase64(trimmedUri);
-
     console.log('[API] 🖼️ Image converted to base64, size:', imageBase64.length, 'bytes');
 
-    // Call Gemini Vision service directly
+    // PRODUCTION: Extract text from image first if using search API
+    if (useSearchAPI) {
+      try {
+        console.log('[API] 📝 Extracting text from image using OCR...');
+        
+        // Use Gemini Vision to extract text from image
+        const extractionResponse = await geminiSolutionService.extractTextFromImage(imageBase64, 'image/jpeg');
+        
+        if (extractionResponse.success && extractionResponse.text && extractionResponse.text.trim().length > 0) {
+          const extractedText = extractionResponse.text.trim();
+          console.log('[API] ✅ Text extracted from image:', extractedText.substring(0, 100), '...');
+          
+          // Validate extracted text
+          if (extractedText.length >= 3 && extractedText.length <= 2000) {
+            // Now search using the extracted text
+            console.log('[API] 🌐 Searching with extracted text from image...');
+            try {
+              const searchResults = await searchQuestion(extractedText, 3);
+              
+              console.log('[API] 📊 Image search response:', searchResults);
+              
+              if (searchResults.success && searchResults.sources && searchResults.sources.length > 0) {
+                console.log('[API] ✅ Found', searchResults.num_sources, 'sources from image search');
+                
+                const processingTime = Date.now() - startTime;
+                return {
+                  success: true,
+                  solution: formatSearchResults(searchResults.sources),
+                  explanation: `Extracted text from image and found ${searchResults.num_sources} relevant sources`,
+                  sources: searchResults.sources,
+                  extracted_text: extractedText,
+                  search_query: searchResults.search_query,
+                  source: 'image_search_api',
+                  processingTime,
+                  metadata: {
+                    imageBase64Length: imageBase64.length,
+                    extractedTextLength: extractedText.length,
+                    searchTime: searchResults.search_time,
+                    timestamp: new Date().toISOString(),
+                  },
+                };
+              } else {
+                console.warn('[API] ⚠️ Search API returned no sources for extracted text');
+              }
+            } catch (searchError: any) {
+              const errorMsg = searchError.error || searchError.message || JSON.stringify(searchError).substring(0, 100);
+              console.warn('[API] ⚠️ Image search failed:', errorMsg);
+              console.warn('[API] 💡 Backend may have variations in response format');
+            }
+          } else {
+            console.warn('[API] ⚠️ Extracted text invalid length:', extractedText.length);
+          }
+        } else {
+          console.warn('[API] ⚠️ Could not extract text from image, falling back to vision AI');
+        }
+      } catch (extractError: any) {
+        const errorMsg = extractError.error || extractError.message || 'Unknown error';
+        console.warn('[API] ⚠️ Text extraction failed:', errorMsg, 'falling back to Gemini Vision');
+      }
+    }
+
+    // Call Gemini Vision service as default or fallback
+    console.log('[API] 🤖 Using Gemini Vision AI to solve image question...');
     const response = await geminiSolutionService.solveByImage(imageBase64, 'image/jpeg');
 
     if (!response.success) {
@@ -240,7 +383,7 @@ export const solveQuestionByImage = async (imageUri: string): Promise<any> => {
       solution: response.solution,
       explanation: response.explanation,
       steps: response.steps,
-      source: 'image',
+      source: 'gemini_vision_ai',
       processingTime,
       metadata: {
         imageBase64Length: imageBase64.length,
@@ -340,7 +483,7 @@ export const checkServiceStatus = async () => {
 export const generateQuiz = async (
   topic: string, 
   numQuestions: number = 5, 
-  difficulty: string = 'medium',
+  difficulty: DifficultyLevel = 'medium',
   document?: any
 ) => {
   try {
@@ -393,21 +536,23 @@ export const generateFlashcards = async (
       topic: topic.trim(),
       numCards: Math.min(Math.max(numCards, 1), 20),
       language: language || 'english',
-      difficulty: difficulty || 'medium'
+      difficulty: (difficulty as 'easy' | 'medium' | 'hard') || 'medium'
     });
 
     if (!response || !response.success) {
       throw new Error(response?.error || 'Failed to generate flashcards');
     }
 
-    console.log('[API] generateFlashcards - Received response with', response.data?.cards?.length || 0, 'cards');
+    // response.data is already the cards array from GeminiFlashcardService
+    const cards = response.data || response.cards || [];
+    console.log('[API] generateFlashcards - Received response with', cards.length, 'cards');
 
     return {
-      cards: response.data.cards,
-      data: response.data,
+      cards: cards,
+      data: cards,
       metadata: {
         topic,
-        totalCards: response.data.total_cards,
+        totalCards: cards.length,
         generatedAt: new Date().toISOString(),
       },
       success: true,
@@ -561,7 +706,7 @@ export const checkYouTubeHealth = async () => {
 export const generatePredictedQuestions = async (
   topic: string,
   userId: string,
-  difficulty: string = 'medium',
+  difficulty: DifficultyLevel = 'medium',
   numQuestions: number = 3,
   examType: string = 'General'
 ): Promise<any> => {
@@ -577,10 +722,10 @@ export const generatePredictedQuestions = async (
     const response = await geminiPredictedQuestionsService.generatePredictedQuestions({
       topic: topic.trim(),
       numQuestions: Math.min(Math.max(numQuestions, 1), 10),
-      difficulty: difficulty || 'medium',
-      examType: examType || 'General',
+      difficulty,
+      examType,
       language: 'English'
-    });
+    }) as PredictedQuestionsResponse;
 
     if (!response || !response.success) {
       throw new Error(response?.error || 'Failed to generate predicted questions');
@@ -588,16 +733,21 @@ export const generatePredictedQuestions = async (
 
     console.log('[API] generatePredictedQuestions - Received response with', response.questions?.length || 0, 'questions');
 
+    const normalizedTitle = response.title || `${topic} Predictions`;
+    const normalizedExamType = response.examType || examType;
+    const normalizedKeyDefinitions = response.key_definitions || response.keyDefinitions || [];
+    const normalizedTopicOutline = response.topicOutline || response.topic_outline || [];
+
     return {
       questions: response.questions,
-      title: response.title,
-      exam_type: response.examType,
-      key_definitions: response.key_definitions,
-      topic_outline: response.topicOutline,
+      title: normalizedTitle,
+      exam_type: normalizedExamType,
+      key_definitions: normalizedKeyDefinitions,
+      topic_outline: normalizedTopicOutline,
       total_questions: response.questions?.length || 0,
       metadata: {
         topic,
-        examType,
+        examType: normalizedExamType,
         totalQuestions: response.questions?.length || 0,
         generatedAt: new Date().toISOString(),
       },
@@ -883,7 +1033,8 @@ export const submitDailyQuiz = async (
   userId: string,
   quizId: string,
   answers: Record<string, number>,
-  timeTakenSeconds: number
+  timeTakenSeconds?: number,
+  language: string = 'english'
 ): Promise<any> => {
   try {
     if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
@@ -898,18 +1049,16 @@ export const submitDailyQuiz = async (
       throw new Error('Answers cannot be empty');
     }
 
-    if (!Number.isInteger(timeTakenSeconds) || timeTakenSeconds < 0) {
-      throw new Error('Time taken must be a positive integer');
-    }
-
     // Production-level request matching backend API format exactly
+    // Format: {"user_id": "8", "quiz_id": "uuid", "language": "english", "answers": {"1": 1, "2": 1}}
     const payload = {
-      user_id: userId.trim(),
+      user_id: userId.trim(),  // Keep as string - backend expects string
       quiz_id: quizId.trim(),
+      language: language || 'english',
       answers: answers,
-      time_taken_seconds: timeTakenSeconds,
     };
 
+    console.log('[API] submitDailyQuiz - Submitting payload:', payload);
     const response = await api.post('/quiz/daily-quiz/submit/', payload);
 
     if (!response.data) {
@@ -1807,7 +1956,8 @@ export const generateFlashcardsFromFile = async (
   file: any,
   numCards: number = 5,
   language: string = 'english',
-  difficulty: string = 'medium'
+  difficulty: string = 'medium',
+  fileContent?: string
 ): Promise<any> => {
   try {
     const fileExtension = (file.name || '').split('.').pop()?.toLowerCase();
@@ -1816,29 +1966,37 @@ export const generateFlashcardsFromFile = async (
     // Use Gemini service directly with file content
     const { geminiFlashcardService } = await import('./quiz/GeminiFlashcardService');
     
-    // For now, extract content from file if possible, otherwise use filename as topic
-    let topic = file.name || 'Document-based flashcards';
+    // Use actual file content if provided, otherwise use filename
+    let topic = fileContent || file.name || 'Document-based flashcards';
+    
+    if (!fileContent) {
+      console.warn('[API] ⚠️ File content not provided, using filename as topic. This may result in fewer or less relevant flashcards.');
+    } else {
+      console.log('[API] ✅ Using extracted file content for flashcard generation');
+    }
     
     const response = await geminiFlashcardService.generateFlashcards({
       topic,
       numCards: Math.min(Math.max(numCards, 1), 20),
       language: language || 'english',
-      difficulty: difficulty || 'medium'
+      difficulty: (difficulty as 'easy' | 'medium' | 'hard') || 'medium'
     });
 
     if (!response || !response.success) {
       throw new Error(response?.error || 'Failed to generate flashcards from file');
     }
 
-    console.log('[API] Returning file-based flashcard result with', response.data?.cards?.length || 0, 'cards');
+    // response.data is already the cards array from GeminiFlashcardService
+    const cards = response.data || response.cards || [];
+    console.log('[API] Returning file-based flashcard result with', cards.length, 'cards');
     
     return {
-      cards: response.data.cards,
-      data: response.data,
+      cards: cards,
+      data: cards,
       metadata: {
         source: 'file',
         fileName: file.name,
-        totalCards: response.data.total_cards,
+        totalCards: cards.length,
         generatedAt: new Date().toISOString(),
       },
       success: true,
@@ -1880,7 +2038,7 @@ export const generatePredictedQuestionsFromFile = async (
       difficulty: 'medium',
       examType: examType || 'General',
       language: 'English'
-    });
+    }) as PredictedQuestionsResponse;
 
     if (!response || !response.success) {
       throw new Error(response?.error || 'Failed to generate predicted questions from file');
@@ -1888,17 +2046,22 @@ export const generatePredictedQuestionsFromFile = async (
 
     console.log('[API] Returning file-based predicted questions result with', response.questions?.length || 0, 'questions');
     
+    const normalizedTitle = response.title || topic;
+    const normalizedExamType = response.examType || examType;
+    const normalizedKeyDefinitions = response.key_definitions || response.keyDefinitions || [];
+    const normalizedTopicOutline = response.topicOutline || response.topic_outline || [];
+
     return {
       questions: response.questions,
-      title: response.title,
-      exam_type: response.examType,
-      key_definitions: response.key_definitions,
-      topic_outline: response.topicOutline,
+      title: normalizedTitle,
+      exam_type: normalizedExamType,
+      key_definitions: normalizedKeyDefinitions,
+      topic_outline: normalizedTopicOutline,
       total_questions: response.questions?.length || 0,
       metadata: {
         source: 'file',
         fileName: file.name,
-        examType,
+        examType: normalizedExamType,
         totalQuestions: response.questions?.length || 0,
         generatedAt: new Date().toISOString(),
       },
@@ -1966,40 +2129,34 @@ export const searchQuestion = async (question: string, maxResults: number = 3): 
       max_results: Math.max(1, Math.min(maxResults, 10)), // Limit between 1 and 10
     });
 
-    if (!response.data.success) {
-      console.error('[API] Search failed:', response.data.error);
-      throw {
+    const backendResponse = response.data;
+
+    if (!backendResponse || backendResponse.success === false) {
+      console.error('[API] Search failed:', backendResponse?.error);
+      return {
         success: false,
-        error: response.data.error || 'Search failed',
-        error_code: response.data.error_code || 'SEARCH_ERROR',
-        details: response.data.details,
+        error: backendResponse?.error || 'Search failed',
+        error_code: backendResponse?.error_code || 'SEARCH_ERROR',
+        details: backendResponse?.details,
+        status: response.status,
+        raw_response: backendResponse,
       };
     }
 
-    console.log('[API] Search successful, found', response.data.num_sources, 'sources');
+    const normalized = normalizeSearchResponse(backendResponse);
+    console.log('[API] Search successful, found', normalized.num_sources, 'sources');
 
-    return {
-      success: true,
-      question: response.data.question,
-      search_query: response.data.search_query,
-      sources: response.data.sources || [],
-      num_sources: response.data.num_sources || 0,
-      processing_time: response.data.processing_time,
-      search_time: response.data.search_time,
-    };
+    return normalized;
   } catch (error: any) {
     console.error('[API] searchQuestion error:', error);
 
-    // Return proper error format
-    if (error.success === false) {
-      throw error; // Already formatted error
-    }
-
-    throw {
+    return {
       success: false,
       error: error.response?.data?.error || error.message || 'Failed to search question',
       error_code: error.response?.data?.error_code || 'SEARCH_ERROR',
       details: error.response?.data?.details,
+      status: error.response?.status,
+      raw_response: error.response?.data,
     };
   }
 };
@@ -2096,6 +2253,160 @@ export const askQuestionWithSources = async (question: string, maxResults: numbe
       details: error.response?.data?.details,
     };
   }
+};
+
+// ==================== RESPONSE NORMALIZATION UTILITIES ====================
+
+/**
+ * Normalizes search API response to handle multiple possible backend response formats
+ * Backend may return sources under different field names, this normalizes them
+ * 
+ * Handles:
+ * - sources (standard)
+ * - results (alternative naming)
+ * - data (wrapped response)
+ * - trusted_results (internal backend naming)
+ * 
+ * @param backendResponse - Raw response from backend search API
+ * @returns Normalized response with guaranteed structure
+ */
+export const normalizeSearchResponse = (backendResponse: any): any => {
+  if (!backendResponse) {
+    console.warn('[API] Search response is null/undefined, returning empty');
+    return {
+      success: false,
+      sources: [],
+      num_sources: 0,
+      raw_response: backendResponse,
+    };
+  }
+
+  // Extract sources from multiple possible field names
+  const sourcesList =
+    backendResponse.search_results ||
+    backendResponse.sources ||
+    backendResponse.results ||
+    backendResponse.data ||
+    backendResponse.trusted_results ||
+    [];
+
+  // Ensure it's an array
+  const normalizedSources = Array.isArray(sourcesList)
+    ? sourcesList.map((item: any) => (typeof item === 'string' ? { domain: item } : item))
+    : [];
+
+  console.log('[API] 📊 Normalized search response:', {
+    original_fields: Object.keys(backendResponse),
+    found_sources: normalizedSources.length,
+    field_used: 
+      backendResponse.search_results ? 'search_results' :
+      backendResponse.sources ? 'sources' :
+      backendResponse.results ? 'results' :
+      backendResponse.data ? 'data' :
+      backendResponse.trusted_results ? 'trusted_results' :
+      'none'
+  });
+
+  return {
+    success: backendResponse.success !== false,
+    question: backendResponse.question,
+    search_query: backendResponse.search_query,
+    sources: normalizedSources,
+    num_sources: backendResponse.total_results ?? normalizedSources.length,
+    processing_time: backendResponse.processing_time,
+    search_time: backendResponse.search_time ?? backendResponse.processing_time,
+    raw_response: backendResponse, // Keep original for debugging
+  };
+};
+
+// ==================== QUIZ ID GENERATION UTILITIES ====================
+
+/**
+ * Generates a unique quiz ID for daily quiz if backend doesn't provide one
+ * Uses timestamp + random hash to ensure uniqueness
+ * 
+ * @returns Generated quiz_id string
+ */
+/**
+ * Extracts quiz_id from backend response (may be at different path depending on backend response format)
+ * Does NOT generate a local quiz_id - backend manages quiz sessions
+ * CRITICAL: Backend rejects submissions with locally-generated quiz_ids because it doesn't recognize the session
+ * 
+ * @param backendQuizData - Quiz data from backend
+ * @returns The quiz_id from backend response or undefined
+ */
+const extractQuizIdFromResponse = (backendQuizData: any): string | undefined => {
+  if (!backendQuizData) return undefined;
+
+  // Try common field names where quiz_id might be
+  const quizId = backendQuizData.quiz_id || 
+                 backendQuizData.id || 
+                 backendQuizData.session_id ||
+                 backendQuizData.quiz_session_id;
+  
+  if (quizId && typeof quizId === 'string' && quizId.trim().length > 0) {
+    console.log('[API] ✅ Extracted quiz_id from backend:', quizId);
+    return quizId;
+  }
+  
+  console.warn('[API] ⚠️ No valid quiz_id found in response');
+  return undefined;
+};
+
+/**
+ * Ensures quiz data includes quiz_id from backend
+ * CRITICAL: Does NOT generate local quiz_id - backend manages quiz sessions
+ * Locally-generated quiz_ids will be rejected with "Quiz session expired" error
+ * 
+ * @param backendQuizData - Quiz data from backend
+ * @returns Quiz data with quiz_id if backend provided it
+ */
+export const ensureQuizId = (backendQuizData: any): any => {
+  if (!backendQuizData) {
+    console.warn('[API] ⚠️ Quiz data is null from backend');
+    return backendQuizData;
+  }
+
+  const quizId = extractQuizIdFromResponse(backendQuizData);
+  
+  if (quizId) {
+    console.log('[API] ✅ Quiz session ID available:', quizId);
+    // Ensure quiz_id is in the standard field name
+    if (!backendQuizData.quiz_id && quizId) {
+      return {
+        ...backendQuizData,
+        quiz_id: quizId
+      };
+    }
+    return backendQuizData;
+  }
+  
+  console.warn('[API] ⚠️ No quiz_id found in backend response');
+  console.warn('[API] Backend response keys:', Object.keys(backendQuizData || {}));
+  console.warn('[API] 🔴 CRITICAL: Submission will fail without a valid backend-issued quiz_id');
+  return backendQuizData;
+};
+
+/**
+ * Validates that quiz data has required fields for submission
+ * 
+ * @param quizData - Quiz data to validate
+ * @returns { valid: boolean, error?: string }
+ */
+export const validateQuizData = (quizData: any): { valid: boolean; error?: string } => {
+  if (!quizData) {
+    return { valid: false, error: 'Quiz data is required' };
+  }
+
+  if (!quizData.quiz_id || quizData.quiz_id.toString().trim().length === 0) {
+    return { valid: false, error: 'Quiz ID is required' };
+  }
+
+  if (!Array.isArray(quizData.questions) || quizData.questions.length === 0) {
+    return { valid: false, error: 'Questions array is required' };
+  }
+
+  return { valid: true };
 };
 
 export { api };

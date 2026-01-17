@@ -199,7 +199,12 @@ export const Pricing: React.FC<PricingProps> = ({ userId, userEmail, userName, o
     }).start();
   };
 
+  /**
+   * PRODUCTION-LEVEL SUBSCRIPTION HANDLER
+   * Handles the complete payment flow with proper error handling and feature unlocking
+   */
   const handleSubscribe = async (planId: string) => {
+    // Validation
     if (planId === 'free') {
       Alert.alert('Free Plan', 'You\'re already on the free plan! Upgrade to unlock more features.');
       return;
@@ -217,7 +222,7 @@ export const Pricing: React.FC<PricingProps> = ({ userId, userEmail, userName, o
       ? '₹1 for first month, then ₹99/month'
       : '₹1 for first month, then ₹499/month';
 
-    // Map plan IDs to backend plan names
+    // Map plan IDs to backend plan names matching backend test results
     const planName = planId === 'scholar' ? 'premium' : 'premium_annual';
 
     Alert.alert(
@@ -229,120 +234,237 @@ export const Pricing: React.FC<PricingProps> = ({ userId, userEmail, userName, o
           onPress: async () => {
             try {
               setProcessing(true);
-              console.log('[Pricing] 🚀 Starting subscription flow...', { userId, planName });
+              console.log('[Pricing] 🚀 Production-level subscription flow initiated', { 
+                userId, 
+                planId, 
+                planName, 
+                platform: Platform.OS,
+                timestamp: new Date().toISOString()
+              });
 
-              // Step 1: Create payment order
+              // ==================== STEP 1: CREATE PAYMENT ORDER ====================
+              console.log('[Pricing] 📦 Step 1: Creating payment order...');
               const orderResponse = await createPaymentOrder(userId, planName);
 
               if (!orderResponse.success) {
-                // Handle duplicate subscription
-                if (orderResponse.error === 'Already Subscribed') {
+                setProcessing(false);
+                
+                // Handle duplicate subscription (409 Conflict from backend)
+                if (orderResponse.error === 'Already Subscribed' || orderResponse.error?.includes('subscribed')) {
+                  console.log('[Pricing] ℹ️ Duplicate subscription detected, showing current plan info');
                   Alert.alert(
                     'Already Subscribed',
-                    orderResponse.message || 'You already have an active subscription. Would you like to upgrade?',
+                    orderResponse.message || 'You already have an active subscription.',
                     [
                       {
-                        text: 'View Subscription',
+                        text: 'View Subscription Details',
                         onPress: async () => {
-                          const status = await checkSubscriptionStatus(userId);
-                          Alert.alert(
-                            'Current Subscription',
-                            `Plan: ${status.plan}\nStatus: ${status.subscription_status}\n${status.is_trial ? `Trial ends: ${status.trial_end_date}` : `Next billing: ${status.next_billing_date}`}`
-                          );
+                          try {
+                            const status = await checkSubscriptionStatus(userId);
+                            const currentPlan = status.plan?.charAt(0).toUpperCase() + status.plan?.slice(1) || 'Unknown';
+                            const statusText = status.subscription_status.toUpperCase();
+                            const dateToShow = status.is_trial 
+                              ? `Trial ends: ${new Date(status.trial_end_date || '').toLocaleDateString()}`
+                              : `Next billing: ${new Date(status.next_billing_date || '').toLocaleDateString()}`;
+                            
+                            Alert.alert(
+                              'Current Subscription',
+                              `Plan: ${currentPlan}\nStatus: ${statusText}\n${dateToShow}\nAuto-renewal: ${status.auto_renewal ? 'Enabled' : 'Disabled'}`
+                            );
+                          } catch (err) {
+                            Alert.alert('Current Subscription', JSON.stringify(orderResponse, null, 2));
+                          }
                         },
                       },
-                      { text: 'OK' },
+                      {
+                        text: 'Upgrade Plan',
+                        onPress: () => {
+                          // Allow upgrade by creating new order with different plan
+                          console.log('[Pricing] 📈 User proceeding to upgrade plan');
+                          handleSubscribe('genius'); // Upgrade to higher plan
+                        },
+                      },
+                      { text: 'Cancel', style: 'cancel' },
                     ]
                   );
-                } else {
-                  Alert.alert('Error', orderResponse.error || 'Failed to create order');
+                  return;
                 }
-                setProcessing(false);
+
+                // Handle other errors
+                console.error('[Pricing] ❌ Order creation failed:', orderResponse);
+                Alert.alert(
+                  'Order Creation Failed',
+                  orderResponse.error || 'Failed to create payment order. Please try again.'
+                );
                 return;
               }
 
-              // Step 2: Open Razorpay checkout (web only)
+              console.log('[Pricing] ✅ Step 1 Complete - Order created:', {
+                orderId: orderResponse.order_id,
+                amount: `₹${orderResponse.amount}`,
+                plan: orderResponse.plan
+              });
+
+              // ==================== STEP 2: HANDLE PLATFORM-SPECIFIC PAYMENT ====================
               if (Platform.OS === 'web') {
-                console.log('[Pricing] 💳 Opening Razorpay checkout...');
+                console.log('[Pricing] 💻 Web Platform: Opening Razorpay checkout modal');
                 
-                await openRazorpayCheckout(
-                  orderResponse,
-                  userId,
-                  userEmail || 'user@example.com',
-                  userName || 'User',
-                  async (paymentResponse) => {
-                    console.log('[Pricing] ✅ Payment successful, polling status...');
-                    
-                    // Step 3: Poll subscription status
-                    const isPremium = await pollSubscriptionStatus(userId);
-                    
-                    setProcessing(false);
-                    
-                    if (isPremium) {
+                try {
+                  await openRazorpayCheckout(
+                    orderResponse,
+                    userId,
+                    userEmail || 'user@example.com',
+                    userName || 'User',
+                    async (paymentResponse) => {
+                      console.log('[Pricing] 💳 Step 2 Complete - Payment received from Razorpay:', {
+                        paymentId: paymentResponse.razorpay_payment_id,
+                        orderId: paymentResponse.razorpay_order_id,
+                        hasSignature: !!paymentResponse.razorpay_signature
+                      });
+
+                      try {
+                        // ==================== STEP 3: POLL FOR SUBSCRIPTION ACTIVATION ====================
+                        console.log('[Pricing] 🔄 Step 3: Polling subscription status after payment...');
+                        const isPremium = await pollSubscriptionStatus(userId, 15, 1000);
+                        
+                        setProcessing(false);
+
+                        if (isPremium) {
+                          console.log('[Pricing] 🎉 SUCCESS - Premium status confirmed!');
+                          Alert.alert(
+                            'Success! 🎉',
+                            'Your subscription has been activated!\n\n✅ All premium features are now unlocked\n✅ Your trial period starts today\n✅ You can start learning immediately',
+                            [
+                              {
+                                text: 'Start Using Features',
+                                onPress: () => {
+                                  console.log('[Pricing] User proceeding to use premium features');
+                                  onSubscriptionComplete?.();
+                                },
+                              },
+                            ]
+                          );
+                        } else {
+                          console.log('[Pricing] ⏱️ Polling timeout - showing refresh prompt');
+                          Alert.alert(
+                            'Payment Successful ✅',
+                            'Your payment has been processed! Your subscription will be activated in a few seconds.\n\nPlease refresh the page to see your premium features.',
+                            [
+                              {
+                                text: 'Refresh Now',
+                                onPress: () => {
+                                  console.log('[Pricing] User requested page refresh');
+                                  if (Platform.OS === 'web') {
+                                    (window as any).location.reload();
+                                  }
+                                },
+                              },
+                              {
+                                text: 'Refresh Later',
+                                onPress: () => {
+                                  console.log('[Pricing] User will refresh later');
+                                  onSubscriptionComplete?.();
+                                },
+                              },
+                            ]
+                          );
+                        }
+                      } catch (pollError: any) {
+                        setProcessing(false);
+                        console.error('[Pricing] ❌ Polling error:', pollError);
+                        Alert.alert(
+                          'Processing Subscription',
+                          'Payment was successful! Please wait a moment and refresh the page to activate your subscription.'
+                        );
+                      }
+                    },
+                    (error) => {
+                      console.log('[Pricing] ❌ Payment cancelled by user:', error.message);
+                      setProcessing(false);
                       Alert.alert(
-                        'Success! 🎉',
-                        'Your subscription has been activated! All premium features are now unlocked.',
-                        [
-                          {
-                            text: 'Start Using',
-                            onPress: () => {
-                              onSubscriptionComplete?.();
-                            },
-                          },
-                        ]
-                      );
-                    } else {
-                      Alert.alert(
-                        'Processing',
-                        'Your payment was successful! Your subscription will be activated shortly. Please refresh the page.',
-                        [
-                          {
-                            text: 'Refresh Now',
-                            onPress: () => {
-                              if (Platform.OS === 'web') {
-                                window.location.reload();
-                              }
-                            },
-                          },
-                          { text: 'OK' },
-                        ]
+                        'Payment Cancelled',
+                        'No charges have been made. You can try again anytime.'
                       );
                     }
-                  },
-                  (error) => {
-                    console.log('[Pricing] ❌ Payment failed or cancelled:', error.message);
-                    setProcessing(false);
-                    Alert.alert('Payment Cancelled', 'No charges were made.');
-                  }
-                );
-              } else {
-                // Mobile: Open external payment link
-                if (orderResponse.order_id) {
-                  // Generate Razorpay payment link for mobile
-                  const paymentUrl = `https://rzp.io/${orderResponse.order_id}`;
-                  const supported = await Linking.canOpenURL(paymentUrl);
-                  
-                  if (supported) {
-                    await Linking.openURL(paymentUrl);
-                    Alert.alert(
-                      'Payment Initiated',
-                      'Complete the payment to activate your subscription. The app will automatically refresh after payment.'
-                    );
-                  }
+                  );
+                } catch (razorpayError: any) {
+                  setProcessing(false);
+                  console.error('[Pricing] ❌ Razorpay error:', razorpayError);
+                  Alert.alert(
+                    'Payment Gateway Error',
+                    razorpayError.message || 'Failed to open payment gateway. Please try again.'
+                  );
                 }
-                setProcessing(false);
+              } else {
+                // ==================== MOBILE PLATFORM ====================
+                console.log('[Pricing] 📱 Mobile Platform: Opening external Razorpay link');
+                
+                try {
+                  if (orderResponse.order_id) {
+                    // Generate Razorpay short URL for mobile
+                    const paymentUrl = `https://rzp.io/${orderResponse.order_id}`;
+                    const supported = await Linking.canOpenURL(paymentUrl);
+                    
+                    if (supported) {
+                      await Linking.openURL(paymentUrl);
+                      setProcessing(false);
+                      
+                      console.log('[Pricing] ✅ Razorpay link opened on mobile');
+                      Alert.alert(
+                        'Payment Initiated',
+                        'Please complete the payment in the opened window.\n\nThe app will automatically refresh after successful payment to unlock your premium features.'
+                      );
+
+                      // Auto-check subscription status after a delay for mobile
+                      setTimeout(async () => {
+                        console.log('[Pricing] 📱 Auto-checking subscription after payment on mobile');
+                        try {
+                          const status = await checkSubscriptionStatus(userId);
+                          if (status.subscription_active) {
+                            console.log('[Pricing] ✅ Mobile: Subscription activated, calling callback');
+                            onSubscriptionComplete?.();
+                          }
+                        } catch (checkError) {
+                          console.warn('[Pricing] Mobile auto-check failed (non-critical):', checkError);
+                        }
+                      }, 3000);
+                    } else {
+                      setProcessing(false);
+                      Alert.alert(
+                        'Cannot Open Payment Link',
+                        'Please ensure you have a browser installed to complete the payment.'
+                      );
+                    }
+                  } else {
+                    setProcessing(false);
+                    Alert.alert('Error', 'Order ID not received from backend');
+                  }
+                } catch (mobileError: any) {
+                  setProcessing(false);
+                  console.error('[Pricing] ❌ Mobile payment error:', mobileError);
+                  Alert.alert('Payment Error', mobileError.message || 'Failed to process payment');
+                }
               }
             } catch (error: any) {
-              console.error('[Pricing] ❌ Subscription error:', error);
               setProcessing(false);
+              console.error('[Pricing] ❌ CRITICAL ERROR in subscription flow:', {
+                message: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+              });
+
               Alert.alert(
-                'Error',
-                error.message || 'Failed to process subscription. Please try again.'
+                'Subscription Error',
+                error.message || 'An unexpected error occurred. Please try again.',
+                [
+                  { text: 'Try Again', onPress: () => handleSubscribe(planId) },
+                  { text: 'Cancel', style: 'cancel' },
+                ]
               );
             }
           },
         },
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel', onPress: () => console.log('[Pricing] User cancelled subscription') },
       ]
     );
   };

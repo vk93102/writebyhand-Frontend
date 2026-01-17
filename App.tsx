@@ -321,7 +321,8 @@ export default function App() {
     try {
       console.log('[App] 🔍 User submitted text question:', question.trim().substring(0, 50), '...');
       
-      const response = await solveQuestionByText(question);
+      // Use search API for production (with Gemini fallback)
+      const response = await solveQuestionByText(question, true);
 
       if (!response || !response.success) {
         throw new Error(response?.message || 'No response from server');
@@ -367,7 +368,8 @@ export default function App() {
     try {
       console.log('[App] 🖼️ User submitted image:', imageUri.substring(0, 50), '...');
 
-      const response = await solveQuestionByImage(imageUri);
+      // Use OCR + search API for production (with Gemini Vision fallback)
+      const response = await solveQuestionByImage(imageUri, true);
 
       if (!response || !response.success) {
         throw new Error(response?.message || 'No response from server');
@@ -525,9 +527,11 @@ export default function App() {
     try {
       const fileName = file.file?.name || file.name || 'document';
       const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      const mimeType = file.mimeType || file.type || '';
       
       // Check if it's a binary file (image)
-      const isBinaryFile = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(fileExtension || '');
+      const isBinaryFile = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(fileExtension || '') || 
+                           mimeType.toLowerCase().startsWith('image/');
       
       if (file.file && typeof file.file === 'object' && file.file.constructor.name === 'File') {
         // For binary files on web, return a descriptive text instead of raw binary
@@ -552,7 +556,7 @@ export default function App() {
         try {
           // For images, we'll create a descriptive text
           if (isBinaryFile) {
-            return `[Image File Content]\nFilename: ${fileName}\nFile Type: ${file.mimeType || 'image'}\n\nThis appears to be an image file. Please provide study material as text documents (PDF, TXT, MD) for better results.`;
+            return `[Image File Content]\nFilename: ${fileName}\nFile Type: ${file.mimeType || file.type || 'image'}\n\nThis appears to be an image file. Please provide study material as text documents (PDF, TXT, MD) for better results.`;
           }
 
           // For PDF files
@@ -623,6 +627,20 @@ export default function App() {
       
       if (!fileContent || fileContent.trim().length === 0) {
         Alert.alert('Error', 'File content is empty or could not be read');
+        setQuizLoading(false);
+        return;
+      }
+
+      // Check if file is an image (which we cannot process)
+      if (fileContent.includes('[Image File Content]')) {
+        Alert.alert('Unsupported File Type', 'Please upload a text-based file (PDF, TXT, MD) instead of an image. Images cannot be used to generate quiz questions.');
+        setQuizLoading(false);
+        return;
+      }
+
+      // Check if file is an image (which we cannot process)
+      if (fileContent.includes('[Image File Content]')) {
+        Alert.alert('Unsupported File Type', 'Please upload a text-based file (PDF, TXT, MD) instead of an image. Images cannot be used to generate quiz questions.');
         setQuizLoading(false);
         return;
       }
@@ -818,7 +836,15 @@ export default function App() {
         console.warn('[Flashcards] Failed to record usage (non-critical):', recordError);
       }
 
-      console.log('[Flashcards] Setting flashcard data with', response?.cards?.length || 0, 'cards');
+      // Handle response with cards in different possible fields
+      const cardCount = response?.cards?.length || response?.data?.length || 0;
+      console.log('[Flashcards] Setting flashcard data with', cardCount, 'cards');
+      
+      // Normalize response structure if needed
+      if (response && !response.cards && response.data && Array.isArray(response.data)) {
+        response.cards = response.data;
+      }
+      
       setFlashcardData(response);
       setFlashcardLoading(false);
       
@@ -952,17 +978,20 @@ export default function App() {
       
       console.log('[Flashcards] Starting file-based generation with', files.length, 'file(s)');
       
-      // Check feature usage
-      // COMMENTED OUT: Let backend handle feature usage validation
-      // const usageCheck = await checkFeatureUsage('flashcards');
-      // if (!usageCheck.allowed) {
-      //   Alert.alert('Feature Limit Reached', usageCheck.error || 'You have reached the limit for generating flashcards');
-      //   setFlashcardLoading(false);
-      //   return;
-      // }
+      // ✅ EXTRACT FILE CONTENT BEFORE PASSING TO API
+      const fileContent = await extractFileContent(files[0]);
+      
+      if (!fileContent || fileContent.trim().length === 0) {
+        Alert.alert('Error', 'File content is empty or could not be read');
+        setFlashcardLoading(false);
+        return;
+      }
+
+      console.log('[Flashcards] Extracted', fileContent.length, 'characters from file');
 
       // Process file through document endpoint
-      const response = await generateFlashcardsFromFile(files[0], numCards, 'english', 'medium');
+      // ✅ PASS FILE CONTENT AS PARAMETER
+      const response = await generateFlashcardsFromFile(files[0], numCards, 'english', 'medium', fileContent);
       
       console.log('[Flashcards] File processing successful, cards generated:', response?.data?.length || 0);
 
@@ -1311,28 +1340,39 @@ export default function App() {
     }
   };
 
-  const handleStartQuiz = (config: any) => {
+  const handleStartQuiz = async (config: any) => {
     try {
-      setMockTestLoading(true);
-      setMockTestData(null);
-
-      // Generate mock test from local JSON files with random question selection
-      const mockTest = generateMockTest({
-        subject: config.subject,
-        topics: config.topics || [],
-        difficulty: config.difficulty || 'medium',
-        examLevel: config.examLevel || 'jee-mains',
-        timeLimit: config.timeLimit || 0,
-        numQuestions: config.numQuestions || 20,
-      });
-
-      setMockTestData(mockTest);
-      setMockTestLoading(false);
+      setQuizLoading(true);
+      
+      // Build topic string from selected topics
+      const topicString = config.topics && config.topics.length > 0 
+        ? config.topics.join(', ')
+        : config.subject;
+      
+      console.log('[App] Generating quiz with Gemini API for topics:', topicString);
+      
+      // Call Gemini API to generate questions
+      const response = await generateQuiz(
+        { topic: topicString },
+        user?.id || 'anonymous',
+        config.numQuestions || 20,
+        config.difficulty || 'medium'
+      );
+      
+      // Set the quiz data from Gemini response
+      setQuizData(response.data || response);
+      setCurrentPage('quiz');
+      
+      setQuizLoading(false);
       
       // Increment Play & Win count for free users
       setDailyQuizCount(prev => prev + 1);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to generate mock test');
+      console.error('[App] Error generating quiz from Gemini:', error);
+      Alert.alert(
+        'Error', 
+        error.message || 'Failed to generate quiz. Please check your internet connection and try again.'
+      );
       setQuizLoading(false);
     }
   };
@@ -1413,7 +1453,7 @@ export default function App() {
 
           {/* Header content */}
           <View style={styles.headerLeft}>
-            <MaterialIcons name="school" size={28} color={colors.primary} />
+            {/* <MaterialIcons name="school" size={28} color={colors.primary} /> */}
             <View style={styles.headerTextContainer}>
               <Text style={styles.pageTitle}>Brain Pay</Text>
               <Text style={styles.pageSubtitle}>AI-powered solving</Text>
@@ -1975,8 +2015,14 @@ export default function App() {
             userId={user?.id || 'guest'}
             onBack={() => setCurrentPage('ask')}
             onPremiumUnlocked={() => {
-              console.log('[App] Premium status unlocked via payment - refreshing...');
-              checkPremiumStatus();
+              console.log('[App] 🎉 Premium status unlocked via payment - triggering immediate refresh...');
+              // Immediately refresh premium status after successful payment
+              checkPremiumStatus().catch(err => console.warn('[App] Premium refresh after payment failed:', err));
+              // Also refresh coins and subscription data
+              if (user?.id) {
+                loadUserCoins().catch(err => console.warn('[App] Coin refresh failed:', err));
+                loadSubscriptionStatus().catch(err => console.warn('[App] Subscription refresh failed:', err));
+              }
             }}
             usage={subscriptionData?.usage}
             limits={subscriptionData?.limits}

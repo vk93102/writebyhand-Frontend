@@ -494,6 +494,138 @@ Be clear, concise, and educational in your explanations.`;
       .replace(/^[\s*•-]+/, '') // Remove leading bullets
       .trim();
   }
+
+  /**
+   * Extract text from image using Gemini Vision - PRODUCTION READY
+   * Used for OCR before search API calls
+   * 
+   * @param imageBase64 - Base64 encoded image data
+   * @param mimeType - MIME type of the image (default: image/jpeg)
+   * @returns Extracted text from the image
+   */
+  async extractTextFromImage(imageBase64: string, mimeType: string = 'image/jpeg'): Promise<{ success: boolean; text: string; error?: string }> {
+    const startTime = Date.now();
+
+    try {
+      if (!this.apiKey) {
+        const error = 'Gemini API key is not configured';
+        this.logError(error, 'extractTextFromImage-setup');
+        throw new Error(error);
+      }
+
+      if (!imageBase64 || imageBase64.trim().length === 0) {
+        const error = 'Image data cannot be empty';
+        this.logError(error, 'extractTextFromImage-validation');
+        throw new Error(error);
+      }
+
+      // Validate image size (max 20MB in base64)
+      if (imageBase64.length > 20 * 1024 * 1024) {
+        const error = 'Image is too large (maximum 20MB)';
+        this.logError(error, 'extractTextFromImage-size');
+        throw new Error(error);
+      }
+
+      // Validate MIME type
+      const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validMimeTypes.includes(mimeType)) {
+        const error = `Invalid MIME type: ${mimeType}. Must be one of: ${validMimeTypes.join(', ')}`;
+        this.logError(error, 'extractTextFromImage-mime');
+        throw new Error(error);
+      }
+
+      this.requestCount++;
+
+      // Prompt for text extraction (OCR)
+      const prompt = `Extract all text visible in this image. Return ONLY the text content, nothing else. If there are multiple text elements, combine them logically. If there is no text, return "NO_TEXT_FOUND".`;
+
+      console.log('[GeminiSolutionService] 📸 Extracting text from image using Gemini Vision...');
+
+      const response = await this.retryWithBackoff(async () => {
+        return await axios.post(
+          `${GEMINI_API_URL}?key=${this.apiKey}`,
+          {
+            contents: [{
+              parts: [
+                {
+                  text: prompt
+                },
+                {
+                  inlineData: {
+                    mimeType,
+                    data: imageBase64
+                  }
+                }
+              ]
+            }],
+            generationConfig: {
+              temperature: 0.2, // Lower temperature for more accurate text extraction
+              topK: 20,
+              topP: 0.8,
+              maxOutputTokens: 2048,
+            }
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            timeout: REQUEST_TIMEOUT_MS,
+          }
+        );
+      });
+
+      const extractedText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!extractedText) {
+        const error = 'No text extracted from image';
+        this.logError(error, 'extractTextFromImage-empty-response');
+        return {
+          success: false,
+          text: '',
+          error
+        };
+      }
+
+      // Clean up the extracted text
+      const cleanedText = extractedText.trim();
+
+      // Check if no text was found
+      if (cleanedText === 'NO_TEXT_FOUND' || cleanedText.length === 0) {
+        console.log('[GeminiSolutionService] ⚠️ No text found in image');
+        return {
+          success: false,
+          text: '',
+          error: 'No text found in image'
+        };
+      }
+
+      const processingTime = Date.now() - startTime;
+      console.log(`[GeminiSolutionService] ✅ Text extracted successfully in ${processingTime}ms`);
+      console.log('[GeminiSolutionService] Extracted text:', cleanedText.substring(0, 100), '...');
+
+      return {
+        success: true,
+        text: cleanedText
+      };
+
+    } catch (error: any) {
+      const processingTime = Date.now() - startTime;
+      const errorMessage = error.response?.data?.error?.message || error.message || 'Failed to extract text from image';
+
+      console.error(
+        `[GeminiSolutionService] ❌ Text extraction failed after ${processingTime}ms:`,
+        errorMessage
+      );
+
+      this.logError(errorMessage, 'extractTextFromImage-error');
+
+      return {
+        success: false,
+        text: '',
+        error: errorMessage
+      };
+    }
+  }
 }
 
 // Export singleton instance

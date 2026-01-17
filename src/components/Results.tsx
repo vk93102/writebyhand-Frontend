@@ -18,13 +18,21 @@ export const Results: React.FC<ResultsProps> = ({ data }) => {
     }
   };
 
-  const extractedText = data?.extracted_text?.original || data?.query?.original || '';
+  // Handle new API response format (solution, explanation, sources)
+  const solution = data?.solution || '';
+  const explanation = data?.explanation || '';
+  const sources = data?.sources || [];
+  const extractedText = data?.extracted_text || data?.search_query || '';
   const cleanedText = data?.extracted_text?.cleaned || data?.query?.cleaned || '';
+  const source = data?.source || 'unknown';
+  const processingTime = data?.processingTime || data?.metadata?.processingTime || 0;
+  
+  // Legacy format support
   const searchResults = data?.search_results?.results || [];
   const webContent = data?.web_content || [];
   const youtubeVideos = data?.youtube_videos || [];
   const confidence = data?.confidence?.overall ?? data?.ocr_confidence ?? 0;
-  const pipeline = data?.pipeline || 'unknown';
+  const pipeline = data?.pipeline || source;
 
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={['top', 'left', 'right']}>
@@ -34,15 +42,31 @@ export const Results: React.FC<ResultsProps> = ({ data }) => {
         <Text style={styles.headerTitle}>Results Found!</Text>
       </View>
 
-      {pipeline && (
+      {(pipeline || source) && (
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
-            Pipeline: <Text style={styles.infoBold}>{pipeline.toUpperCase()}</Text>
+            Source: <Text style={styles.infoBold}>{(pipeline || source).toUpperCase().replace('_', ' ')}</Text>
           </Text>
-          {typeof data?.metadata?.processing_time === 'number' && (
+          {processingTime > 0 && (
             <Text style={styles.infoText}>
-              Processing: <Text style={styles.infoBold}>{data.metadata.processing_time.toFixed(2)}s</Text>
+              Processing: <Text style={styles.infoBold}>{(processingTime / 1000).toFixed(2)}s</Text>
             </Text>
+          )}
+        </View>
+      )}
+
+      {solution && (
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="lightbulb" size={20} color={colors.primary} />
+            <Text style={styles.sectionTitle}>Solution</Text>
+          </View>
+          <Text style={styles.solutionText}>{solution}</Text>
+          {explanation && (
+            <>
+              <Text style={styles.explanationLabel}>Explanation:</Text>
+              <Text style={styles.explanationText}>{explanation}</Text>
+            </>
           )}
         </View>
       )}
@@ -62,6 +86,34 @@ export const Results: React.FC<ResultsProps> = ({ data }) => {
           )}
         </View>
       ) : null}
+
+      {sources.length > 0 && (
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="link" size={20} color={colors.primary} />
+            <Text style={styles.sectionTitle}>Sources ({sources.length})</Text>
+          </View>
+
+          {sources.map((src: any, idx: number) => (
+            <TouchableOpacity key={idx} style={styles.resultCard} onPress={() => src.url && handleLinkPress(src.url)}>
+              <Text style={styles.resultTitle} numberOfLines={2}>{src.title || `Source ${idx + 1}`}</Text>
+              <Text style={styles.resultSnippet} numberOfLines={3}>{src.snippet || src.description || 'No description available'}</Text>
+              {src.url && (
+                <View style={styles.linkContainer}>
+                  <MaterialIcons name="open-in-new" size={14} color={colors.primary} />
+                  <Text style={styles.linkText} numberOfLines={1}>{src.url}</Text>
+                </View>
+              )}
+              {src.is_trusted && (
+                <View style={styles.trustBadge}>
+                  <MaterialIcons name="verified" size={12} color={colors.success} />
+                  <Text style={styles.trustText}>Trusted Source</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       {searchResults.length > 0 && (
         <View style={styles.section}>
@@ -149,6 +201,9 @@ const styles = StyleSheet.create({
   sectionTitle: { ...typography.h4, color: colors.primary },
   extractedText: { ...typography.body, lineHeight: 22, backgroundColor: colors.backgroundGray, padding: spacing.md, borderRadius: borderRadius.sm, marginBottom: spacing.sm },
   cleanedLabel: { ...typography.small, color: colors.textMuted, marginTop: spacing.md, marginBottom: spacing.xs },
+  solutionText: { ...typography.body, lineHeight: 24, marginBottom: spacing.md, color: colors.text },
+  explanationLabel: { ...typography.small, color: colors.textMuted, fontWeight: '600', marginTop: spacing.md, marginBottom: spacing.xs },
+  explanationText: { ...typography.body, lineHeight: 22, backgroundColor: colors.backgroundGray, padding: spacing.md, borderRadius: borderRadius.sm },
 
   confidenceSection: { alignItems: 'center', marginBottom: spacing.lg },
   confidenceLabel: { ...typography.body, color: colors.textMuted, marginBottom: spacing.xs },

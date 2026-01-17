@@ -46,31 +46,51 @@ class AdsManager {
 
       // If user is premium, skip ads initialization
       if (isPremium) {
-        console.log('[AdsManager] Premium user detected, ads disabled');
+        console.log('[AdsManager] 👑 Premium user detected, ads disabled');
         this.isInitialized = true;
+        this.isAdReady = false; // Ensure no ads show for premium users
         return;
       }
 
       // Get platform-specific Game ID
       const gameId = Platform.OS === 'ios' ? this.IOS_GAME_ID : this.ANDROID_GAME_ID;
       
-      console.log(`[AdsManager] Initializing on ${Platform.OS} with Game ID: ${gameId}`);
+      console.log(`[AdsManager] 🚀 Initializing Unity Ads on ${Platform.OS} with Game ID: ${gameId}`);
 
       // Initialize UnityAds SDK
-      if (NativeModules.UnityAdsBridge) {
-        await NativeModules.UnityAdsBridge.initialize(gameId);
+      if (Platform.OS === 'web') {
+        console.log('[AdsManager] 🌐 Web platform detected - using simulated ads');
+        this.isInitialized = true;
+        this.isAdReady = true; // Simulate ads ready for web testing
+      } else if (NativeModules.UnityAdsBridge) {
+        // Wait for initialization with timeout
+        const initTimeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Unity Ads initialization timeout')), 10000)
+        );
+        
+        await Promise.race([
+          NativeModules.UnityAdsBridge.initialize(gameId, false), // testMode = false for production
+          initTimeout
+        ]);
+        
         console.log('[AdsManager] ✅ Unity Ads initialized successfully');
         this.isInitialized = true;
 
-        // Preload first ad after initialization
-        this.preloadAd();
+        // Wait a moment before preloading first ad
+        setTimeout(() => {
+          this.preloadAd();
+        }, 1000);
       } else {
-        console.warn('[AdsManager] ⚠️ UnityAdsBridge not available (web/preview mode)');
+        console.warn('[AdsManager] ⚠️ UnityAdsBridge module not available (native module missing)');
         this.isInitialized = true;
+        // Fall back to simulated mode for development
+        this.isAdReady = true;
       }
     } catch (error) {
       console.error('[AdsManager] ❌ Initialization failed:', error);
       this.isInitialized = true; // Mark as initialized to prevent retry loops
+      // Still allow app to work without ads
+      this.isAdReady = false;
     }
   }
 
@@ -104,49 +124,73 @@ class AdsManager {
   }
 
   /**
-   * Show interstitial ad
+   * Show interstitial ad - PRODUCTION READY
    * Only shows if ad is ready and user is not premium
    */
   async showAd(): Promise<void> {
     try {
+      // Check premium status first
       if (this.isPremium) {
-        console.log('[AdsManager] Premium user - skipping ad');
+        console.log('[AdsManager] 👑 Premium user - skipping ad');
         return;
       }
 
+      // Check initialization
       if (!this.isInitialized) {
-        console.warn('[AdsManager] Ads not initialized yet');
+        console.warn('[AdsManager] ⚠️ Ads not initialized yet, attempting to initialize...');
+        await this.initialize(false);
+        // Don't show ad immediately after init, wait for next feature use
         return;
       }
 
+      // Check if ad is ready
       if (!this.isAdReady) {
-        console.warn('[AdsManager] Ad not ready yet');
+        console.warn('[AdsManager] ⚠️ Ad not ready yet, preloading...');
+        this.preloadAd();
         return;
       }
 
-      if (!NativeModules.UnityAdsBridge) {
-        console.log('[AdsManager] Skipping ad display (web mode)');
-        // Simulate ad in web/preview mode
+      // Handle web/simulation mode
+      if (Platform.OS === 'web' || !NativeModules.UnityAdsBridge) {
+        console.log('[AdsManager] 🌐 Web mode - showing simulated ad');
         this._simulateAdDisplay();
         return;
       }
 
+      // Show actual Unity Ad
       const adUnitId = Platform.OS === 'ios' ? 'Interstitial_iOS' : 'Interstitial_Android';
       
-      console.log(`[AdsManager] Showing ad: ${adUnitId}`);
+      console.log(`[AdsManager] 📺 Displaying Unity Ad: ${adUnitId}`);
       
-      // Show the ad
-      await NativeModules.UnityAdsBridge.showAd(adUnitId);
+      // Set timeout for ad display
+      const adTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Ad display timeout')), 30000)
+      );
+      
+      await Promise.race([
+        NativeModules.UnityAdsBridge.showAd(adUnitId),
+        adTimeout
+      ]);
       
       console.log('[AdsManager] ✅ Ad displayed successfully');
       
-      // Ad completed, preload next one
+      // Ad completed, mark as not ready and preload next one
       this.isAdReady = false;
-      this.preloadAd();
-    } catch (error) {
-      console.error('[AdsManager] ❌ Failed to show ad:', error);
+      setTimeout(() => {
+        this.preloadAd();
+      }, 2000); // Wait 2 seconds before preloading next ad
+      
+    } catch (error: any) {
+      console.error('[AdsManager] ❌ Failed to show ad:', error.message || error);
+      
+      // Mark ad as not ready on error
       this.isAdReady = false;
-      this.preloadAd(); // Attempt to preload next ad
+      
+      // Attempt to preload next ad after delay
+      setTimeout(() => {
+        console.log('[AdsManager] 🔄 Retrying ad preload after error...');
+        this.preloadAd();
+      }, 5000);
     }
   }
 
