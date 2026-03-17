@@ -1,34 +1,43 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-TOKEN=$(python3 - <<'PY'
-import jwt
-from datetime import datetime, timedelta
-print(jwt.encode({"user_id":8,"username":"user8","email":"user8@example.com","exp":datetime.utcnow()+timedelta(hours=24),"iat":datetime.utcnow()},"4f5e2bac434c38bcf80b3f71df16ad50",algorithm="HS256"))
+BASE_URL="${BASE_URL:-https://ed-tech-backend-tzn8.onrender.com}"
+API_BASE="${BASE_URL%/}/api"
+AUTH_TOKEN="${AUTH_TOKEN:-}"
+USER_ID="${USER_ID:-8}"
+LANGUAGE="${LANGUAGE:-english}"
+
+if [[ -z "$AUTH_TOKEN" ]]; then
+  echo "Skipping Daily_submit.sh (AUTH_TOKEN not set)."
+  exit 0
+fi
+
+COOKIE_JAR="/tmp/quiz_cookies_$$.txt"
+
+GET_RAW=$(curl -sS -w '\n%{http_code}' -c "$COOKIE_JAR" -X GET "${API_BASE}/quiz/daily-quiz/?user_id=${USER_ID}&language=${LANGUAGE}" \
+  -H "Authorization: Bearer ${AUTH_TOKEN}" \
+  -H "Content-Type: application/json")
+GET_STATUS="${GET_RAW##*$'\n'}"
+GET_BODY="${GET_RAW%$'\n'*}"
+
+[[ "$GET_STATUS" == "200" ]] || { echo "$GET_BODY"; rm -f "$COOKIE_JAR"; exit 1; }
+
+QUIZ_ID=$(python3 - "$GET_BODY" <<'PY'
+import json,sys
+print((json.loads(sys.argv[1]).get('quiz_id') or '').strip())
 PY
 )
 
-echo "Token: $TOKEN"
+[[ -n "$QUIZ_ID" ]] || { echo "quiz_id missing"; rm -f "$COOKIE_JAR"; exit 1; }
 
-echo "\n--- GET /api/quiz/daily-quiz/ (saving cookies to /tmp/quiz_cookies.txt) ---"
-curl -s -c /tmp/quiz_cookies.txt -X GET "https://ed-tech-backend-tzn8.onrender.com/api/quiz/daily-quiz/?user_id=8&language=english" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" -o /tmp/quiz_get.json
-
-echo "GET response:"
-cat /tmp/quiz_get.json | jq '.'
-
-QUIZ_ID=$(jq -r '.quiz_id' /tmp/quiz_get.json)
-
-echo "\nQuiz ID: $QUIZ_ID"
-
-if [ -z "$QUIZ_ID" ] || [ "$QUIZ_ID" = "null" ]; then
-  echo "No quiz_id found; aborting."
-  exit 1
-fi
-
-echo "\n--- POST /api/quiz/daily-quiz/submit/ (using saved cookies) ---"
-curl -s -b /tmp/quiz_cookies.txt -X POST "https://ed-tech-backend-tzn8.onrender.com/api/quiz/daily-quiz/submit/" \
-  -H "Authorization: Bearer $TOKEN" \
+SUBMIT_RAW=$(curl -sS -w '\n%{http_code}' -b "$COOKIE_JAR" -X POST "${API_BASE}/quiz/daily-quiz/submit/" \
+  -H "Authorization: Bearer ${AUTH_TOKEN}" \
   -H "Content-Type: application/json" \
-  -d "{\"user_id\":\"8\",\"quiz_id\":\"$QUIZ_ID\",\"language\":\"english\",\"answers\":{\"1\":1,\"2\":1,\"3\":1,\"4\":1,\"5\":1}}" | jq '.'
+  -d "{\"user_id\":\"${USER_ID}\",\"quiz_id\":\"${QUIZ_ID}\",\"language\":\"${LANGUAGE}\",\"answers\":{\"1\":1,\"2\":1,\"3\":1,\"4\":1,\"5\":1}}")
+SUBMIT_STATUS="${SUBMIT_RAW##*$'\n'}"
+SUBMIT_BODY="${SUBMIT_RAW%$'\n'*}"
+
+[[ "$SUBMIT_STATUS" == "200" ]] || { echo "$SUBMIT_BODY"; rm -f "$COOKIE_JAR"; exit 1; }
+
+rm -f "$COOKIE_JAR"
+echo "Daily_submit.sh passed"

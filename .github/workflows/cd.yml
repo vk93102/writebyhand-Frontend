@@ -1,0 +1,56 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+        continue-on-error: true
+
+      - name: Install dependencies (if package.json exists)
+        run: |
+          if [ -f package.json ]; then
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install
+            fi
+          else
+            echo "package.json not found, skipping npm ci"
+          fi
+
+      - name: Build production web bundle (if package.json exists)
+        run: |
+          if [ -f package.json ]; then
+            npm run build
+          else
+            echo "package.json not found, skipping web build"
+          fi
+
+      - name: Trigger deployment hook
+        if: ${{ secrets.DEPLOY_HOOK_URL != '' }}
+        run: curl -fsSL -X POST "${{ secrets.DEPLOY_HOOK_URL }}"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-web-build
+          path: dist
+          if-no-files-found: warn

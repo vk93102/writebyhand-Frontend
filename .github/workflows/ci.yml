@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_URL: ${{ secrets.E2E_BASE_URL }}
+      AUTH_TOKEN: ${{ secrets.E2E_AUTH_TOKEN }}
+      USER_ID: ${{ secrets.E2E_USER_ID }}
+      LANGUAGE: english
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+        continue-on-error: true
+
+      - name: Install dependencies (if package.json exists)
+        run: |
+          if [ -f package.json ]; then
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install
+            fi
+          else
+            echo "package.json not found, skipping npm ci"
+          fi
+
+      - name: Build Expo web (if package.json exists)
+        run: |
+          if [ -f package.json ]; then
+            npm run build
+          else
+            echo "package.json not found, skipping web build"
+          fi
+
+      - name: Run ask-question E2E
+        run: bash ./tests/ask.sh
+
+      - name: Run payment/subscription E2E
+        run: bash ./tests/payment.sh
+
+      - name: Run daily quiz E2E
+        run: bash ./tests/Daily_submit.sh
+
+      - name: Build Docker image
+        run: docker build -t writebyhand-frontend:ci .
+
+      - name: Upload web export artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: dist
+          if-no-files-found: warn
