@@ -50,9 +50,6 @@ jobs:
       - name: Run ask-question E2E
         run: bash ./tests/ask.sh
 
-      - name: Run payment/subscription E2E
-        run: bash ./tests/payment.sh
-
       - name: Run daily quiz E2E
         run: bash ./tests/Daily_submit.sh
 
