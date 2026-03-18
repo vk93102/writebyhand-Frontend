@@ -1,0 +1,224 @@
+{
+  "exam_trends": {
+    "class_10_boards": {
+      "exam_info": {
+        "duration": "3 hours",
+        "total_marks": 100,
+        "questions": 30
+      },
+      "subjects": {
+        "mathematics": {
+          "chapters": [
+            {
+              "name": "Algebra",
+              "weightage": 20,
+              "priority": "high",
+              "difficulty": "medium",
+              "average_questions": 6,
+              "subtopics": ["Linear Equations", "Polynomials"]
+            },
+            {
+              "name": "Geometry",
+              "weightage": 18,
+              "priority": "medium",
+              "difficulty": "medium",
+              "average_questions": 5,
+              "subtopics": ["Triangles", "Circles"]
+            }
+          ]
+        }
+      }
+    },
+    "class_12_boards": {
+      "exam_info": {
+        "duration": "3 hours",
+        "total_marks": 100,
+        "questions": 33
+      },
+      "subjects": {
+        "mathematics": {
+          "chapters": [
+            {
+              "name": "Calculus",
+              "weightage": 30,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": 8,
+              "subtopics": ["Differentiation", "Integration"]
+            },
+            {
+              "name": "Vectors and 3D",
+              "weightage": 16,
+              "priority": "medium",
+              "difficulty": "medium",
+              "average_questions": 4,
+              "subtopics": ["Vector Algebra", "Lines and Planes"]
+            }
+          ]
+        }
+      }
+    },
+    "jee_mains": {
+      "exam_info": {
+        "duration": "3 hours",
+        "total_marks": 300,
+        "questions": 75
+      },
+      "subjects": {
+        "mathematics": {
+          "chapters": [
+            {
+              "name": "Coordinate Geometry",
+              "weightage": 14,
+              "priority": "high",
+              "difficulty": "medium",
+              "average_questions": 4,
+              "subtopics": ["Parabola", "Circle", "Ellipse"]
+            },
+            {
+              "name": "Probability",
+              "weightage": 8,
+              "priority": "medium",
+              "difficulty": "medium",
+              "average_questions": 2,
+              "subtopics": ["Conditional Probability", "Bayes Theorem"]
+            }
+          ]
+        }
+      }
+    },
+    "jee_advanced": {
+      "exam_info": {
+        "duration": "6 hours",
+        "total_marks": 360,
+        "questions": 54
+      },
+      "subjects": {
+        "mathematics": {
+          "chapters": [
+            {
+              "name": "Complex Numbers",
+              "weightage": 10,
+              "priority": "high",
+              "difficulty": "hard",
+              "average_questions": 2,
+              "subtopics": ["Argand Plane", "De Moivre"]
+            },
+            {
+              "name": "Permutation & Combination",
+              "weightage": 7,
+              "priority": "medium",
+              "difficulty": "hard",
+              "average_questions": 2,
+              "subtopics": ["Combinatorics", "Arrangements"]
+            }
+          ]
+        }
+      }
+    },
+    "neet": {
+      "exam_info": {
+        "duration": "3 hours 20 minutes",
+        "total_marks": 720,
+        "questions": 180
+      },
+      "subjects": {
+        "mathematics": {
+          "chapters": [
+            {
+              "name": "Data Interpretation",
+              "weightage": 5,
+              "priority": "low",
+              "difficulty": "easy",
+              "average_questions": 1,
+              "subtopics": ["Graphs", "Tables"]
+            }
+          ]
+        }
+      }
+    },
+    "gate": {
+      "exam_info": {
+        "duration": "3 hours",
+        "total_marks": 100,
+        "questions": 65
+      },
+      "subjects": {
+        "mathematics": {
+          "chapters": [
+            {
+              "name": "Engineering Mathematics",
+              "weightage": 15,
+              "priority": "high",
+              "difficulty": "medium",
+              "average_questions": 10,
+              "subtopics": ["Linear Algebra", "Probability", "Calculus"]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "preparation_strategies": {
+    "class_10": {
+      "timeline": "4-6 months",
+      "daily_hours": "2-3 hours",
+      "focus": "NCERT mastery and regular revision",
+      "key_tips": [
+        "Solve previous year questions weekly",
+        "Create short formula notes",
+        "Practice chapter tests after each topic"
+      ]
+    },
+    "class_12": {
+      "timeline": "6-8 months",
+      "daily_hours": "3-4 hours",
+      "focus": "Board + entrance overlap topics",
+      "key_tips": [
+        "Prioritize high-weightage chapters",
+        "Revise derivations and proofs",
+        "Take timed mock tests"
+      ]
+    },
+    "jee_mains": {
+      "timeline": "9-12 months",
+      "daily_hours": "5-6 hours",
+      "focus": "Speed and accuracy in mixed practice",
+      "key_tips": [
+        "Analyze mock tests for weak areas",
+        "Maintain an error log notebook",
+        "Do daily mixed-topic question sets"
+      ]
+    },
+    "jee_advanced": {
+      "timeline": "12 months",
+      "daily_hours": "6-7 hours",
+      "focus": "Concept depth and multi-step problem solving",
+      "key_tips": [
+        "Practice subjective and tricky problems",
+        "Revise advanced concepts bi-weekly",
+        "Attempt full-length papers in exam conditions"
+      ]
+    },
+    "neet": {
+      "timeline": "8-10 months",
+      "daily_hours": "5-6 hours",
+      "focus": "NCERT-based biology plus PYQs",
+      "key_tips": [
+        "Revise NCERT line-by-line",
+        "Practice assertion-reason questions",
+        "Schedule weekly full-syllabus tests"
+      ]
+    },
+    "gate": {
+      "timeline": "8-10 months",
+      "daily_hours": "4-5 hours",
+      "focus": "Core subjects with aptitude and math balance",
+      "key_tips": [
+        "Build a subject-wise revision calendar",
+        "Solve chapter-wise PYQs",
+        "Focus on conceptual clarity over shortcuts"
+      ]
+    }
+  }
+}
